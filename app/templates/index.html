@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding: 10px;">
+    <h2> Connected Academic Support Desk</h2>
+    <p>Authenticated: <strong>{{ current_user.username }}</strong> (Clearance Tier: {{ current_user.role | upper }})</p>
+
+    <div id="chatBox" style="border: 1px solid #ccc; height: 350px; overflow-y: scroll; padding: 15px; margin-bottom: 15px; background: #fafafa; border-radius: 4px;">
+        {% for msg in history %}
+            <p style="margin-bottom: 8px;">
+                <strong>{{ msg.sender | capitalize }}:</strong> {{ msg.message }}
+            </p>
+        {% endfor %}
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="userInput" placeholder="Ask structural policy updates..." style="flex-grow: 1; padding: 10px; font-size: 1em;">
+        <button onclick="dispatchQuery()" style="padding: 10px 20px; font-size: 1em; cursor: pointer;">Send</button>
+    </div>
+</div>
+
+<script>
+async function dispatchQuery() {
+    const input = document.getElementById('userInput');
+    const box = document.getElementById('chatBox');
+    const txt = input.value.trim();
+    if(!txt) return;
+
+    box.innerHTML += `<p style="margin-bottom: 8px;"><strong>User:</strong> ${txt}</p>`;
+    input.value = '';
+    box.scrollTop = box.scrollHeight;
+
+    try {
+        const res = await fetch("{{ url_for('ask') }}", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ question: txt })
+        });
+        const data = await res.json();
+        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer}</p>`;
+    } catch (e) {
+        box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Unable to process request.</p>`;
+    }
+    box.scrollTop = box.scrollHeight;
+}
+
+// Ensure panel scrolls to the base of prior conversations on workspace entry
+const chatContainer = document.getElementById('chatBox');
+chatContainer.scrollTop = chatContainer.scrollHeight;
+</script>
+{% endblock %}

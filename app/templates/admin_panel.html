@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding: 10px;">
+    <h2> Control Panel</h2>
+    <p><a href="{{ url_for('index') }}">⬅ Back to Chat Workspace</a></p>
+    <hr>
+
+    <div style="background: #fdfdfd; border: 1px solid #e0e0e0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
+        <h3> Upload Documentation</h3>
+        <form action="{{ url_for('admin_panel') }}" method="post" enctype="multipart/form-data">
+            {{ upload_form.hidden_tag() }}
+            <p>
+                {{ upload_form.document.label }}<br>
+                {{ upload_form.document() }}
+                {% for error in upload_form.document.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ upload_form.clearance.label }}<br>
+                {{ upload_form.clearance() }}
+            </p>
+            <p>
+                {{ upload_form.submit(style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;") }}
+            </p>
+        </form>
+    </div>
+
+    <h3>Pending Verification Items</h3>
+    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; background: white;">
+        <thead style="background: #f2f2f2;">
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>ID</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in pending %}
+            <tr>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.email }}</td>
+                <td><code>{{ user.student_id }}</code></td>
+                <td><span style="background: #e6f2ff; padding: 2px 6px; border-radius: 4px;">{{ user.role | upper }}</span></td>
+                <td align="center">
+                    <a href="{{ url_for('approve_user', user_id=user.id) }}" style="color: green; font-weight: bold; text-decoration: none;">
+                        [GRANT APPROVAL]
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" align="center" style="color: #666; padding: 20px;">
+                    Verification queue clean. No items pending validation.
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
