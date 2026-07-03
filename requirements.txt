@@ -20,3 +20,4 @@ Flask-Mail
 pypdf
 requests
 chromadb
+python-dotenv
