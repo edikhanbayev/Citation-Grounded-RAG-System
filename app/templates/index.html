@@ -37,7 +37,7 @@ async function dispatchQuery() {
             body: JSON.stringify({ question: txt })
         });
         const data = await res.json();
-        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer} (Source: ${data.citation})</p>`;
+        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer}</p>`;
     } catch (e) {
         box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Unable to process request.</p>`;
     }
