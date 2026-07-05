@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 1500px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0">Active Files Loaded in Vector Database</h2>
+        </div>
+        <div class="card-body">
+            {% if sources %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Document Filename</th>
+                                <th>Access Tier Clearance</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for source in sources %}
+                            <tr id="row-{{ loop.index }}">
+                                <td>
+                                    <span class="fw-medium text-secondary">📄 {{ source.filename }}</span>
+                                </td>
+                                <td>
+                                    {% if source.clearance == 'restricted' %}
+                                        <span class="badge bg-danger rounded-pill px-3">Restricted (Admins Only)</span>
+                                    {% elif source.clearance == 'internal' %}
+                                        <span class="badge bg-warning text-dark rounded-pill px-3">Internal (Faculty & Staff)</span>
+                                    {% else %}
+                                        <span class="badge bg-success rounded-pill px-3">Public (Everyone)</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm px-3" onclick="confirmPurge('{{ source.filename }}', 'row-{{ loop.index }}')">
+                                        Delete Source
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <p class="mb-0">No source documents located inside the active database structures.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+async function confirmPurge(filename, rowId) {
+    if (!confirm(`WARNING:\n\nAre you sure you want to completely erase "${filename}"?\nThis will permanently purge all vectors from ChromaDB and remove the file from storage.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/admin/delete-source', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: filename })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            alert(result.message);
+            document.getElementById(rowId).remove();
+
+            // If table is now completely empty, refresh to show the empty state message
+            if (document.querySelectorAll('tbody tr').length === 0) {
+                window.location.reload();
+            }
+        } else {
+            alert("Error: " + (result.error || "Execution failed."));
+        }
+    } catch (err) {
+        alert("Network system connection interrupted: " + err);
+    }
+}
+</script>
+{% endblock %}

@@ -145,3 +145,57 @@ def register():
         flash('Registration completed successfully!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/admin/manage-sources', methods=['GET'])
+@login_required
+def manage_sources():
+    """Renders the dashboard menu showing all active files inside ChromaDB."""
+    if current_user.role != 'admin':
+        flash("Access Denied. Resource restricted to administrators.")
+        return redirect(url_for('index'))
+
+    # Fetches unique filenames directly out of ChromaDB metadata
+    sources = rag.get_all_sources()
+    return render_template('manage_sources.html', sources=sources)
+
+
+@app.route('/admin/delete-source', methods=['POST'])
+@login_required
+def delete_source_endpoint():
+    """Handles real-time asynchronous data purge requests from the front-end."""
+    if current_user.role != 'admin':
+        return jsonify({"error": "Unauthorized endpoint access block."}), 403
+
+    data = request.get_json()
+    filename = data.get('filename')
+
+    if not filename:
+        return jsonify({"error": "No filename specified for deletion."}), 400
+
+    # 1. Purge all matching vector chunks from ChromaDB collection
+    vector_success = rag.delete_source(filename)
+
+    # 2. 🚀 NEW: Physically delete the PDF from the 'uploads' directory on disk
+    if vector_success:
+        try:
+            # Reconstruct the exact absolute path matching your upload logic
+            upload_dir = os.path.join(app.root_path, '..', 'uploads')
+            file_path = os.path.join(upload_dir, filename)
+
+            # Check if the file physically exists on the operating system before deleting it
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"Disk Cleanup Success: Removed {file_path}")
+            else:
+                print(f"Disk Cleanup Warning: File not found on disk path {file_path}")
+
+        except Exception as e:
+            # Use a non-blocking try-except block so an OS file lock doesn't halt the whole route
+            print(f"Disk Cleanup Failure: Failed to remove physical file. Detail: {str(e)}")
+
+        return jsonify({
+            "success": True,
+            "message": f"'{filename}' has been completely expunged from ChromaDB and the uploads folder."
+        })
+    else:
+        return jsonify({"error": "Failed to fully clear vector fragments from memory."}), 500

@@ -172,3 +172,39 @@ class RagEngine:
                 return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}. Detail: {response.text}", "None"
         except Exception as e:
             return f"Cloud Connection Outage: Unable to connect to Groq endpoints. Detail: {str(e)}", "None"
+
+    def get_all_sources(self):
+        """Fetches all unique file sources and their respective clearance tiers from ChromaDB."""
+        try:
+            # Grab raw metadatas for all entries in the collection
+            results = self.collection.get(include=['metadatas'])
+            if not results or 'metadatas' not in results or not results['metadatas']:
+                return []
+
+            # Extract both source name and clearance using a dictionary to keep unique records
+            source_dict = {}
+            for meta in results['metadatas']:
+                if meta and 'source' in meta:
+                    filename = meta['source']
+                    clearance = meta.get('clearance', 'public')  # Fallback default to public
+                    source_dict[filename] = clearance
+
+            # Convert to a sorted list of dictionaries for easier rendering in Jinja
+            unique_sources = [
+                {"filename": fname, "clearance": tier}
+                for fname, tier in sorted(source_dict.items())
+            ]
+            return unique_sources
+
+        except Exception as e:
+            print(f"Error fetching ChromaDB sources with clearance: {str(e)}")
+            return []
+
+    def delete_source(self, filename):
+        """Completely purges all vector chunks associated with a specific file."""
+        try:
+            self.collection.delete(where={"source": filename})
+            return True
+        except Exception as e:
+            print(f"Error deleting from ChromaDB: {str(e)}")
+            return False
