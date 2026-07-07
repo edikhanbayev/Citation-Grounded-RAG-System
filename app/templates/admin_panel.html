@@ -9,13 +9,28 @@
         <h3> Upload Documentation</h3>
         <form action="{{ url_for('admin_panel') }}" method="post" enctype="multipart/form-data">
             {{ upload_form.hidden_tag() }}
-            <p>
-                {{ upload_form.document.label }}<br>
-                {{ upload_form.document() }}
+
+            <!-- 🚀 UPDATED: Language-Safe File Picker with Explicit ID Mapping -->
+            <div style="margin-bottom: 16px;">
+                <label class="form-label" style="font-weight: 500; display: block; margin-bottom: 8px;">
+                    Select Regulation PDF Document
+                </label>
+                <div class="input-group" style="display: flex; align-items: center; max-width: 500px;">
+                    <!-- 💡 Hardcoded ID connection prevents any unmapped references -->
+                    <label class="btn btn-secondary" style="padding: 6px 12px; background-color: #6c757d; color: white; border: 1px solid #6c757d; border-top-left-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 0;">
+                        Choose File...
+                    {{ upload_form.document(class="d-none", style="display: none;", onchange="updateFileName(this)") }}
+                    </label>
+                    <!-- Display block to output selected filename -->
+                    <span id="file-chosen-text" style="flex-grow: 1; padding: 6px 12px; background-color: #ffffff; border: 1px solid #ced4da; border-left: none; border-top-right-radius: 4px; border-bottom-right-radius: 4px; color: #6c757d; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        No file chosen
+                    </span>
+                </div>
                 {% for error in upload_form.document.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
+                    <span style="color: red; display: block; margin-top: 4px;">[{{ error }}]</span>
                 {% endfor %}
-            </p>
+            </div>
+
             <p>
                 {{ upload_form.clearance.label }}<br>
                 {{ upload_form.clearance() }}
@@ -25,8 +40,9 @@
             </p>
         </form>
     </div>
+
     <div class="mb-4">
-        <a href="{{ url_for('manage_sources') }}" class="btn btn-danger">
+        <a href="{{ url_for('manage_sources') }}" class="btn btn-danger" style="text-decoration: none;">
             🗑️ View & Delete Active Base Documents
         </a>
     </div>
@@ -65,4 +81,20 @@
         </tbody>
     </table>
 </div>
+
+<!-- JavaScript to catch selection events and update the placeholder field -->
+<script>
+function updateFileName(input) {
+    const textSpan = document.getElementById('file-chosen-text');
+    if (input.files && input.files.length > 0) {
+        textSpan.textContent = input.files[0].name;
+        textSpan.style.color = "#212529";
+        textSpan.style.fontWeight = "500";
+    } else {
+        textSpan.textContent = "No file chosen";
+        textSpan.style.color = "#6c757d";
+        textSpan.style.fontWeight = "normal";
+    }
+}
+</script>
 {% endblock %}
