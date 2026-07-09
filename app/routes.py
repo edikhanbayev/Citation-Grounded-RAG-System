@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify
+from flask import render_template, redirect, url_for, flash, request, jsonify, send_from_directory, abort
 import sqlalchemy as sa
 from flask_login import login_user, current_user, login_required, logout_user
 from urllib.parse import urlsplit
@@ -7,8 +7,33 @@ from werkzeug.utils import secure_filename
 from app import app, db
 from app.models import Student, ChatMessage, RagEngine
 from app.forms import LoginForm, RegistrationForm, DocumentUploadForm
+import re
+from urllib.parse import quote
 
 rag = RagEngine()
+
+@app.template_filter('render_citations')
+def render_citations(text):
+    """Converts plain text citations in history into clickable HTML links."""
+    if not text:
+        return ""
+
+    # This matches patterns like "| Source: Handbook.pdf (Page 14)"
+    pattern = r"\|\s*Source:\s*(.*?)\s*\(Page\s*(\d+)\)"
+
+    match = re.search(pattern, text)
+    if match:
+        filename = match.group(1).trim() if hasattr(match.group(1), 'trim') else match.group(1).strip()
+        page = match.group(2)
+        encoded_filename = quote(filename)
+
+        # Build the HTML anchor tag link replacement
+        link_html = f'| Source: <a href="/view-source/{encoded_filename}#page={page}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">{filename} (Page {page}) ↗️</a>'
+
+        # Replace the plain text citation with our HTML link snippet
+        return re.sub(pattern, link_html, text)
+
+    return text
 
 
 @app.route('/', methods=['GET'])
@@ -38,12 +63,25 @@ def ask():
 
     answer, citation = rag.search_and_generate(question, allowed)
 
-    bot_msg = ChatMessage(user_id=current_user.id, sender='bot', message=f"{answer} (Source: {citation})")
+    bot_msg = ChatMessage(user_id=current_user.id, sender='bot', message=f"{answer} | Source: {citation}")
     db.session.add(bot_msg)
     db.session.commit()
 
     return jsonify({"answer": answer, "citation": citation})
 
+
+@app.route('/view-source/<path:filename>', methods=['GET'])
+@login_required
+def view_source(filename):
+    """Safely serves uploaded policy documents from the disk to authenticated users."""
+    try:
+        # Reconstruct path matching your exact upload criteria
+        upload_dir = os.path.join(app.root_path, '..', 'uploads')
+
+        # send_from_directory automatically thwarts cross-directory traversal security vulnerabilities
+        return send_from_directory(upload_dir, filename)
+    except FileNotFoundError:
+        abort(404)
 
 #  Handles form post transactions and processes text chunks
 @app.route('/admin_panel', methods=['GET', 'POST'])

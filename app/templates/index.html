@@ -8,18 +8,29 @@
     <div id="chatBox" style="border: 1px solid #ccc; height: 350px; overflow-y: scroll; padding: 15px; margin-bottom: 15px; background: #fafafa; border-radius: 4px;">
         {% for msg in history %}
             <p style="margin-bottom: 8px;">
-                <strong>{{ msg.sender | capitalize }}:</strong> {{ msg.message }}
+                <strong>{{ msg.sender | capitalize }}:</strong>
+                {#  UPDATED: Pass the message text through our custom link renderer filter #}
+                {{ msg.message | render_citations | safe }}
             </p>
         {% endfor %}
     </div>
 
     <div style="display: flex; gap: 10px;">
-        <input type="text" id="userInput" placeholder="Ask structural policy updates..." style="flex-grow: 1; padding: 10px; font-size: 1em;">
+        <input type="text" id="userInput" placeholder="Ask structural policy updates..." onkeydown="handleKeyPress(event)" style="flex-grow: 1; padding: 10px; font-size: 1em;">
         <button onclick="dispatchQuery()" style="padding: 10px 20px; font-size: 1em; cursor: pointer;">Send</button>
     </div>
 </div>
 
 <script>
+function handleKeyPress(event) {
+    // Check if the key pressed was 'Enter'
+    if (event.key === 'Enter') {
+        // Prevent the default browser action (like refreshing the page)
+        event.preventDefault();
+        // Trigger your existing query function
+        dispatchQuery();
+    }
+}
 async function dispatchQuery() {
     const input = document.getElementById('userInput');
     const box = document.getElementById('chatBox');
@@ -37,7 +48,23 @@ async function dispatchQuery() {
             body: JSON.stringify({ question: txt })
         });
         const data = await res.json();
-        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer} (Source: ${data.citation})</p>`;
+        let citationHTML = `(Source: ${data.citation})`;
+
+        if (data.citation) {
+            // This matches "Filename.pdf (Page X)" or similar patterns
+            const match = data.citation.match(/(.*?)\s*\(Page\s*(\d+)\)/i);
+            if (match) {
+                const filename = match[1].trim();
+                const page = match[2].trim();
+
+                // Construct our secure route URL and inject a browser-native hash helper (#page=X)
+                const viewUrl = `/view-source/${encodeURIComponent(filename)}#page=${page}`;
+
+                citationHTML = `(Source: <a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${filename} (Page ${page}) ↗️</a>)`;
+            }
+        }
+        // Output the combined text string alongside our new clickable HTML link
+        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer} ${citationHTML}</p>`;
     } catch (e) {
         box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Unable to process request.</p>`;
     }
