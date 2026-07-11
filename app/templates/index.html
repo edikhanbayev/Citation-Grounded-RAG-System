@@ -42,7 +42,7 @@ async function dispatchQuery() {
     box.scrollTop = box.scrollHeight;
 
     try {
-        const res = await fetch("{{ url_for('ask') }}", {
+        const res = await fetch("{{ url_for('chat.ask') }}", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ question: txt })

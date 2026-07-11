@@ -63,7 +63,7 @@ async function confirmPurge(filename, rowId) {
     }
 
     try {
-        const response = await fetch('/admin/delete-source', {
+        const response = await fetch("{{ url_for('admin.delete_source_endpoint') }}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ filename: filename })

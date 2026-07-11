@@ -14,14 +14,14 @@
 <body>
     <nav>
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('index') }}"> Chat Workspace</a>
+            <a href="{{ url_for('chat.index') }}"> Chat Workspace</a>
             {% if current_user.role == 'admin' %}
-                <a href="{{ url_for('admin_panel') }}" style="font-weight: bold; color: #dc3545;"> Admin Panel</a>
+                <a href="{{ url_for('admin.admin_panel') }}" style="font-weight: bold; color: #dc3545;"> Admin Panel</a>
             {% endif %}
-            <a href="{{ url_for('logout') }}" style="float: right; color: #6c757d;">Sign Out</a>
+            <a href="{{ url_for('auth.logout') }}" style="float: right; color: #6c757d;">Sign Out</a>
         {% else %}
-            <a href="{{ url_for('login') }}">Sign In</a>
-            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('auth.login') }}">Sign In</a>
+            <a href="{{ url_for('auth.register') }}">Register</a>
         {% endif %}
     </nav>
 

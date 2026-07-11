@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Sign In</h1>
-    <form action="{{ url_for('login') }}" method="post" novalidate>
+    <form action="{{ url_for('auth.login') }}" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
@@ -15,5 +15,5 @@
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit() }}</p>
     </form>
-    <p>New profile context? <a href="{{ url_for('register') }}">Create an account here</a></p>
+    <p>New profile context? <a href="{{ url_for('auth.register') }}">Create an account here</a></p>
 {% endblock %}

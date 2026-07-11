@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Register</h1>
-    <form action="{{ url_for('register') }}" method="post">
+    <form action="{{ url_for('auth.register') }}" method="post">
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
@@ -48,5 +48,5 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-    <p>Existing profile parameters? <a href="{{ url_for('login') }}">Login here</a></p>
+    <p>Existing profile? <a href="{{ url_for('auth.login') }}">Login here</a></p>
 {% endblock %}
