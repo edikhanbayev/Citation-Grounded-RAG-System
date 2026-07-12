@@ -137,34 +137,82 @@ class RagEngine:
 
     def search_and_generate(self, question, allowed_clearances):
         """
-        Queries ChromaDB checking for content records matching authorized metadata,
-        packages context results, and routes safely to the Groq Cloud API Gateway.
+        Queries ChromaDB, applies a strict vector distance threshold cutoff
+        to filter out irrelevant padding chunks, and forwards high-confidence
+        contexts to the Groq Cloud API Gateway.
         """
         db_results = self.collection.query(
             query_texts=[question],
-            n_results=3,
+            n_results=4,
             where={"clearance": {"$in": allowed_clearances}}
         )
 
         # Guard clause: ensure valid baseline vectors exist in the return payload
         if not db_results or not db_results['documents'] or not db_results['documents'][0]:
-            return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", "None"
+            return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", []
 
-        context_string = "\n".join(db_results['documents'][0])
-        meta = db_results['metadatas'][0][0]
-        citation = f"{meta['source']} (Page {meta['page']})"
+        # Extract raw matched parameters from the vector space return payload
+        raw_docs = db_results['documents'][0]
+        raw_metas = db_results['metadatas'][0]
+        raw_distances = db_results.get('distances', [[]])[0]  # 🚀 Extract vector distance arrays
+
+        valid_documents = []
+        citations_list = []
+        seen_sources = set()
+
+        # 🎯 SEMANTIC GUARDRAIL THRESHOLD
+        # For Chroma's default L2 space, 1.15 is the ideal dividing line
+        # to separate high-confidence answers from legacy padding noise.
+        # Chunks with distances greater than 1.15 are treated as irrelevant noise and dropped.
+        DISTANCE_THRESHOLD = 1.15
+
+        for i in range(len(raw_docs)):
+            doc = raw_docs[i]
+            meta = raw_metas[i]
+            # Safeguard array bounds for distance outputs
+            dist = raw_distances[i] if i < len(raw_distances) else 0.0
+
+            # Terminal diagnostic printout so you can track exact scores in real time
+            print(
+                f"[*] Vector Match Check -> File: {meta.get('source')} | Page: {meta.get('page')} | Distance Score: {dist:.4f}")
+
+            # 🚀 Dynamic Trimming: Only accept chunks that pass our strict distance threshold
+            if dist <= DISTANCE_THRESHOLD:
+                valid_documents.append(doc)
+
+                filename = meta.get('source')
+                page = meta.get('page', 1)
+
+                if filename:
+                    source_tag = (filename, page)
+                    if source_tag not in seen_sources:
+                        seen_sources.add(source_tag)
+                        citations_list.append({
+                            "filename": filename,
+                            "page": page
+                        })
+            else:
+                print(
+                    f"[!] Noise Detected: Suppressing filler chunk from {meta.get('source')} (Score {dist:.4f} exceeds threshold {DISTANCE_THRESHOLD})")
+
+        # Secondary guard check: if no chunks were strong enough to pass the threshold cutoff
+        if not valid_documents:
+            return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", []
+
+        # Assemble the cleaner context string consisting ONLY of high-confidence results
+        context_string = "\n\n".join(valid_documents)
 
         system_instruction = (
             "You are an academic regulations assistant. Answer the user's question relying strictly on the provided context. "
             "If the answer cannot be found within the background context, reply that you cannot locate the information."
         )
 
-        # 🚀 Fetch Groq cloud environment token credentials
+        # Fetch Groq cloud environment token credentials
         api_key = os.environ.get('GROQ_API_KEY')
         if not api_key:
-            return "Configuration Error: GROQ_API_KEY missing from system .env file.", "None"
+            return "Configuration Error: GROQ_API_KEY missing from system .env file.", []
 
-        # 🚀 Set up Groq HTTP Headers & OpenAI compatible request body mapping
+        # Set up Groq HTTP Headers & OpenAI compatible request body mapping
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -180,7 +228,7 @@ class RagEngine:
         }
 
         try:
-            # 🚀 Forward context transaction directly onto Groq cloud servers
+            # Forward context transaction directly onto Groq cloud servers
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 json=payload,
@@ -189,12 +237,11 @@ class RagEngine:
             )
 
             if response.status_code == 200:
-                # 🚀 Parse out message choices matching OpenAI standard responses
-                return response.json()['choices'][0]['message']['content'], citation
+                return response.json()['choices'][0]['message']['content'], citations_list
             else:
-                return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}. Detail: {response.text}", "None"
+                return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}. Detail: {response.text}", []
         except Exception as e:
-            return f"Cloud Connection Outage: Unable to connect to Groq endpoints. Detail: {str(e)}", "None"
+            return f"Cloud Connection Outage: Unable to connect to Groq endpoints. Detail: {str(e)}", []
 
     def get_all_sources(self):
         """Fetches all unique file sources and their respective clearance tiers from ChromaDB."""
