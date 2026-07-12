@@ -11,24 +11,43 @@ rag = RagEngine()
 
 
 def process_async_upload(file_data, clearance_level):
-    """Saves file to disk instantly, then schedules background RAG vector indexing."""
+    """Saves file to disk instantly, handling duplicates gracefully, then schedules background RAG vector indexing."""
     filename = secure_filename(file_data.filename)
 
-    # 1. Instantly register the file in SQLite with a 'Processing' state
-    new_doc = Document(filename=filename, clearance_level=clearance_level, status='Processing')
-    db.session.add(new_doc)
-    db.session.commit()
+    #  STEP 1: Query the SQLite DB to see if this filename is a duplicate
+    existing_doc = Document.query.filter_by(filename=filename).first()
+
+    if existing_doc:
+        print(f"[*] Re-upload Detected: '{filename}' already exists. Initiating overwrite sequence...")
+
+        #  STEP 2: Clear old matching vector fragments from ChromaDB immediately
+        # This prevents stale text chunks from mixing with the new content
+        rag.delete_source(filename)
+
+        #  STEP 3: Repurpose the existing record instead of inserting a duplicate row
+        existing_doc.clearance_level = clearance_level
+        existing_doc.status = 'Processing'
+        db.session.commit()
+
+        doc_id = existing_doc.id
+    else:
+        # If the file is genuinely new, execute a standard structural insert
+        new_doc = Document(filename=filename, clearance_level=clearance_level, status='Processing')
+        db.session.add(new_doc)
+        db.session.commit()
+
+        doc_id = new_doc.id
 
     # Safely target the uploads directory relative to current runtime
     upload_dir = os.path.join(current_app.root_path, '..', 'uploads')
     os.makedirs(upload_dir, exist_ok=True)
     saved_path = os.path.join(upload_dir, filename)
 
-    # 1. Fast disk write
+    # 4. Fast disk write (Werkzeug's save automatically overwrites the old physical file)
     file_data.save(saved_path)
 
-    #  DECOUPLED HANDOFF: Process PDF text parsing & vector math in a background thread
-    executor.submit(async_vector_pipeline, new_doc.id, saved_path, clearance_level)
+    #  DECOUPLED HANDOFF: Pass the tracked doc_id into the background worker pool
+    executor.submit(async_vector_pipeline, doc_id, saved_path, clearance_level)
     return filename
 
 
@@ -48,8 +67,10 @@ def async_vector_pipeline(doc_id, file_path, clearance_level):
             db_document.status = 'Ready'
             db.session.commit()
         except Exception as e:
+            print(f"[!] Background Indexing Failure for Doc ID {doc_id}: {str(e)}")
             db_document.status = 'Failed'
             db.session.commit()
+
 
 def delete_document_source(filename):
     """Completely expunges text vectors from ChromaDB and wipes the file from local disk."""

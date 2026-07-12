@@ -60,19 +60,25 @@ async function dispatchQuery() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ question: txt })
         });
-        const data = await res.json();
-        let citationHTML = `(Source: ${data.citation})`;
+        const data = await res.json(); // Payload structure: {"answer": "...", "citations": [{"filename": "...", "page": 3}, ...]}
+        let citationHTML = '';
 
-        if (data.citation && data.citation.filename) {
-            const filename = data.citation.filename;
-            const page = data.citation.page;
+        if (data.citations && data.citations.length > 0) {
+            citationHTML += ' | Sources: ';
 
-            // Route target strictly follows your new 'admin.view_source' Blueprint path mapping
-            const viewUrl = `/view-source/${encodeURIComponent(filename)}#page=${page}`;
+            // Loop through every citation item returned by the server
+            data.citations.forEach((cit, index) => {
+                const viewUrl = `/view-source/${encodeURIComponent(cit.filename)}#page=${cit.page}`;
 
-            citationHTML = ` | Source: <a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${filename} (Page ${page}) ↗️</a>`;
+                citationHTML += `<a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${cit.filename} (Page ${cit.page}) ↗️</a>`;
+
+                // Append commas between links for structural formatting polish
+                if (index < data.citations.length - 1) {
+                    citationHTML += ', ';
+                }
+            });
         }
-        // Output the combined text string alongside our new clickable HTML link
+
         box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer}${citationHTML}</p>`;
     } catch (e) {
         box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Unable to process request.</p>`;
