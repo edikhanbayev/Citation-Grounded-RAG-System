@@ -9,8 +9,21 @@
         {% for msg in history %}
             <p style="margin-bottom: 8px;">
                 <strong>{{ msg.sender | capitalize }}:</strong>
-                {#  UPDATED: Pass the message text through our custom link renderer filter #}
-                {{ msg.message | render_citations | safe }}
+                {# 1. Render the clean text response directly without ugly string splitting #}
+                {{ msg.message }}
+
+                {# 2. 🚀 NEW: Relational Citation Rendering Loop #}
+                {% if msg.citations.count() > 0 %}
+                    {% for citation in msg.citations %}
+                        {% if citation.document %}
+                            {# If the document exists, generate a direct, safe namespaced link #}
+                            | Source: <a href="{{ url_for('admin.view_source', filename=citation.document.filename) }}#page={{ citation.page_number }}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">{{ citation.document.filename }} (Page {{ citation.page_number }}) ↗️</a>
+                        {% else %}
+                            {# Graceful fallback: Handles cases where an admin has since deleted the file from disk #}
+                            <span style="color: #dc3545; font-style: italic;">| Source: [Document Archive Purged] (Page {{ citation.page_number }})</span>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </p>
         {% endfor %}
     </div>
@@ -50,21 +63,17 @@ async function dispatchQuery() {
         const data = await res.json();
         let citationHTML = `(Source: ${data.citation})`;
 
-        if (data.citation) {
-            // This matches "Filename.pdf (Page X)" or similar patterns
-            const match = data.citation.match(/(.*?)\s*\(Page\s*(\d+)\)/i);
-            if (match) {
-                const filename = match[1].trim();
-                const page = match[2].trim();
+        if (data.citation && data.citation.filename) {
+            const filename = data.citation.filename;
+            const page = data.citation.page;
 
-                // Construct our secure route URL and inject a browser-native hash helper (#page=X)
-                const viewUrl = `/view-source/${encodeURIComponent(filename)}#page=${page}`;
+            // Route target strictly follows your new 'admin.view_source' Blueprint path mapping
+            const viewUrl = `/view-source/${encodeURIComponent(filename)}#page=${page}`;
 
-                citationHTML = `(Source: <a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${filename} (Page ${page}) ↗️</a>)`;
-            }
+            citationHTML = ` | Source: <a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${filename} (Page ${page}) ↗️</a>`;
         }
         // Output the combined text string alongside our new clickable HTML link
-        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer} ${citationHTML}</p>`;
+        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer}${citationHTML}</p>`;
     } catch (e) {
         box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Unable to process request.</p>`;
     }

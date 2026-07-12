@@ -1,6 +1,6 @@
 # setup.py
 from app import app, db
-from app.models import Student
+from app.models import User
 import sqlalchemy as sa
 
 
@@ -15,22 +15,22 @@ def boot_and_seed_environment():
         print("Checking for Master System Administrator status...")
         # Use a safe modern SQLAlchemy scalar query to check if the admin already exists
         admin_exists = db.session.scalar(
-            sa.select(Student).where(Student.username == "system_root")
+            sa.select(User).where(User.username == "system_root")
         )
 
         if not admin_exists:
             print("Injecting initial Master System Administrator profile context...")
-            admin = Student(
+            admin = User(
                 username="system_root",
                 email="root@university.ac.uk",
                 student_id="SYS-ADMIN-01",
                 role="admin",
                 is_approved=True
             )
-            admin.set_password("masterpassword123")
+            admin.set_password("master123")
             db.session.add(admin)
             db.session.commit()
-            print("Master Admin account generated successfully (system_root / masterpassword123).")
+            print("Master Admin account generated successfully (system_root / master123).")
         else:
             print("Master Admin account already exists. Skipping seed step.")
 

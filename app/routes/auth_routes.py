@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, logout_user
 import sqlalchemy as sa
 from urllib.parse import urlsplit
 from app import db
-from app.models import Student
+from app.models import User
 from app.forms import LoginForm, RegistrationForm
 
 auth_bp = Blueprint('auth', __name__)
@@ -14,7 +14,7 @@ def login():
         return redirect(url_for('chat.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = db.session.scalar(sa.select(Student).where(Student.username == form.username.data))
+        user = db.session.scalar(sa.select(User).where(User.username == form.username.data))
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('auth.login'))
@@ -43,7 +43,7 @@ def register():
     if form.validate_on_submit():
         is_auto_approved = True if form.role.data == 'student' else False
 
-        user = Student(
+        user = User(
             username=form.username.data,
             email=form.email.data,
             student_id=form.student_id.data,

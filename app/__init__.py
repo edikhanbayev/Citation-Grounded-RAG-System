@@ -26,8 +26,8 @@ login.login_message_category = 'info'
 # 3. User Loader Callback for Session Tracking
 @login.user_loader
 def load_user(user_id):
-    from app.models import Student
-    return db.session.get(Student, int(user_id))
+    from app.models import User
+    return db.session.get(User, int(user_id))
 
 
 # 4. Architectural Blueprint Ingestion

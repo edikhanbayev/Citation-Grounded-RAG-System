@@ -3,7 +3,7 @@ from wtforms import StringField, SubmitField, PasswordField, BooleanField, Selec
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 import sqlalchemy as sa
-from app.models import Student
+from app.models import User
 from app import db
 
 class LoginForm(FlaskForm):
@@ -26,18 +26,18 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_username(self, username):
-        user = db.session.scalar(sa.select(Student).where(Student.username == username.data))
+        user = db.session.scalar(sa.select(User).where(User.username == username.data))
         if user is not None:
             raise ValidationError('Please use a different username.')
 
     def validate_email(self, email):
-        user = db.session.scalar(sa.select(Student).where(Student.email == email.data))
+        user = db.session.scalar(sa.select(User).where(User.email == email.data))
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
     def validate_student_id(self, student_id):
         existing_id = db.session.scalar(
-            sa.select(Student).where(Student.student_id == student_id.data)
+            sa.select(User).where(User.student_id == student_id.data)
         )
         if existing_id is not None:
             raise ValidationError('This Student/Staff ID has already been registered.')

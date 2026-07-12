@@ -11,25 +11,20 @@ import chromadb
 from chromadb.utils import embedding_functions
 from datetime import datetime
 
+class User(UserMixin, db.Model):
+    """Semantic normalization: Replaces the 'Student' model to accurately encapsulate all roles."""
+    __tablename__ = 'users'
 
-class Student(db.Model, UserMixin):
-    __tablename__ = 'student'
-    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(db.String, index=True, unique=True)
-    email: Mapped[str] = mapped_column(db.String, index=True, unique=True)
-    student_id: Mapped[str] = mapped_column(db.String, index=True, unique=True)
-    password_hash: Mapped[str] = mapped_column(db.String)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, unique=True, nullable=False)
+    email = db.Column(db.String(120), index=True, unique=True, nullable=False)
+    student_id = db.Column(db.String(32), unique=True, nullable=True)  # Nullable for non-student accounts
+    role = db.Column(db.String(20), default='student', nullable=False)  # student, faculty, admin
+    password_hash = db.Column(db.String(256), nullable=False)
+    is_approved = db.Column(db.Boolean, default=False, nullable=False)
 
-    # Dynamic Access and Authorization Tiers
-    role: Mapped[str] = mapped_column(db.String, default='student')  # student, faculty, admin
-    is_approved: Mapped[bool] = mapped_column(db.Boolean, default=False)
-
-    # Cascading relational relationship linking users to historical logs
-    chat_messages: Mapped[list['ChatMessage']] = relationship(
-        "ChatMessage",
-        back_populates="user",
-        cascade="all, delete-orphan"
-    )
+    # Relationships
+    messages = db.relationship('ChatMessage', backref='author', lazy='dynamic', cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -38,20 +33,48 @@ class Student(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
 
+class Document(db.Model):
+    """New Asset Inventory Table: Pairs SQLite directly with physical OS and ChromaDB files."""
+    __tablename__ = 'documents'
+
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255), unique=True, nullable=False)
+    clearance_level = db.Column(db.String(50), default='public', nullable=False)
+    status = db.Column(db.String(50), default='Processing', nullable=False)  # Processing, Ready, Failed
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    citations = db.relationship('Citation', backref='document', lazy='dynamic', cascade="all, delete")
+
+
 class ChatMessage(db.Model):
-    __tablename__ = 'chat_message'
-    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey('student.id'))
-    sender: Mapped[str] = mapped_column(db.String)  # 'user' or 'bot'
-    message: Mapped[str] = mapped_column(db.Text)
-    timestamp: Mapped[datetime] = mapped_column(db.DateTime, default=datetime.utcnow)
+    """Maintains clean logs strictly limited to conversational texts."""
+    __tablename__ = 'chat_messages'
 
-    user = relationship("Student", back_populates="chat_messages")
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    sender = db.Column(db.String(10), nullable=False)  # user, bot
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow, nullable=False)
 
+    # Relationships
+    citations = db.relationship('Citation', backref='message', lazy='dynamic', cascade="all, delete-orphan")
+
+
+class Citation(db.Model):
+    """Normalized Intersection Table: Resolves structural mapping between messages and documents."""
+    __tablename__ = 'citations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.Integer, db.ForeignKey('chat_messages.id'), nullable=False)
+
+    # ON DELETE SET NULL ensures old chat history text is preserved even if the source document is purged
+    document_id = db.Column(db.Integer, db.ForeignKey('documents.id', ondelete='SET NULL'), nullable=True)
+    page_number = db.Column(db.Integer, nullable=False)
 
 @login.user_loader
 def load_user(id):
-    return db.session.get(Student, int(id))
+    return db.session.get(User, int(id))
 
 
 # ==========================================

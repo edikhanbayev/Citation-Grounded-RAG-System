@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_from_directory, abort, current_app
 from flask_login import login_required, current_user
 from app import db
-from app.models import Student, RagEngine
+from app.models import User, RagEngine
 from app.forms import DocumentUploadForm
 from app.services.document_service import process_async_upload, delete_document_source
 
@@ -17,7 +17,7 @@ def admin_panel():
         return redirect(url_for('chat.index'))
 
     upload_form = DocumentUploadForm()
-    pending = Student.query.filter_by(is_approved=False).all()
+    pending = User.query.filter_by(is_approved=False).all()
 
     if upload_form.validate_on_submit():
         # Invoke our decoupled background processor service
@@ -42,7 +42,7 @@ def view_source(filename):
 def approve_user(user_id):
     if current_user.role != 'admin':
         return "Forbidden", 403
-    target_user = db.session.get(Student, user_id)
+    target_user = db.session.get(User, user_id)
     if target_user:
         target_user.is_approved = True
         db.session.commit()
