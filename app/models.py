@@ -96,7 +96,8 @@ class RagEngine:
     def process_and_index_pdf(self, pdf_path, clearance_level="public"):
         """
         Actively parses target PDF assets page by page using PyMuPDF,
-        extracts high-fidelity text contexts, and registers vectors in ChromaDB.
+        extracts high-fidelity text contexts, and registers vectors in ChromaDB. And applies a strict
+        sliding word-window to completely bypass the 256-token truncation blind spot
         """
         if not os.path.exists(pdf_path):
             print(f"Ingestion Alert: Specified target path does not exist: {pdf_path}")
@@ -107,33 +108,43 @@ class RagEngine:
         doc = fitz.open(pdf_path)
         chunk_count = 0
 
+        # Configuration for  safe token-boundary approximation
+        WINDOW_SIZE = 150  # ~200 tokens (Safely under the 256-token ceiling)
+        WINDOW_OVERLAP = 30  # Preserves context across chunk splits
+
         # Iterate cleanly using zero-indexed pages natively mapped
         for page_num, page in enumerate(doc):
             text = page.get_text("text")
             if not text or not text.strip():
                 continue
+            # Flatten the page text into an array of clean words
+            words = text.split()
 
-            # Chunking strategies: split page contents by structural paragraphs
-            paragraphs = text.split('\n\n')
-            for para in paragraphs:
-                clean_para = para.strip()
-                if len(clean_para) < 30:
-                    continue  # Drops headers, footers, or empty fragment noise
+            # Sliding window execution loop
+            i = 0
+            while i < len(words):
+                # Slice out the target window of words
+                chunk_words = words[i: i + WINDOW_SIZE]
+                clean_chunk = " ".join(chunk_words)
 
-                # Generate a strict unique ID for each chunked slice
-                unique_chunk_id = f"{filename}_p{page_num + 1}_c{chunk_count}"
+                # Skip tiny stray fragments at the very end of a page
+                if len(clean_chunk) > 30:
+                    unique_chunk_id = f"{filename}_p{page_num + 1}_c{chunk_count}"
 
-                # Commit text embeddings and structural metadata directly to ChromaDB
-                self.collection.add(
-                    documents=[clean_para],
-                    metadatas=[{
-                        "source": filename,
-                        "page": page_num + 1,
-                        "clearance": clearance_level
-                    }],
-                    ids=[unique_chunk_id]
-                )
-                chunk_count += 1
+                    # Commit the safely bounded chunk to ChromaDB
+                    self.collection.add(
+                        documents=[clean_chunk],
+                        metadatas=[{
+                            "source": filename,
+                            "page": page_num + 1,
+                            "clearance": clearance_level
+                        }],
+                        ids=[unique_chunk_id]
+                    )
+                    chunk_count += 1
+
+                # Slide the window forward by size minus overlap
+                i += (WINDOW_SIZE - WINDOW_OVERLAP)
 
         doc.close()
         print(
@@ -167,8 +178,8 @@ class RagEngine:
         # 🎯 SEMANTIC GUARDRAIL THRESHOLD
         # For Chroma's default L2 space, 1.15 is the ideal dividing line
         # to separate high-confidence answers from legacy padding noise.
-        # Chunks with distances greater than 1.15 are treated as irrelevant noise and dropped.
-        DISTANCE_THRESHOLD = 1.15
+        # Chunks with distances greater than 1.13 are treated as irrelevant noise and dropped.
+        DISTANCE_THRESHOLD = 1.13
 
         for i in range(len(raw_docs)):
             doc = raw_docs[i]
