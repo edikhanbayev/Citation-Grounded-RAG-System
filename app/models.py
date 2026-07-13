@@ -10,6 +10,7 @@ import requests
 import chromadb
 from chromadb.utils import embedding_functions
 from datetime import datetime
+import fitz # PyMuPDF engine
 
 class User(UserMixin, db.Model):
     """Semantic normalization: Replaces the 'Student' model to accurately encapsulate all roles."""
@@ -94,28 +95,30 @@ class RagEngine:
 
     def process_and_index_pdf(self, pdf_path, clearance_level="public"):
         """
-        Actively parses target PDF assets page by page using pypdf,
-        extracts text contexts, and registers vectors in ChromaDB.
+        Actively parses target PDF assets page by page using PyMuPDF,
+        extracts high-fidelity text contexts, and registers vectors in ChromaDB.
         """
         if not os.path.exists(pdf_path):
             print(f"Ingestion Alert: Specified target path does not exist: {pdf_path}")
             return
 
         filename = os.path.basename(pdf_path)
-        reader = pypdf.PdfReader(pdf_path)
+        # 🚀 Open the document via PyMuPDF's C-compiled core engine
+        doc = fitz.open(pdf_path)
         chunk_count = 0
 
-        for page_num, page in enumerate(reader.pages):
-            text = page.extract_text()
+        # Iterate cleanly using zero-indexed pages natively mapped
+        for page_num, page in enumerate(doc):
+            text = page.get_text("text")
             if not text or not text.strip():
                 continue
 
-            # Chunking strategies: split page contents by paragraphs
+            # Chunking strategies: split page contents by structural paragraphs
             paragraphs = text.split('\n\n')
             for para in paragraphs:
                 clean_para = para.strip()
                 if len(clean_para) < 30:
-                    continue  # Filter out empty lines, page numbers, or short headers
+                    continue  # Drops headers, footers, or empty fragment noise
 
                 # Generate a strict unique ID for each chunked slice
                 unique_chunk_id = f"{filename}_p{page_num + 1}_c{chunk_count}"
@@ -132,6 +135,7 @@ class RagEngine:
                 )
                 chunk_count += 1
 
+        doc.close()
         print(
             f"Successfully processed '{filename}': Vectorized {chunk_count} chunks under '{clearance_level}' clearance.")
 
