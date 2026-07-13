@@ -11,6 +11,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 from datetime import datetime
 import fitz # PyMuPDF engine
+from rank_bm25 import BM25Okapi  #  Added for Sparse Lexical Search
 
 class User(UserMixin, db.Model):
     """Semantic normalization: Replaces the 'Student' model to accurately encapsulate all roles."""
@@ -151,70 +152,111 @@ class RagEngine:
             f"Successfully processed '{filename}': Vectorized {chunk_count} chunks under '{clearance_level}' clearance.")
 
     def search_and_generate(self, question, allowed_clearances):
+
         """
-        Queries ChromaDB, applies a strict vector distance threshold cutoff
-        to filter out irrelevant padding chunks, and forwards high-confidence
-        contexts to the Groq Cloud API Gateway.
+        Executes parallel Dense (Vector) and Sparse (BM25) lookups,
+        fuses their output rankings via Reciprocal Rank Fusion (RRF),
+        applies strict vector guardrails, and forwards the context to Groq.
         """
-        db_results = self.collection.query(
-            query_texts=[question],
-            n_results=4,
+        from rank_bm25 import BM25Okapi  # Isolated import for the lexical engine
+
+        #  STEP 1: Fetch all available chunks within permitted clearance to build the Lexical Corpus
+        corpus_payload = self.collection.get(
             where={"clearance": {"$in": allowed_clearances}}
         )
 
-        # Guard clause: ensure valid baseline vectors exist in the return payload
-        if not db_results or not db_results['documents'] or not db_results['documents'][0]:
+        if not corpus_payload or not corpus_payload['documents']:
             return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", []
 
-        # Extract raw matched parameters from the vector space return payload
-        raw_docs = db_results['documents'][0]
-        raw_metas = db_results['metadatas'][0]
-        raw_distances = db_results.get('distances', [[]])[0]  # 🚀 Extract vector distance arrays
+        corpus_docs = corpus_payload['documents']
+        corpus_metas = corpus_payload['metadatas']
+        corpus_ids = corpus_payload['ids']
+
+        #  STEP 2: Execute Parallel Strategy A - Lexical BM25 Scoring
+        tokenized_corpus = [doc.lower().split() for doc in corpus_docs]
+        bm25 = BM25Okapi(tokenized_corpus)
+
+        tokenized_query = question.lower().split()
+        bm25_scores = bm25.get_scores(tokenized_query)
+
+        # Sort sparse indices by highest keyword relevance
+        sparse_ranked_indices = sorted(
+            range(len(bm25_scores)),
+            key=lambda i: bm25_scores[i],
+            reverse=True
+        )
+
+        #  STEP 3: Execute Parallel Strategy B - Dense Vector Lookup
+        # We increase n_results to 20 to cast a wider net for hybrid fusion evaluation
+        db_results = self.collection.query(
+            query_texts=[question],
+            n_results=20,
+            where={"clearance": {"$in": allowed_clearances}}
+        )
+
+        #  STEP 4: Merge Rank Pools via Reciprocal Rank Fusion (RRF)
+        rrf_scores = {}  # Map structural keys: { global_corpus_index: combined_rrf_score }
+        K_CONSTANT = 60  # Standard smoothing factor to prevent low-rank inflation
+        DISTANCE_THRESHOLD = 1.13  # Your calibrated semantic limit
+
+        # Map top 20 BM25 ranks into RRF dictionary
+        for rank, local_idx in enumerate(sparse_ranked_indices[:20]):
+            rrf_scores[local_idx] = rrf_scores.get(local_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
+
+        # Map vector results into RRF dictionary (applying your exact distance threshold)
+        if db_results and db_results['ids'] and db_results['ids'][0]:
+            raw_ids = db_results['ids'][0]
+            raw_docs = db_results['documents'][0]
+            raw_metas = db_results['metadatas'][0]
+            raw_distances = db_results.get('distances', [[]])[0]
+
+            for rank, chunk_id in enumerate(raw_ids):
+                dist = raw_distances[rank] if rank < len(raw_distances) else 0.0
+                meta = raw_metas[rank]
+
+                # Your explicit terminal diagnostic printout
+                print(
+                    f"[*] Vector Match Check -> File: {meta.get('source')} | Page: {meta.get('page')} | Distance Score: {dist:.4f}")
+
+                # Dynamic Trimming: Enforce your exact distance threshold rule
+                if dist <= DISTANCE_THRESHOLD:
+                    if chunk_id in corpus_ids:
+                        global_idx = corpus_ids.index(chunk_id)
+                        # Add vector rank score to existing sparse score (or initialize it)
+                        rrf_scores[global_idx] = rrf_scores.get(global_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
+                else:
+                    print(
+                        f"[!] Noise Detected: Suppressing filler chunk from {meta.get('source')} (Score {dist:.4f} exceeds threshold {DISTANCE_THRESHOLD})")
+
+        #  STEP 5: Sort fused outcomes and slice the Top 4 context blocks
+        fused_sorted_indices = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
+        top_fused_indices = fused_sorted_indices[:4]
 
         valid_documents = []
         citations_list = []
         seen_sources = set()
 
-        # 🎯 SEMANTIC GUARDRAIL THRESHOLD
-        # For Chroma's default L2 space, 1.15 is the ideal dividing line
-        # to separate high-confidence answers from legacy padding noise.
-        # Chunks with distances greater than 1.13 are treated as irrelevant noise and dropped.
-        DISTANCE_THRESHOLD = 1.13
+        for idx in top_fused_indices:
+            valid_documents.append(corpus_docs[idx])
+            meta = corpus_metas[idx]
 
-        for i in range(len(raw_docs)):
-            doc = raw_docs[i]
-            meta = raw_metas[i]
-            # Safeguard array bounds for distance outputs
-            dist = raw_distances[i] if i < len(raw_distances) else 0.0
+            filename = meta.get('source')
+            page = meta.get('page', 1)
 
-            # Terminal diagnostic printout so you can track exact scores in real time
-            print(
-                f"[*] Vector Match Check -> File: {meta.get('source')} | Page: {meta.get('page')} | Distance Score: {dist:.4f}")
+            if filename:
+                source_tag = (filename, page)
+                if source_tag not in seen_sources:
+                    seen_sources.add(source_tag)
+                    citations_list.append({
+                        "filename": filename,
+                        "page": page
+                    })
 
-            # 🚀 Dynamic Trimming: Only accept chunks that pass our strict distance threshold
-            if dist <= DISTANCE_THRESHOLD:
-                valid_documents.append(doc)
-
-                filename = meta.get('source')
-                page = meta.get('page', 1)
-
-                if filename:
-                    source_tag = (filename, page)
-                    if source_tag not in seen_sources:
-                        seen_sources.add(source_tag)
-                        citations_list.append({
-                            "filename": filename,
-                            "page": page
-                        })
-            else:
-                print(
-                    f"[!] Noise Detected: Suppressing filler chunk from {meta.get('source')} (Score {dist:.4f} exceeds threshold {DISTANCE_THRESHOLD})")
-
-        # Secondary guard check: if no chunks were strong enough to pass the threshold cutoff
+        # Secondary guard check: if no chunks were strong enough to pass validation
         if not valid_documents:
             return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", []
 
-        # Assemble the cleaner context string consisting ONLY of high-confidence results
+        # Assemble the cleaner context string consisting ONLY of hybrid-fused results
         context_string = "\n\n".join(valid_documents)
 
         system_instruction = (
