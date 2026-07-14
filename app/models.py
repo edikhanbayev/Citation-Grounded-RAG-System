@@ -11,7 +11,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 from datetime import datetime
 import fitz # PyMuPDF engine
-from rank_bm25 import BM25Okapi  #  Added for Sparse Lexical Search
+
 
 class User(UserMixin, db.Model):
     """Semantic normalization: Replaces the 'Student' model to accurately encapsulate all roles."""

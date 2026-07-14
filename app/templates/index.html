@@ -1,6 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!--  Styling for Dynamic Button States -->
+<style>
+    #sendBtn {
+        padding: 10px 20px;
+        font-size: 1em;
+        cursor: pointer;
+        background-color: #007bff; /* Primary theme color (Active Blue) */
+        color: #ffffff;
+        border: 1px solid #007bff;
+        border-radius: 4px;
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    #sendBtn:hover:not(:disabled) {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    /*  Dynamic Inactive Guardrail */
+    #sendBtn:disabled {
+        background-color: #e5e7eb !important; /* Soft Gray */
+        color: #9ca3af !important;            /* Muted Gray Text */
+        border-color: #e5e7eb !important;
+        cursor: not-allowed !important;        /* Shows "No entry" mouse cursor */
+    }
+</style>
+
 <div style="padding: 10px;">
     <h2> Connected Academic Support Desk</h2>
     <p>Authenticated: <strong>{{ current_user.username }}</strong> (Clearance Tier: {{ current_user.role | upper }})</p>
@@ -9,17 +36,13 @@
         {% for msg in history %}
             <p style="margin-bottom: 8px;">
                 <strong>{{ msg.sender | capitalize }}:</strong>
-                {# 1. Render the clean text response directly without ugly string splitting #}
                 {{ msg.message }}
 
-                {# 2. 🚀 NEW: Relational Citation Rendering Loop #}
                 {% if msg.citations.count() > 0 %}
                     {% for citation in msg.citations %}
                         {% if citation.document %}
-                            {# If the document exists, generate a direct, safe namespaced link #}
                             | Source: <a href="{{ url_for('admin.view_source', filename=citation.document.filename) }}#page={{ citation.page_number }}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">{{ citation.document.filename }} (Page {{ citation.page_number }}) ↗️</a>
                         {% else %}
-                            {# Graceful fallback: Handles cases where an admin has since deleted the file from disk #}
                             <span style="color: #dc3545; font-style: italic;">| Source: [Document Archive Purged] (Page {{ citation.page_number }})</span>
                         {% endif %}
                     {% endfor %}
@@ -29,21 +52,30 @@
     </div>
 
     <div style="display: flex; gap: 10px;">
-        <input type="text" id="userInput" placeholder="Ask structural policy updates..." onkeydown="handleKeyPress(event)" style="flex-grow: 1; padding: 10px; font-size: 1em;">
-        <button onclick="dispatchQuery()" style="padding: 10px 20px; font-size: 1em; cursor: pointer;">Send</button>
+        <!-- Added oninput listener to monitor changes in real-time -->
+        <input type="text" id="userInput" placeholder="Ask question about academic regulations..." onkeydown="handleKeyPress(event)" oninput="updateButtonState()" style="flex-grow: 1; padding: 10px; font-size: 1em; border-radius: 4px; border: 1px solid #ccc;">
+        <!-- Added id="sendBtn" and set initial state to disabled -->
+        <button id="sendBtn" onclick="dispatchQuery()" disabled>Send</button>
     </div>
 </div>
 
 <script>
+// Helper function to dynamically manage active/disabled state
+function updateButtonState() {
+    const input = document.getElementById('userInput');
+    const btn = document.getElementById('sendBtn');
+
+    // Disable button if trimmed text is empty
+    btn.disabled = input.value.trim() === '';
+}
+
 function handleKeyPress(event) {
-    // Check if the key pressed was 'Enter'
     if (event.key === 'Enter') {
-        // Prevent the default browser action (like refreshing the page)
         event.preventDefault();
-        // Trigger your existing query function
         dispatchQuery();
     }
 }
+
 async function dispatchQuery() {
     const input = document.getElementById('userInput');
     const box = document.getElementById('chatBox');
@@ -51,7 +83,11 @@ async function dispatchQuery() {
     if(!txt) return;
 
     box.innerHTML += `<p style="margin-bottom: 8px;"><strong>User:</strong> ${txt}</p>`;
+
+    // Clear input field and immediately run state check to disable button
     input.value = '';
+    updateButtonState();
+
     box.scrollTop = box.scrollHeight;
 
     try {
@@ -60,19 +96,16 @@ async function dispatchQuery() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ question: txt })
         });
-        const data = await res.json(); // Payload structure: {"answer": "...", "citations": [{"filename": "...", "page": 3}, ...]}
+        const data = await res.json();
         let citationHTML = '';
 
         if (data.citations && data.citations.length > 0) {
             citationHTML += ' | Sources: ';
 
-            // Loop through every citation item returned by the server
             data.citations.forEach((cit, index) => {
                 const viewUrl = `/view-source/${encodeURIComponent(cit.filename)}#page=${cit.page}`;
-
                 citationHTML += `<a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${cit.filename} (Page ${cit.page}) ↗️</a>`;
 
-                // Append commas between links for structural formatting polish
                 if (index < data.citations.length - 1) {
                     citationHTML += ', ';
                 }
@@ -86,7 +119,9 @@ async function dispatchQuery() {
     box.scrollTop = box.scrollHeight;
 }
 
-// Ensure panel scrolls to the base of prior conversations on workspace entry
+// Initial evaluation in case of browser-autofilled or cached inputs
+updateButtonState();
+
 const chatContainer = document.getElementById('chatBox');
 chatContainer.scrollTop = chatContainer.scrollHeight;
 </script>
