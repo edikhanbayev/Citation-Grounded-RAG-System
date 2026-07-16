@@ -1,25 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="padding: 10px;">
-    <h2> Control Panel</h2>
+<!-- Constrained container to restrict width only on this page -->
+<div style="max-width: 1000px; margin: 0 auto; padding: 20px 15px;">
+    <h2>Control Panel</h2>
     <hr>
 
+    <!-- Upload Documentation Section -->
     <div style="background: #fdfdfd; border: 1px solid #e0e0e0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
-        <h3> Upload Documentation</h3>
+        <h3>Upload Documentation</h3>
         <form action="{{ url_for('admin.admin_panel') }}" method="post" enctype="multipart/form-data">
             {{ upload_form.hidden_tag() }}
 
-            <!-- 🚀 UPDATED: Language-Safe File Picker with Explicit ID Mapping -->
+            <!-- Language-Safe File Picker with Explicit ID Mapping -->
             <div style="margin-bottom: 16px;">
                 <label class="form-label" style="font-weight: 500; display: block; margin-bottom: 8px;">
                     Select Regulation PDF Document
                 </label>
                 <div class="input-group" style="display: flex; align-items: center; max-width: 500px;">
-                    <!-- 💡 Hardcoded ID connection prevents any unmapped references -->
+                    <!-- Hardcoded ID connection prevents any unmapped references -->
                     <label class="btn btn-secondary" style="padding: 6px 12px; background-color: #6c757d; color: white; border: 1px solid #6c757d; border-top-left-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 0;">
                         Choose File...
-                    {{ upload_form.document(class="d-none", style="display: none;", onchange="updateFileName(this)") }}
+                        {{ upload_form.document(class="d-none", style="display: none;", onchange="updateFileName(this)") }}
                     </label>
                     <!-- Display block to output selected filename -->
                     <span id="file-chosen-text" style="flex-grow: 1; padding: 6px 12px; background-color: #ffffff; border: 1px solid #ced4da; border-left: none; border-top-right-radius: 4px; border-bottom-right-radius: 4px; color: #6c757d; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -41,45 +43,49 @@
         </form>
     </div>
 
-    <div class="mb-4">
-        <a href="{{ url_for('admin.manage_sources') }}" class="btn btn-danger" style="text-decoration: none;">
+    <!-- View & Delete Button -->
+    <div class="mb-4" style="margin-bottom: 30px;">
+        <a href="{{ url_for('admin.manage_sources') }}" class="btn btn-danger" style="text-decoration: none; display: inline-block;">
             🗑️ View & Delete Active Base Documents
         </a>
     </div>
 
+    <!-- Verification Table Section -->
     <h3>Pending Verification Items</h3>
-    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; background: white;">
-        <thead style="background: #f2f2f2;">
-            <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>ID</th>
-                <th>Role</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for user in pending %}
-            <tr>
-                <td><strong>{{ user.username }}</strong></td>
-                <td>{{ user.email }}</td>
-                <td><code>{{ user.student_id }}</code></td>
-                <td><span style="background: #e6f2ff; padding: 2px 6px; border-radius: 4px;">{{ user.role | upper }}</span></td>
-                <td align="center">
-                    <a href="{{ url_for('admin.approve_user', user_id=user.id) }}" style="color: green; font-weight: bold; text-decoration: none;">
-                        [GRANT APPROVAL]
-                    </a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5" align="center" style="color: #666; padding: 20px;">
-                    Verification queue clean. No items pending validation.
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div style="overflow-x: auto; border: 1px solid #e0e0e0; border-radius: 6px;">
+        <table border="0" cellpadding="12" cellspacing="0" style="width: 100%; border-collapse: collapse; background: white; font-size: 15px;">
+            <thead style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0; text-align: left;">
+                <tr>
+                    <th style="padding: 12px;">Username</th>
+                    <th style="padding: 12px;">Email</th>
+                    <th style="padding: 12px;">ID</th>
+                    <th style="padding: 12px;">Role</th>
+                    <th style="text-align: center; padding: 12px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in pending %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px;"><strong>{{ user.username }}</strong></td>
+                    <td style="padding: 12px;">{{ user.email }}</td>
+                    <td style="padding: 12px;"><code>{{ user.student_id or 'N/A' }}</code></td>
+                    <td style="padding: 12px;"><span style="background: #e6f2ff; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: #0056b3;">{{ user.role | upper }}</span></td>
+                    <td align="center" style="padding: 12px;">
+                        <a href="{{ url_for('admin.approve_user', user_id=user.id) }}" style="color: #28a745; font-weight: bold; text-decoration: none; border: 1px solid #28a745; padding: 6px 12px; border-radius: 4px; font-size: 13px; display: inline-block; background-color: #f6fff8;">
+                            GRANT APPROVAL
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" align="center" style="color: #666; padding: 30px;">
+                        Verification queue clean. No items pending validation.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- JavaScript to catch selection events and update the placeholder field -->

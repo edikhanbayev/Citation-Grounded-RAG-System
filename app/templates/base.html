@@ -4,37 +4,61 @@
     <meta charset="UTF-8">
     <title>{{ title if title else "Regulations Desk" }}</title>
     <style>
-        body { font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        /* Global resets and responsive background */
+        * { box-sizing: border-box; }
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 10px 20px;
+            line-height: 1.6;
+            background-color: #f3f4f6; /* Modern, soft off-white background */
+            color: #111827;
+        }
         .alert { background: #fff3cd; color: #856404; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ffeeba; }
-        nav { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+
+        /* Navigation wrapper centered and responsive up to 1400px */
+        nav {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        nav a { margin-right: 15px; color: #0066cc; text-decoration: none; font-weight: 500; }
         nav a:hover { text-decoration: underline; }
+
+        /* The overall layout wrapper: enables the page to expand to widescreen sizes */
+        .main-layout {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
-    <nav>
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('chat.index') }}"> Chat Workspace</a>
-            {% if current_user.role == 'admin' %}
-                <a href="{{ url_for('admin.admin_panel') }}" style="font-weight: bold; color: #dc3545;"> Admin Panel</a>
+    <div class="main-layout">
+        <nav>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.index') }}"> Chat Workspace</a>
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.admin_panel') }}" style="font-weight: bold; color: #dc3545;"> Admin Panel</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}" style="float: right; color: #6c757d;">Sign Out</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Sign In</a>
+                <a href="{{ url_for('auth.register') }}">Register</a>
             {% endif %}
-            <a href="{{ url_for('auth.logout') }}" style="float: right; color: #6c757d;">Sign Out</a>
-        {% else %}
-            <a href="{{ url_for('auth.login') }}">Sign In</a>
-            <a href="{{ url_for('auth.register') }}">Register</a>
-        {% endif %}
-    </nav>
+        </nav>
 
-    <div>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+        <div>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
     </div>
-
-    {% block content %}{% endblock %}
 </body>
 </html>

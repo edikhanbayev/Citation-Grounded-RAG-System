@@ -1,71 +1,228 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!--  Styling for Dynamic Button States -->
+<!-- Styling for Thread-Based Workspace Panel and Layout Fixes -->
 <style>
+    /* Outer wrapper to force a spacious, centered layout regardless of base.html limits */
+    .workspace-wrapper {
+        max-width: 1300px; /* Generous widescreen desktop layout */
+        margin: 0 auto;    /* Centers the workspace on the page */
+        width: 100%;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+    .app-workspace {
+        display: flex;
+        height: 500px; /* Increased height to balance the new wider layout */
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Left Sidebar Styling */
+    .sidebar-panel {
+        width: 280px; /* Marginally wider sidebar for easier title reading */
+        background-color: #f9fafb;
+        border-right: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .new-chat-btn {
+        margin: 15px;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        text-align: center;
+        transition: background 0.2s;
+    }
+
+    .new-chat-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .history-list {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 0 10px 15px 10px;
+    }
+
+    .history-item {
+        padding: 12px 10px;
+        border-radius: 6px;
+        margin-bottom: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #374151;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .history-item:hover {
+        background-color: #f3f4f6;
+    }
+
+    .history-item.active {
+        background-color: #e5e7eb;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    /* Right Main Chat Panel Styling */
+    .chat-panel {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        min-width: 0; /* Prevents long URLs or unbroken strings from overflowing */
+    }
+
+    .chat-header {
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chat-header h3 {
+        margin: 0;
+        font-size: 1.25em; /* Cleaner, larger title presentation */
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .chat-container {
+        flex-grow: 1;
+        padding: 25px;
+        overflow-y: scroll;
+        background: #fafafa;
+
+        /* Dynamic word wrapping boundaries */
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Adjust space between paragraphs in chat bubble style */
+    .chat-container p {
+        margin-bottom: 16px;
+        line-height: 1.6;
+        color: #374151;
+    }
+
+    .input-row {
+        padding: 20px;
+        background: #ffffff;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        gap: 12px;
+        box-sizing: border-box;
+    }
+
+    #userInput {
+        flex-grow: 1;
+        padding: 14px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        outline: none;
+        min-width: 0;
+    }
+
+    #userInput:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+    }
+
     #sendBtn {
-        padding: 10px 20px;
+        padding: 10px 24px;
         font-size: 1em;
         cursor: pointer;
-        background-color: #007bff; /* Primary theme color (Active Blue) */
-        color: #ffffff;
+        background-color: #007bff;
+        color: white;
         border: 1px solid #007bff;
-        border-radius: 4px;
-        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        border-radius: 6px;
+        font-weight: 600;
+        flex-shrink: 0; /* Keeps button size static and visible */
+        transition: background 0.2s, opacity 0.2s;
     }
 
     #sendBtn:hover:not(:disabled) {
         background-color: #0056b3;
-        border-color: #0056b3;
     }
 
-    /*  Dynamic Inactive Guardrail */
     #sendBtn:disabled {
-        background-color: #e5e7eb !important; /* Soft Gray */
-        color: #9ca3af !important;            /* Muted Gray Text */
+        background-color: #e5e7eb !important;
+        color: #9ca3af !important;
         border-color: #e5e7eb !important;
-        cursor: not-allowed !important;        /* Shows "No entry" mouse cursor */
+        cursor: not-allowed !important;
     }
 </style>
 
-<div style="padding: 10px;">
-    <h2> Connected Academic Support Desk</h2>
-    <p>Authenticated: <strong>{{ current_user.username }}</strong> (Clearance Tier: {{ current_user.role | upper }})</p>
+<div class="workspace-wrapper">
+    <h2 style="margin-top: 0; margin-bottom: 5px;">Connected Academic Support Desk</h2>
+    <p style="color: #6b7280; margin-bottom: 20px;">
+        Authenticated: <strong>{{ current_user.username }}</strong>
+        <span style="margin-left: 10px; padding: 2px 8px; background: #e5e7eb; border-radius: 4px; font-size: 0.85em; font-weight: 600; color: #374151;">
+            Clearance Tier: {{ current_user.role | upper }}
+        </span>
+    </p>
 
-    <div id="chatBox" style="border: 1px solid #ccc; height: 350px; overflow-y: scroll; padding: 15px; margin-bottom: 15px; background: #fafafa; border-radius: 4px;">
-        {% for msg in history %}
-            <p style="margin-bottom: 8px;">
-                <strong>{{ msg.sender | capitalize }}:</strong>
-                {{ msg.message }}
+    <!-- Main Two-Column Workspace -->
+    <div class="app-workspace">
 
-                {% if msg.citations.count() > 0 %}
-                    {% for citation in msg.citations %}
-                        {% if citation.document %}
-                            | Source: <a href="{{ url_for('admin.view_source', filename=citation.document.filename) }}#page={{ citation.page_number }}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">{{ citation.document.filename }} (Page {{ citation.page_number }}) ↗️</a>
-                        {% else %}
-                            <span style="color: #dc3545; font-style: italic;">| Source: [Document Archive Purged] (Page {{ citation.page_number }})</span>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            </p>
-        {% endfor %}
-    </div>
+        <!-- Sidebar History Panel (Left Column) -->
+        <div class="sidebar-panel">
+            <button class="new-chat-btn" onclick="startNewConversation()">➕ New Chat</button>
+            <div class="history-list" id="sidebarList">
+                <!-- Dynamically loaded on window load -->
+            </div>
+        </div>
 
-    <div style="display: flex; gap: 10px;">
-        <!-- Added oninput listener to monitor changes in real-time -->
-        <input type="text" id="userInput" placeholder="Ask question about academic regulations..." onkeydown="handleKeyPress(event)" oninput="updateButtonState()" style="flex-grow: 1; padding: 10px; font-size: 1em; border-radius: 4px; border: 1px solid #ccc;">
-        <!-- Added id="sendBtn" and set initial state to disabled -->
-        <button id="sendBtn" onclick="dispatchQuery()" disabled>Send</button>
+        <!-- Focus Conversation Panel (Right Column) -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <h3 id="activeChatTitle">New Chat</h3>
+            </div>
+
+            <div class="chat-container" id="chatBox">
+                <!-- Dialogue loaded asynchronously -->
+            </div>
+
+            <div class="input-row">
+                <input type="text" id="userInput" placeholder="Ask question about academic regulations..." onkeydown="handleKeyPress(event)" oninput="updateButtonState()">
+                <button id="sendBtn" onclick="dispatchQuery()" disabled>Send</button>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
-// Helper function to dynamically manage active/disabled state
+let activeConversationId = null;
+
+// Initial setup on loading the dashboard page
+document.addEventListener("DOMContentLoaded", () => {
+    loadSidebarConversations();
+    startNewConversation(); // System defaults to a clean workspace
+});
+
 function updateButtonState() {
     const input = document.getElementById('userInput');
     const btn = document.getElementById('sendBtn');
-
-    // Disable button if trimmed text is empty
     btn.disabled = input.value.trim() === '';
 }
 
@@ -76,36 +233,120 @@ function handleKeyPress(event) {
     }
 }
 
+// Populates sidebar list with user's past conversational threads
+async function loadSidebarConversations() {
+    try {
+        const response = await fetch("{{ url_for('chat.get_conversations') }}");
+        const list = await response.json();
+        const sidebar = document.getElementById('sidebarList');
+        sidebar.innerHTML = '';
+
+        list.forEach(item => {
+            const isActive = item.id === activeConversationId ? 'active' : '';
+            sidebar.innerHTML += `
+                <div class="history-item ${isActive}" id="item-${item.id}" onclick="loadConversationHistory('${item.id}', '${item.title.replace(/'/g, "\\'")}')">
+                    ${item.title}
+                </div>
+            `;
+        });
+    } catch (e) {
+        console.error("Failed to load historical threads list: ", e);
+    }
+}
+
+// Resets interface workspace for a clean query session
+function startNewConversation() {
+    activeConversationId = null;
+    document.getElementById('activeChatTitle').innerText = "New Chat";
+    document.getElementById('chatBox').innerHTML = `
+        <p style="color: #6b7280; text-align: center; margin-top: 40px;">
+            Start a new query thread. Memory isolation is now active.
+        </p>
+    `;
+
+    document.querySelectorAll('.history-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('userInput').value = '';
+    updateButtonState();
+}
+
+// Loads specific conversational historical memory records
+async function loadConversationHistory(id, title) {
+    activeConversationId = id;
+    document.getElementById('activeChatTitle').innerText = title;
+
+    document.querySelectorAll('.history-item').forEach(el => el.classList.remove('active'));
+    const activeEl = document.getElementById(`item-${id}`);
+    if (activeEl) activeEl.classList.add('active');
+
+    const box = document.getElementById('chatBox');
+    box.innerHTML = '<p style="color:#6b7280; text-align:center; margin-top: 40px;">Retrieving conversation thread memory...</p>';
+
+    try {
+        const res = await fetch(`/conversation/${id}`);
+        const messages = await res.json();
+        box.innerHTML = '';
+
+        messages.forEach(msg => {
+            let citationHTML = '';
+            if (msg.citations && msg.citations.length > 0) {
+                citationHTML += ' | Sources: ';
+                msg.citations.forEach((cit, idx) => {
+                    const viewUrl = `/view-source/${encodeURIComponent(cit.filename)}#page=${cit.page}`;
+                    citationHTML += `<a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${cit.filename} (Page ${cit.page}) ↗️</a>`;
+                    if (idx < msg.citations.length - 1) citationHTML += ', ';
+                });
+            }
+
+            const senderTag = msg.sender === 'user' ? 'User' : 'Bot';
+            box.innerHTML += `<p style="margin-bottom: 8px;"><strong>${senderTag}:</strong> ${msg.message}${citationHTML}</p>`;
+        });
+
+        box.scrollTop = box.scrollHeight;
+    } catch (e) {
+        box.innerHTML = `<p style="color:red; text-align:center;">Error pulling memory block.</p>`;
+    }
+}
+
 async function dispatchQuery() {
     const input = document.getElementById('userInput');
     const box = document.getElementById('chatBox');
     const txt = input.value.trim();
-    if(!txt) return;
+    if (!txt) return;
+
+    // Clear instruction placeholder on first question
+    if (box.querySelector('p[style*="text-align: center"]')) {
+        box.innerHTML = '';
+    }
 
     box.innerHTML += `<p style="margin-bottom: 8px;"><strong>User:</strong> ${txt}</p>`;
-
-    // Clear input field and immediately run state check to disable button
     input.value = '';
     updateButtonState();
-
     box.scrollTop = box.scrollHeight;
 
     try {
         const res = await fetch("{{ url_for('chat.ask') }}", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ question: txt })
+            body: JSON.stringify({
+                question: txt,
+                conversation_id: activeConversationId
+            })
         });
         const data = await res.json();
-        let citationHTML = '';
 
+        // Check if server initialized a brand new conversation
+        if (data.conversation_id && !activeConversationId) {
+            activeConversationId = data.conversation_id;
+            await loadSidebarConversations();
+            document.getElementById('activeChatTitle').innerText = data.conversation_title || "Active Chat";
+        }
+
+        let citationHTML = '';
         if (data.citations && data.citations.length > 0) {
             citationHTML += ' | Sources: ';
-
             data.citations.forEach((cit, index) => {
                 const viewUrl = `/view-source/${encodeURIComponent(cit.filename)}#page=${cit.page}`;
                 citationHTML += `<a href="${viewUrl}" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: 500;">${cit.filename} (Page ${cit.page}) ↗️</a>`;
-
                 if (index < data.citations.length - 1) {
                     citationHTML += ', ';
                 }
@@ -114,15 +355,9 @@ async function dispatchQuery() {
 
         box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer}${citationHTML}</p>`;
     } catch (e) {
-        box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Unable to process request.</p>`;
+        box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Memory ingestion pipeline failure.</p>`;
     }
     box.scrollTop = box.scrollHeight;
 }
-
-// Initial evaluation in case of browser-autofilled or cached inputs
-updateButtonState();
-
-const chatContainer = document.getElementById('chatBox');
-chatContainer.scrollTop = chatContainer.scrollHeight;
 </script>
 {% endblock %}
