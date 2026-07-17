@@ -186,3 +186,20 @@ def ask():
             "answer": "The core AI engine encountered a processing error. Please try again.",
             "citations": []
         }), 500
+
+
+@chat_bp.route('/conversation/<conv_id>', methods=['DELETE'])
+@login_required
+def delete_conversation(conv_id):
+    """Safely purges a conversational thread and cascaded logs after ownership verification."""
+    # Strict security check: Ensure the chat exists AND belongs to the current user
+    conv = Conversation.query.filter_by(id=conv_id, user_id=current_user.id).first_or_404()
+
+    try:
+        db.session.delete(conv)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Conversation successfully deleted."}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"[!] Database Error during conversation purge: {str(e)}")
+        return jsonify({"error": "Internal server error occurred while processing deletion."}), 500

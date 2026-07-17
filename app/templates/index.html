@@ -26,7 +26,7 @@
 
     /* Left Sidebar Styling */
     .sidebar-panel {
-        width: 280px; /* Marginally wider sidebar for easier title reading */
+        width: 350px; /* Marginally wider sidebar for easier title reading */
         background-color: #f9fafb;
         border-right: 1px solid #e5e7eb;
         display: flex;
@@ -58,16 +58,17 @@
     }
 
     .history-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         padding: 12px 10px;
         border-radius: 6px;
         margin-bottom: 5px;
         cursor: pointer;
         font-size: 0.9em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
         color: #374151;
-        transition: background 0.2s, color 0.2s;
+        transition: background 0.2s, color 0.2s, opacity 0.3s ease, transform 0.3s ease;
+        position: relative;
     }
 
     .history-item:hover {
@@ -78,6 +79,44 @@
         background-color: #e5e7eb;
         font-weight: 600;
         color: #111827;
+    }
+
+    /* Container text element to preserve uniform ellipsis behavior */
+    .history-item-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-grow: 1;
+        margin-right: 8px;
+    }
+
+    /* Professional industry-grade delete trigger styling */
+    .delete-chat-btn {
+        opacity: 0;
+        background: none;
+        border: none;
+        color: #dc3545;
+        padding: 2px 6px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 1.1em;
+        transition: opacity 0.2s ease, background 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    /* Reveal only upon hovering the targeted chat list node wrapper */
+    .history-item:hover .delete-chat-btn {
+        opacity: 1;
+    }
+
+    .delete-chat-btn:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    /* Asynchronous CSS animation state styling */
+    .fade-out {
+        opacity: 0 !important;
+        transform: translateX(-20px);
     }
 
     /* Right Main Chat Panel Styling */
@@ -243,9 +282,14 @@ async function loadSidebarConversations() {
 
         list.forEach(item => {
             const isActive = item.id === activeConversationId ? 'active' : '';
+            const escapedTitle = item.title.replace(/'/g, "\\'");
+
             sidebar.innerHTML += `
-                <div class="history-item ${isActive}" id="item-${item.id}" onclick="loadConversationHistory('${item.id}', '${item.title.replace(/'/g, "\\'")}')">
-                    ${item.title}
+                <div class="history-item ${isActive}" id="item-${item.id}" onclick="loadConversationHistory('${item.id}', '${escapedTitle}')">
+                    <span class="history-item-title">💬 ${item.title}</span>
+                    <button class="delete-chat-btn" title="Delete Conversation" onclick="deleteConversationHandler(event, '${item.id}')">
+                        🗑️
+                    </button>
                 </div>
             `;
         });
@@ -304,6 +348,46 @@ async function loadConversationHistory(id, title) {
         box.scrollTop = box.scrollHeight;
     } catch (e) {
         box.innerHTML = `<p style="color:red; text-align:center;">Error pulling memory block.</p>`;
+    }
+}
+
+// Asynchronously handles the removal of conversational logs from SQLite via cascade
+async function deleteConversationHandler(event, conversationId) {
+    // 🛑 STOP BUBBLING: Critical execution interceptor to prevent row row selection triggers
+    event.stopPropagation();
+
+    if (!confirm("Are you sure you want to permanently delete this chat thread?")) {
+        return;
+    }
+
+    const targetElement = document.getElementById(`item-${conversationId}`);
+
+    try {
+        const response = await fetch(`/conversation/${conversationId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            // Initiate aesthetic fade-out transformation transition
+            targetElement.classList.add('fade-out');
+
+            setTimeout(() => {
+                targetElement.remove();
+
+                // Clear active desktop viewpoint workspace if user drops their current focal lens
+                if (activeConversationId === conversationId) {
+                    startNewConversation();
+                }
+            }, 300); // Matches the 0.3s transition definition perfectly
+        } else {
+            alert("Authorization Error: Unable to complete thread deletion.");
+        }
+    } catch (error) {
+        console.error("Network Purge Exception:", error);
+        alert("Server communication error occurred while attempting deletion.");
     }
 }
 
