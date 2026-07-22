@@ -1,5 +1,6 @@
 import os
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_from_directory, abort, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_from_directory, abort, \
+    current_app
 from flask_login import login_required, current_user
 from app import db
 from app.models import User, RagEngine
@@ -20,8 +21,12 @@ def admin_panel():
     pending = User.query.filter_by(is_approved=False).all()
 
     if upload_form.validate_on_submit():
-        # Invoke our decoupled background processor service
+        # Step 1: Invoke our decoupled background processor service
         filename = process_async_upload(upload_form.document.data, upload_form.clearance.data)
+
+        # STEP 2: Invalidate Layer 1 Semantic Cache & Refresh Layer 2 RAM BM25 Buffer
+        rag.clear_all_caches()
+
         flash(f"Success! '{filename}' uploaded safely. Parsing and vector indexing are running in the background.")
         return redirect(url_for('admin.admin_panel'))
 
@@ -69,8 +74,11 @@ def delete_source_endpoint():
     if not filename:
         return jsonify({"error": "No filename specified."}), 400
 
-    # Call our isolated business service layer
+    # Step 1: Call our isolated business service layer
     success, message = delete_document_source(filename)
     if success:
+        #  STEP 2: Flush all cache layers to purge stale citations and vectors
+        rag.clear_all_caches()
+
         return jsonify({"success": True, "message": message})
     return jsonify({"error": message}), 500
