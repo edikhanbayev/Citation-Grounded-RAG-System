@@ -409,14 +409,14 @@ class RagEngine:
         print(f"[*] Rewritten Standalone Query: {search_query}")
 
         # =====================================================================
-        # 🚀 TIER 1 CHECK: SEMANTIC CACHE LOOKUP
+        # TIER 1 CHECK: SEMANTIC CACHE LOOKUP
         # =====================================================================
         cached_answer, cached_citations = self._check_semantic_cache(search_query)
         if cached_answer is not None:
             return cached_answer, cached_citations
 
         # =====================================================================
-        # 🚀 TIER 3 CHECK: TWO-TIERED VECTOR ROUTING
+        #  TIER 3 CHECK: TWO-TIERED VECTOR ROUTING
         # =====================================================================
         vector_results = None
         used_hot_tier = False
@@ -445,7 +445,7 @@ class RagEngine:
             print("[*] [Layer 3] ROUTING FALLBACK: Executed search across Full Archive Vector Store.")
 
         # =====================================================================
-        # 🚀 TIER 2 CHECK: IN-MEMORY BM25 SCORING
+        #  TIER 2 CHECK: IN-MEMORY BM25 SCORING
         # =====================================================================
         if not self.in_memory_corpus_docs:
             return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", []
@@ -577,8 +577,22 @@ class RagEngine:
             if response.status_code == 200:
                 answer_text = response.json()['choices'][0]['message']['content']
 
-                # 🚀 TIER 1 WRITE: Store fresh response in Semantic Query Cache
-                self._write_semantic_cache(search_query, answer_text, citations_list)
+                #  NEGATIVE RESPONSE GUARD: Do not cache "information not found" fallbacks
+                negative_indicators = [
+                    "cannot locate",
+                    "cannot find",
+                    "not mentioned",
+                    "provided context does not",
+                    "no relevant documentation"
+                ]
+
+                is_negative_answer = any(phrase in answer_text.lower() for phrase in negative_indicators)
+
+                if not is_negative_answer:
+                    #  TIER 1 WRITE: Store only successful answers in cache
+                    self._write_semantic_cache(search_query, answer_text, citations_list)
+                else:
+                    print("[*] [Layer 1] Skipped caching negative/fallback response.")
 
                 return answer_text, citations_list
             else:
