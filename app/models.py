@@ -206,8 +206,9 @@ class RagEngine:
             if results and results['ids'] and results['ids'][0]:
                 distance = results['distances'][0][0]
                 if distance <= distance_threshold:
-                    cached_answer = results['documents'][0][0]
                     metadata = results['metadatas'][0][0]
+                    # Retrieve the cached answer from metadata (or fallback to document for backward compatibility)
+                    cached_answer = metadata.get('answer', results['documents'][0][0])
                     citations = json.loads(metadata.get('citations', '[]'))
                     print(
                         f"[*] [Layer 1] CACHE HIT! Query Distance ({distance:.4f}) <= Threshold ({distance_threshold}).")
@@ -225,9 +226,10 @@ class RagEngine:
         try:
             cache_id = f"cache_{uuid.uuid4()}"
             self.cache_collection.add(
-                documents=[answer],
+                documents=[search_query],  # Vectorize search_query so vector search compares Query vs Query
                 metadatas=[{
                     "original_query": search_query,
+                    "answer": answer,        # Store generated answer string inside metadata
                     "citations": json.dumps(citations),
                     "cached_at": datetime.utcnow().isoformat()
                 }],
@@ -241,9 +243,10 @@ class RagEngine:
                 try:
                     cache_id = f"cache_{uuid.uuid4()}"
                     self.cache_collection.add(
-                        documents=[answer],
+                        documents=[search_query],  # Vectorize search_query
                         metadatas=[{
                             "original_query": search_query,
+                            "answer": answer,       # Store generated answer string inside metadata
                             "citations": json.dumps(citations),
                             "cached_at": datetime.utcnow().isoformat()
                         }],
@@ -474,7 +477,7 @@ class RagEngine:
         # =====================================================================
         rrf_scores = {}
         K_CONSTANT = 60
-        DISTANCE_THRESHOLD = 1.13
+        DISTANCE_THRESHOLD = 1.25
         banned_global_indices = set()
 
         for rank, local_idx in enumerate(sparse_ranked_indices[:20]):
