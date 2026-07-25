@@ -302,7 +302,7 @@ class RagEngine:
                 i += (WINDOW_SIZE - WINDOW_OVERLAP)
 
         doc.close()
-        print(f"Processed '{filename}': Vectorized {chunk_count} chunks into Archive Store.")
+        print(f"Processed '{filename}' with a clearance '{clearance_level}': Vectorized {chunk_count} chunks into Archive Store.")
 
         # Flush outdated caches and rebuild RAM BM25 buffer
         self.clear_all_caches()
@@ -448,7 +448,7 @@ class RagEngine:
         #  TIER 2 CHECK: IN-MEMORY BM25 SCORING
         # =====================================================================
         if not self.in_memory_corpus_docs:
-            return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", []
+            return "I am sorry, I don't have relevant information", []
 
         # Filter RAM indices by user clearance tier
         valid_indices = [
@@ -529,7 +529,7 @@ class RagEngine:
                     citations_list.append({"filename": filename, "page": page})
 
         if not valid_documents:
-            return "I am sorry, but I cannot locate relevant documentation parameters in my verified database context.", []
+            return "I am sorry, I don't have relevant information.", []
 
         # Trigger dynamic promotion logic for hit documents
         self._track_and_promote_hot_docs(cited_filenames)
@@ -540,7 +540,8 @@ class RagEngine:
         context_string = "\n\n".join(valid_documents)
         system_instruction = (
             "You are an academic regulations assistant. Answer the user's question relying strictly on the provided context. "
-            "If the answer cannot be found within the background context, reply that you cannot locate the information."
+            "If the answer cannot be found within the provided context, or if the context is insufficient, you MUST reply with EXACTLY: "
+            "\"I am sorry. I don't have relevant information\" and nothing else."
         )
 
         headers = {
