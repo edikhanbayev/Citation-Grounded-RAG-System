@@ -578,8 +578,13 @@ class RagEngine:
             if response.status_code == 200:
                 answer_text = response.json()['choices'][0]['message']['content']
 
+                # Normalize text to handle curly apostrophes (’) vs straight (')
+                normalized_answer = answer_text.lower().replace("’", "'").replace("`", "'")
+
                 #  NEGATIVE RESPONSE GUARD: Do not cache "information not found" fallbacks
                 negative_indicators = [
+                    "don't have relevant information",
+                    "do not have relevant information",
                     "cannot locate",
                     "cannot find",
                     "not mentioned",
@@ -594,6 +599,7 @@ class RagEngine:
                     self._write_semantic_cache(search_query, answer_text, citations_list)
                 else:
                     print("[*] [Layer 1] Skipped caching negative/fallback response.")
+                    citations_list = []  #  Clears sources on negative-fallback responses
 
                 return answer_text, citations_list
             else:
