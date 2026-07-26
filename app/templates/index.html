@@ -186,6 +186,11 @@
         box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
     }
 
+    #userInput:disabled {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
+    }
+
     #sendBtn {
         padding: 10px 24px;
         font-size: 1em;
@@ -209,14 +214,48 @@
         border-color: #e5e7eb !important;
         cursor: not-allowed !important;
     }
+
+    /* --- ANIMATED TYPING INDICATOR STYLING --- */
+    .typing-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 12px;
+        background-color: #e5e7eb;
+        border-radius: 12px;
+    }
+
+    .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background-color: #4b5563;
+        border-radius: 50%;
+        display: inline-block;
+        animation: typingDots 1.4s infinite ease-in-out both;
+    }
+
+    .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingDots {
+        0%, 80%, 100% {
+            transform: scale(0.6);
+            opacity: 0.4;
+        }
+        40% {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+    }
 </style>
 
 <div class="workspace-wrapper">
-    <h2 style="margin-top: 0; margin-bottom: 5px;">Connected Academic Support Desk</h2>
+    <h2 style="margin-top: 0; margin-bottom: 5px;">Academic Support Desk</h2>
     <p style="color: #6b7280; margin-bottom: 20px;">
         Authenticated: <strong>{{ current_user.username }}</strong>
         <span style="margin-left: 10px; padding: 2px 8px; background: #e5e7eb; border-radius: 4px; font-size: 0.85em; font-weight: 600; color: #374151;">
-            Clearance Tier: {{ current_user.role | upper }}
+            Access level: {{ current_user.role | upper }}
         </span>
     </p>
 
@@ -262,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function updateButtonState() {
     const input = document.getElementById('userInput');
     const btn = document.getElementById('sendBtn');
-    btn.disabled = input.value.trim() === '';
+    btn.disabled = input.value.trim() === '' || input.disabled;
 }
 
 function handleKeyPress(event) {
@@ -304,7 +343,7 @@ function startNewConversation() {
     document.getElementById('activeChatTitle').innerText = "New Chat";
     document.getElementById('chatBox').innerHTML = `
         <p style="color: #6b7280; text-align: center; margin-top: 40px;">
-            Start a new query thread. Memory isolation is now active.
+            Start a new query thread.
         </p>
     `;
 
@@ -341,7 +380,7 @@ async function loadConversationHistory(id, title) {
                 });
             }
 
-            const senderTag = msg.sender === 'user' ? 'User' : 'Bot';
+            const senderTag = msg.sender === 'user' ? 'User' : 'Support';
             box.innerHTML += `<p style="margin-bottom: 8px;"><strong>${senderTag}:</strong> ${msg.message}${citationHTML}</p>`;
         });
 
@@ -353,7 +392,7 @@ async function loadConversationHistory(id, title) {
 
 // Asynchronously handles the removal of conversational logs from SQLite via cascade
 async function deleteConversationHandler(event, conversationId) {
-    // 🛑 STOP BUBBLING: Critical execution interceptor to prevent row row selection triggers
+    // STOP BUBBLING: Critical execution interceptor to prevent row selection triggers
     event.stopPropagation();
 
     if (!confirm("Are you sure you want to permanently delete this chat thread?")) {
@@ -393,6 +432,7 @@ async function deleteConversationHandler(event, conversationId) {
 
 async function dispatchQuery() {
     const input = document.getElementById('userInput');
+    const btn = document.getElementById('sendBtn');
     const box = document.getElementById('chatBox');
     const txt = input.value.trim();
     if (!txt) return;
@@ -402,9 +442,24 @@ async function dispatchQuery() {
         box.innerHTML = '';
     }
 
+    // 1. Render User input instantly
     box.innerHTML += `<p style="margin-bottom: 8px;"><strong>User:</strong> ${txt}</p>`;
     input.value = '';
-    updateButtonState();
+
+    // 2. Lock UI controls during network transit
+    input.disabled = true;
+    btn.disabled = true;
+
+    // 3. Render temporary typing indicator bubble
+    const loadingId = 'loading-' + Date.now();
+    box.innerHTML += `
+        <div id="${loadingId}" style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+            <strong>Support:</strong>
+            <div class="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    `;
     box.scrollTop = box.scrollHeight;
 
     try {
@@ -417,6 +472,10 @@ async function dispatchQuery() {
             })
         });
         const data = await res.json();
+
+        // 4. Remove loading indicator
+        const loadingElem = document.getElementById(loadingId);
+        if (loadingElem) loadingElem.remove();
 
         // Check if server initialized a brand new conversation
         if (data.conversation_id && !activeConversationId) {
@@ -437,11 +496,21 @@ async function dispatchQuery() {
             });
         }
 
-        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Bot:</strong> ${data.answer}${citationHTML}</p>`;
+        // 5. Render final bot response
+        box.innerHTML += `<p style="margin-bottom: 8px;"><strong>Support:</strong> ${data.answer}${citationHTML}</p>`;
     } catch (e) {
+        // Remove loading indicator on error
+        const loadingElem = document.getElementById(loadingId);
+        if (loadingElem) loadingElem.remove();
+
         box.innerHTML += `<p style="margin-bottom: 8px; color: red;"><strong>System Error:</strong> Memory ingestion pipeline failure.</p>`;
+    } finally {
+        // 6. Unlock UI controls & restore focus
+        input.disabled = false;
+        updateButtonState();
+        input.focus();
+        box.scrollTop = box.scrollHeight;
     }
-    box.scrollTop = box.scrollHeight;
 }
 </script>
 {% endblock %}
