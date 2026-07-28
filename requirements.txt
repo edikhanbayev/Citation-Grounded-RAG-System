@@ -24,3 +24,5 @@ python-dotenv
 flask_migrate
 pymupdf
 rank-bm25
+groq
+pandas

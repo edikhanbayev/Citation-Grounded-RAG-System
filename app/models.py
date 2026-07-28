@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import UserMixin
 from app import db, login
-import os
+import os, re
 import json
 import requests
 import chromadb
@@ -144,6 +144,12 @@ class RagEngine:
             embedding_function=self.default_ef
         )
 
+    @staticmethod
+    def tokenize_text(doc):
+        """Extracts clean alphanumeric words, emails, and acronyms from text."""
+        if not doc or not isinstance(doc, str):
+            return []
+        return re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[a-zA-Z0-9]+', doc.lower())
     # -------------------------------------------------------------------------
     # LAYER 2 HELPERS: RAM BUFFERING & DYNAMIC HOT PROMOTION
     # -------------------------------------------------------------------------
@@ -151,10 +157,14 @@ class RagEngine:
         """Loads all documents from Archive collection into RAM for sub-millisecond BM25 scoring."""
         try:
             payload = self.archive_collection.get()
-            if payload and payload['documents']:
-                self.in_memory_corpus_docs = payload['documents']
-                self.in_memory_corpus_metas = payload['metadatas']
-                self.in_memory_corpus_ids = payload['ids']
+            docs = payload.get('documents', []) if payload else []
+            metas = payload.get('metadatas', []) if payload else []
+            ids = payload.get('ids', []) if payload else []
+
+            if docs:
+                self.in_memory_corpus_docs = docs
+                self.in_memory_corpus_metas = metas
+                self.in_memory_corpus_ids = ids
 
                 STOP_WORDS = {
                     "how", "to", "use", "the", "a", "of", "and", "is", "for", "on", "in",
@@ -163,10 +173,14 @@ class RagEngine:
                     "do", "does", "did", "could", "would", "should", "has", "have", "had", "been", "will", "shall"
                 }
 
-                tokenized_corpus = [
-                    [w for w in doc.lower().split() if w not in STOP_WORDS]
-                    for doc in self.in_memory_corpus_docs
-                ]
+                tokenized_corpus = []
+                for doc in self.in_memory_corpus_docs:
+                    tokens = [w for w in self.tokenize_text(doc) if w not in STOP_WORDS]
+                    # Fallback to unfiltered tokens if all words were stop words
+                    if not tokens:
+                        tokens = self.tokenize_text(doc)
+                    tokenized_corpus.append(tokens)
+
                 self.in_memory_bm25 = BM25Okapi(tokenized_corpus)
                 print(f"[*] [Layer 2] Refreshed RAM BM25 Buffer: {len(self.in_memory_corpus_docs)} chunks indexed.")
             else:
@@ -199,8 +213,8 @@ class RagEngine:
     # -------------------------------------------------------------------------
     # LAYER 1 HELPERS: SEMANTIC QUERY CACHE
     # -------------------------------------------------------------------------
-    def _check_semantic_cache(self, search_query, distance_threshold=0.15):
-        """Layer 1: Checks cache vector store. Distance <= 0.15 means near-identical meaning."""
+    def _check_semantic_cache(self, search_query, distance_threshold=0.05):
+        """Layer 1: Checks cache vector store. Distance <= 0.05 means near-identical meaning."""
         try:
             results = self.cache_collection.query(query_texts=[search_query], n_results=1)
             if results and results['ids'] and results['ids'][0]:
@@ -416,7 +430,7 @@ class RagEngine:
             return cached_answer, cached_citations
 
         # =====================================================================
-        #  TIER 3 CHECK: TWO-TIERED VECTOR ROUTING
+        # TIER 3 CHECK: TWO-TIERED VECTOR ROUTING
         # =====================================================================
         vector_results = None
         used_hot_tier = False
@@ -427,7 +441,6 @@ class RagEngine:
                 n_results=10,
                 where={"clearance": {"$in": allowed_clearances}}
             )
-            # Evaluate whether Hot Tier yielded high-confidence match (Distance <= 1.10)
             if hot_results and hot_results['distances'] and hot_results['distances'][0]:
                 best_hot_dist = hot_results['distances'][0][0]
                 if best_hot_dist <= 1.10:
@@ -435,22 +448,20 @@ class RagEngine:
                     used_hot_tier = True
                     print(f"[*] [Layer 3] ROUTING HIT: Answered via Hot Collection (Distance: {best_hot_dist:.4f}).")
 
-        # Fall back to Full Archive Collection if Hot Tier misses or is empty
         if not used_hot_tier:
             vector_results = self.archive_collection.query(
                 query_texts=[search_query],
-                n_results=20,
+                n_results=15,
                 where={"clearance": {"$in": allowed_clearances}}
             )
             print("[*] [Layer 3] ROUTING FALLBACK: Executed search across Full Archive Vector Store.")
 
         # =====================================================================
-        #  TIER 2 CHECK: IN-MEMORY BM25 SCORING
+        # TIER 2 CHECK: IN-MEMORY BM25 SCORING
         # =====================================================================
         if not self.in_memory_corpus_docs:
             return "I am sorry, I don't have relevant information", []
 
-        # Filter RAM indices by user clearance tier
         valid_indices = [
             i for i, meta in enumerate(self.in_memory_corpus_metas)
             if meta.get('clearance') in allowed_clearances
@@ -462,9 +473,11 @@ class RagEngine:
             "when", "where", "what", "who", "which", "why", "whose", "whom", "are", "was", "were",
             "do", "does", "did", "could", "would", "should", "has", "have", "had", "been", "will", "shall"
         }
-        tokenized_query = [w for w in search_query.lower().split() if w not in STOP_WORDS]
+
+        # FIX 1: Use tokenize_text consistently for query tokenization
+        tokenized_query = [w for w in self.tokenize_text(search_query) if w not in STOP_WORDS]
         if not tokenized_query:
-            tokenized_query = search_query.lower().split()
+            tokenized_query = self.tokenize_text(search_query)
 
         raw_bm25_scores = self.in_memory_bm25.get_scores(tokenized_query)
         sparse_ranked_indices = [
@@ -477,38 +490,23 @@ class RagEngine:
         # =====================================================================
         rrf_scores = {}
         K_CONSTANT = 60
-        DISTANCE_THRESHOLD = 1.25
-        banned_global_indices = set()
 
-        for rank, local_idx in enumerate(sparse_ranked_indices[:20]):
+        # Accumulate Sparse BM25 Ranks
+        for rank, local_idx in enumerate(sparse_ranked_indices[:15]):
             rrf_scores[local_idx] = rrf_scores.get(local_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
 
+        # FIX 2: O(1) Dictionary Lookup for ID indexing
+        id_to_idx_map = {cid: idx for idx, cid in enumerate(self.in_memory_corpus_ids)}
+
+        # Accumulate Dense Vector Ranks
         if vector_results and vector_results['ids'] and vector_results['ids'][0]:
             raw_ids = vector_results['ids'][0]
-            raw_metas = vector_results['metadatas'][0]
-            raw_distances = vector_results.get('distances', [[]])[0]
-
             for rank, chunk_id in enumerate(raw_ids):
-                dist = raw_distances[rank] if rank < len(raw_distances) else 0.0
-                meta = raw_metas[rank]
+                if chunk_id in id_to_idx_map:
+                    global_idx = id_to_idx_map[chunk_id]
+                    rrf_scores[global_idx] = rrf_scores.get(global_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
 
-                print(
-                    f"[*] Vector Match Check -> File: {meta.get('source')} | Page: {meta.get('page')} | Distance Score: {dist:.4f}")
-
-                if chunk_id in self.in_memory_corpus_ids:
-                    global_idx = self.in_memory_corpus_ids.index(chunk_id)
-                    if dist <= DISTANCE_THRESHOLD:
-                        rrf_scores[global_idx] = rrf_scores.get(global_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
-                    else:
-                        print(
-                            f"[!] Noise Suppressed: File {meta.get('source')} (Score {dist:.4f} > {DISTANCE_THRESHOLD})")
-                        banned_global_indices.add(global_idx)
-
-        # Apply Vector Veto
-        for banned_idx in banned_global_indices:
-            if banned_idx in rrf_scores:
-                del rrf_scores[banned_idx]
-
+        # FIX 3: Reduce top_fused_indices from 8 to 4 to reduce context noise and improve precision
         fused_sorted_indices = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
         top_fused_indices = fused_sorted_indices[:4]
 
@@ -531,11 +529,10 @@ class RagEngine:
         if not valid_documents:
             return "I am sorry, I don't have relevant information.", []
 
-        # Trigger dynamic promotion logic for hit documents
         self._track_and_promote_hot_docs(cited_filenames)
 
         # =====================================================================
-        # GROQ LLM RESPONSE GENERATION
+        # GROQ LLM RESPONSE GENERATION (WITH RETRY FOR 429 RATE LIMITS)
         # =====================================================================
         context_string = "\n\n".join(valid_documents)
         system_instruction = (
@@ -567,45 +564,51 @@ class RagEngine:
             "temperature": 0.0
         }
 
-        try:
-            response = requests.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                json=payload,
-                headers=headers,
-                timeout=30
-            )
+        # FIX 4: Add Exponential Backoff Retry Loop for Groq 429 Rate Limits
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    json=payload,
+                    headers=headers,
+                    timeout=30
+                )
 
-            if response.status_code == 200:
-                answer_text = response.json()['choices'][0]['message']['content']
+                if response.status_code == 200:
+                    answer_text = response.json()['choices'][0]['message']['content']
 
-                # Normalize text to handle curly apostrophes (’) vs straight (')
-                normalized_answer = answer_text.lower().replace("’", "'").replace("`", "'")
+                    negative_indicators = [
+                        "don't have relevant information",
+                        "do not have relevant information",
+                        "cannot locate",
+                        "cannot find",
+                        "not mentioned",
+                        "provided context does not",
+                        "no relevant documentation"
+                    ]
 
-                #  NEGATIVE RESPONSE GUARD: Do not cache "information not found" fallbacks
-                negative_indicators = [
-                    "don't have relevant information",
-                    "do not have relevant information",
-                    "cannot locate",
-                    "cannot find",
-                    "not mentioned",
-                    "provided context does not",
-                    "no relevant documentation"
-                ]
+                    is_negative_answer = any(phrase in answer_text.lower() for phrase in negative_indicators)
 
-                is_negative_answer = any(phrase in answer_text.lower() for phrase in negative_indicators)
+                    if not is_negative_answer:
+                        self._write_semantic_cache(search_query, answer_text, citations_list)
+                    else:
+                        print("[*] [Layer 1] Skipped caching negative/fallback response.")
+                        citations_list = []
 
-                if not is_negative_answer:
-                    #  TIER 1 WRITE: Store only successful answers in cache
-                    self._write_semantic_cache(search_query, answer_text, citations_list)
+                    return answer_text, citations_list
+                elif response.status_code == 429:
+                    wait_time = (attempt + 1) * 3
+                    print(
+                        f"[!] Groq Rate Limit (429) hit. Retrying in {wait_time}s... (Attempt {attempt + 1}/{max_retries})")
+                    time.sleep(wait_time)
                 else:
-                    print("[*] [Layer 1] Skipped caching negative/fallback response.")
-                    citations_list = []  #  Clears sources on negative-fallback responses
-
-                return answer_text, citations_list
-            else:
-                return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}. Detail: {response.text}", []
-        except Exception as e:
-            return f"Cloud Connection Outage: Unable to connect to Groq endpoints. Detail: {str(e)}", []
+                    return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}. Detail: {response.text}", []
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    return f"Cloud Connection Outage: Unable to connect to Groq endpoints. Detail: {str(e)}", []
+                time.sleep(2)
 
     # -------------------------------------------------------------------------
     # FLUSH AND INVALIDATION HANDLER
