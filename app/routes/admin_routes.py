@@ -21,11 +21,8 @@ def admin_panel():
     pending = User.query.filter_by(is_approved=False).all()
 
     if upload_form.validate_on_submit():
-        # Step 1: Invoke our decoupled background processor service
+        # Step 1: Invoke decoupled background processor service (handles targeted cache invalidation)
         filename = process_async_upload(upload_form.document.data, upload_form.clearance.data)
-
-        # STEP 2: Invalidate Layer 1 Semantic Cache & Refresh Layer 2 RAM BM25 Buffer
-        rag.clear_all_caches()
 
         flash(f"Success! '{filename}' uploaded safely. Parsing and vector indexing are running in the background.")
         return redirect(url_for('admin.admin_panel'))
@@ -35,7 +32,7 @@ def admin_panel():
 @admin_bp.route('/view-source/<path:filename>', methods=['GET'])
 @login_required
 def view_source(filename):
-    """Safely streams uploaded local raw PDF data paths to authenticated sessions."""
+    # Streaming uploaded local raw PDF data paths to authenticated sessions."""
     try:
         upload_dir = os.path.join(current_app.root_path, '..', 'uploads')
         return send_from_directory(upload_dir, filename)
@@ -74,11 +71,8 @@ def delete_source_endpoint():
     if not filename:
         return jsonify({"error": "No filename specified."}), 400
 
-    # Step 1: Call our isolated business service layer
+    # Step 1: Call isolated business service layer (handles selective cache invalidation internally)
     success, message = delete_document_source(filename)
     if success:
-        #  STEP 2: Flush all cache layers to purge stale citations and vectors
-        rag.clear_all_caches()
-
         return jsonify({"success": True, "message": message})
     return jsonify({"error": message}), 500

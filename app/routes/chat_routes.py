@@ -10,7 +10,7 @@ rag = RagEngine()
 
 
 def generate_chat_title(first_question, api_key):
-    """Generates a brief 3-to-5 word title summarizing the user's initial query."""
+    # Generating a brief 3-5 word title summarizing the user's initial query
     prompt = (
         "You are an automated UI title generator. Summarize the following user question "
         "into a brief, descriptive chat title (maximum of 5 words). "
@@ -40,14 +40,14 @@ def generate_chat_title(first_question, api_key):
 @chat_bp.route('/', methods=['GET'])
 @login_required
 def index():
-    """Renders the workspace. Thread collections are populated asynchronously via AJAX."""
+    # Rendering the workspace. Thread collections are populated asynchronously via AJAX
     return render_template('index.html')
 
 
 @chat_bp.route('/conversations', methods=['GET'])
 @login_required
 def get_conversations():
-    """Fetches all past conversations for the authenticated user."""
+    # Getting all past conversations for the authenticated user
     convs = Conversation.query.filter_by(user_id=current_user.id).order_by(Conversation.created_at.desc()).all()
     return jsonify([{
         "id": c.id,
@@ -59,7 +59,7 @@ def get_conversations():
 @chat_bp.route('/conversation/<conv_id>', methods=['GET'])
 @login_required
 def get_conversation_history(conv_id):
-    """Loads past history and mapped citations for a specific memory context container."""
+    # Loads past history and mapped citations for a specific memory context container.
     conv = Conversation.query.filter_by(id=conv_id, user_id=current_user.id).first_or_404()
     msgs = ChatMessage.query.filter_by(conversation_id=conv_id).order_by(ChatMessage.timestamp.asc()).all()
 
@@ -79,11 +79,10 @@ def get_conversation_history(conv_id):
         })
     return jsonify(history_payload)
 
-
 @chat_bp.route('/ask', methods=['POST'])
 @login_required
 def ask():
-    """Ingests multi-turn conversational sequences and returns targeted search matches."""
+    # Ingesting multi-turn conversational sequences and returns targeted search matches
     data = request.get_json() or {}
     question = data.get('question', '').strip()
     conv_id = data.get('conversation_id')
@@ -153,7 +152,7 @@ def ask():
             if filename:
                 linked_doc = Document.query.filter_by(filename=filename).first()
 
-                # 🔥 SELF-HEALING: Document in ChromaDB but missing from SQL table
+                #  SELF-HEALING: Document in ChromaDB but missing from SQL table
                 if not linked_doc:
                     linked_doc = Document(
                         filename=filename,
@@ -191,7 +190,7 @@ def ask():
 @chat_bp.route('/conversation/<conv_id>', methods=['DELETE'])
 @login_required
 def delete_conversation(conv_id):
-    """Safely purges a conversational thread and cascaded logs after ownership verification."""
+    # Purges a conversational thread and cascaded logs after ownership verification
     # Strict security check: Ensure the chat exists AND belongs to the current user
     conv = Conversation.query.filter_by(id=conv_id, user_id=current_user.id).first_or_404()
 

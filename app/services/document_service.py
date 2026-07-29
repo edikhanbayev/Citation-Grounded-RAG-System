@@ -11,20 +11,19 @@ rag = RagEngine()
 
 
 def process_async_upload(file_data, clearance_level):
-    """Saves file to disk instantly, handling duplicates gracefully, then schedules background RAG vector indexing."""
+    # Saving file to disk instantly, handling duplicates, then schedules background RAG vector indexing
     filename = secure_filename(file_data.filename)
 
-    #  STEP 1: Query the SQLite DB to see if this filename is a duplicate
+    # Step 1: Query the SQLite DB to see if this filename is a duplicate
     existing_doc = Document.query.filter_by(filename=filename).first()
 
     if existing_doc:
         print(f"[*] Re-upload Detected: '{filename}' already exists. Initiating overwrite sequence...")
 
-        #  STEP 2: Clear old matching vector fragments from ChromaDB immediately
-        # This prevents stale text chunks from mixing with the new content
+        # Step 2: Clear old matching vector fragments and selective cache entries from ChromaDB
         rag.delete_source(filename)
 
-        #  STEP 3: Repurpose the existing record instead of inserting a duplicate row
+        # Step 3: Repurpose the existing record instead of inserting a duplicate row
         existing_doc.clearance_level = clearance_level
         existing_doc.status = 'Processing'
         db.session.commit()
@@ -46,21 +45,21 @@ def process_async_upload(file_data, clearance_level):
     # 4. Fast disk write (Werkzeug's save automatically overwrites the old physical file)
     file_data.save(saved_path)
 
-    #  DECOUPLED HANDOFF: Pass the tracked doc_id into the background worker pool
+    # Decoupled handoff: Pass the tracked doc_id into the background worker pool
     executor.submit(async_vector_pipeline, doc_id, saved_path, clearance_level)
     return filename
 
 
 def async_vector_pipeline(doc_id, file_path, clearance_level):
-    """Wrapper function execution block running inside the background thread pool."""
+    # Wrapper function execution block running inside the background thread pool
     from app import app, db
     from app.models import Document
 
-    # We use an application context wrapper block to ensure thread safety with SQLite
+    # Using an application context wrapper block to ensure thread safety with SQLite
     with app.app_context():
         db_document = db.session.get(Document, doc_id)
         try:
-            # Execute your PyMuPDF chunking and parsing pipelines here...
+            # Execute PyMuPDF chunking, selective cache invalidation, and RAM refresh pipelines
             rag.process_and_index_pdf(file_path, clearance_level)
 
             # Update status to Ready upon completion
@@ -73,8 +72,8 @@ def async_vector_pipeline(doc_id, file_path, clearance_level):
 
 
 def delete_document_source(filename):
-    """Completely expunges text vectors from ChromaDB and wipes the file from local disk."""
-    # 1. Purge matching data chunks from ChromaDB
+    # Completely expunges text vectors from ChromaDB, selectively invalidates dependent cache entries, and wipes the file from local disk
+    # 1. Purge matching data chunks and dependent cache entries from ChromaDB
     vector_success = rag.delete_source(filename)
     if not vector_success:
         return False, "Failed to fully clear vector fragments from memory."
