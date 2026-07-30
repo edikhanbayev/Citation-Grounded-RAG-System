@@ -15,7 +15,6 @@ JUDGE_MODEL = "llama-3.3-70b-versatile"
 
 
 # 1. Test dataset (16 Handbook Questions)
-
 TEST_DATASET = [
     {
         "question": "What is the primary role of a Personal Tutor?",
@@ -81,17 +80,15 @@ TEST_DATASET = [
         "question": "What software system is used by the university to monitor student attendance at in-person teaching sessions?",
         "ground_truth": "MyAttendance.  "
     },
-
 ]
 
 
 # 2. GROQ judge prompt and evaluation logic
-
 JUDGE_SYSTEM_PROMPT = """
 You are an expert academic AI evaluator grading a Retrieval-Augmented Generation (RAG) system.
 Grade the system's output across four metrics on a scale from 0.0 to 1.0:
 
-1. Faithfulness: Is the generated answer grounded strictly ONLY in the retrieved context? (1.0 = fully grounded, 0.0 = halluncinated/unsupported).
+1. Faithfulness: Is the generated answer grounded strictly ONLY in the retrieved context? (1.0 = fully grounded, 0.0 = hallucinated/unsupported).
 2. Answer Relevancy: Does the answer directly address the user's question? (1.0 = completely direct, 0.0 = off-topic/evasive).
 3. Context Precision: Are the retrieved contexts relevant and free from unnecessary noise? (1.0 = clean & relevant, 0.0 = completely irrelevant).
 4. Context Recall: Does the retrieved context contain all the facts present in the ground truth answer? (1.0 = full facts retrieved, 0.0 = missing key facts).
@@ -108,7 +105,6 @@ CRITICAL: Output ONLY a valid JSON object matching this schema. No markdown wrap
 
 
 def evaluate_with_groq(question, retrieved_context, generated_answer, ground_truth):
-    """Sends a single response payload to Groq to act as judge."""
     user_eval_prompt = f"""
     [USER QUESTION]: {question}
     [GROUND TRUTH ANSWER]: {ground_truth}
@@ -153,22 +149,21 @@ def run_evaluation():
 
         print(f"[{idx}/{len(TEST_DATASET)}] Evaluating Query: '{question}'")
 
-        # Step 1: Run query through production RAG pipeline
-        answer_text, citations = engine.search_and_generate(question, ['public'])
+        # Unpack answer, filtered citations, AND raw retrieved chunks
+        answer_text, citations, retrieved_chunks = engine.search_and_generate(question, ['public'])
 
-        # Step 2: Format retrieved citations as context string
-        if citations:
-            formatted_context = "\n".join([
-                f"- Page {c.get('page', 'N/A')} ({c.get('filename', 'Doc')}): {c.get('text', '')[:300]}..."
-                for c in citations
+        # Format full retrieved text chunks for the judge
+        if retrieved_chunks:
+            formatted_context = "\n\n".join([
+                f"--- Source: {c['filename']} (Page {c['page']}) ---\n{c['text']}"
+                for c in retrieved_chunks
             ])
         else:
             formatted_context = "No context retrieved / Refusal triggered."
 
-        # Step 3: Grade using Groq Judge
+        # Grade using Groq Judge
         scores = evaluate_with_groq(question, formatted_context, answer_text, ground_truth)
 
-        # Step 4: Record output row
         row = {
             "Question": question,
             "Ground Truth": ground_truth,
@@ -181,7 +176,6 @@ def run_evaluation():
         }
         results_log.append(row)
 
-    # Step 5: Process and display summary
     df = pd.DataFrame(results_log)
 
     print("\n" + "=" * 60)
@@ -193,7 +187,6 @@ def run_evaluation():
     print(f"Mean Context Recall:    {df['Context Recall'].mean():.2f}")
     print("=" * 60)
 
-    # Export to CSV for figures and analysis
     output_filename = "rag_evaluation_results.csv"
     df.to_csv(output_filename, index=False)
     print(f"\n[+] Detailed evaluation report saved to: {output_filename}")

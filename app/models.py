@@ -17,7 +17,6 @@ from rank_bm25 import BM25Okapi
 
 
 class User(UserMixin, db.Model):
-    # Semantic normalization: Replacing the 'Student' model to accurately encapsulate all roles
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +38,6 @@ class User(UserMixin, db.Model):
 
 
 class Conversation(db.Model):
-    #Encapsulate multi-turn conversational threads to isolate search history scopes
     __tablename__ = 'conversations'
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -52,7 +50,6 @@ class Conversation(db.Model):
 
 
 class Document(db.Model):
-    # New Table: Pairing SQLite directly with physical OS and ChromaDB files
     __tablename__ = 'documents'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -66,12 +63,11 @@ class Document(db.Model):
 
 
 class ChatMessage(db.Model):
-    # Maintaining clean logs strictly limited to conversational texts
     __tablename__ = 'chat_messages'
 
     id = db.Column(db.Integer, primary_key=True)
     conversation_id = db.Column(db.String(36), db.ForeignKey('conversations.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Retained for legacy schema safety
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     sender = db.Column(db.String(10), nullable=False)  # user, bot
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow, nullable=False)
@@ -81,19 +77,15 @@ class ChatMessage(db.Model):
 
 
 class Citation(db.Model):
-    # Normalized intersection Table: Resolves structural mapping between messages and documents
     __tablename__ = 'citations'
 
     id = db.Column(db.Integer, primary_key=True)
     message_id = db.Column(db.Integer, db.ForeignKey('chat_messages.id'), nullable=False)
-
-    # ON DELETE SET NULL ensures old chat history text is preserved even if the source document is purged
     document_id = db.Column(db.Integer, db.ForeignKey('documents.id', ondelete='SET NULL'), nullable=True)
     page_number = db.Column(db.Integer, nullable=False)
 
 
-
-# Retrieval augmented generation (RAG) engine - 3-tier optimized architecture
+# Retrieval Augmented Generation (RAG) Engine
 class RagEngine:
     def __init__(self):
         base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -101,38 +93,30 @@ class RagEngine:
         self.chroma_client = chromadb.PersistentClient(path=self.chroma_path)
         self.default_ef = embedding_functions.DefaultEmbeddingFunction()
 
-        # Layer 3: Two tier vector storage collections
-
-        # Primary full-archive vector collection
+        # Vector storage collections
         self.archive_collection = self.chroma_client.get_or_create_collection(
             "uni_regs_archive",
             embedding_function=self.default_ef
         )
-        # Hot-tier collection containing only high-frequency document chunks
         self.hot_collection = self.chroma_client.get_or_create_collection(
             "uni_regs_hot",
             embedding_function=self.default_ef
         )
 
-        # Layer1: Semantic query cache collection
         self._init_cache_collection()
 
-        # Layer 2: In memory buffer and frequency tracker state
-        self.doc_access_counts = defaultdict(int)  # Tracks access hits per filename
-        self.HOT_PROMOTION_THRESHOLD = 5  # Accesses before promoting to Hot Collection
-        self.hot_filenames = set()  # Active hot files
+        self.doc_access_counts = defaultdict(int)
+        self.HOT_PROMOTION_THRESHOLD = 5
+        self.hot_filenames = set()
 
-        # In-memory RAM state for BM25 to avoid Disk I/O
         self.in_memory_bm25 = None
         self.in_memory_corpus_docs = []
         self.in_memory_corpus_metas = []
         self.in_memory_corpus_ids = []
 
-        # Build RAM BM25 buffer on startup
         self._refresh_ram_buffer()
 
     def _init_cache_collection(self):
-        # Fetches or creates the active Layer 1 semantic query cache collection handle
         self.cache_collection = self.chroma_client.get_or_create_collection(
             "query_response_cache",
             embedding_function=self.default_ef
@@ -140,14 +124,11 @@ class RagEngine:
 
     @staticmethod
     def tokenize_text(doc):
-        # Extracts clean alphanumeric words, emails, and acronyms from text
         if not doc or not isinstance(doc, str):
             return []
         return re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[a-zA-Z0-9]+', doc.lower())
 
-    # Layer 2 helpers: RAM Buffering and dynamic hot promotion
     def _refresh_ram_buffer(self):
-        #Loading all documents from Archive collection into RAM for sub-millisecond BM25 scoring
         try:
             payload = self.archive_collection.get()
             docs = payload.get('documents', []) if payload else []
@@ -184,7 +165,6 @@ class RagEngine:
             print(f"[!] [Layer 2] RAM buffer build exception: {str(e)}")
 
     def _track_and_promote_hot_docs(self, cited_filenames):
-        # Incrementing file hit counts and promotes high-frequency documents to Layer 3 Hot Collection
         for filename in cited_filenames:
             self.doc_access_counts[filename] += 1
             count = self.doc_access_counts[filename]
@@ -202,9 +182,7 @@ class RagEngine:
                     )
                     print(f"[*] [Layer 3] Added {len(payload['documents'])} chunks of '{filename}' into Hot Tier.")
 
-    # Layer 1 helpers: Semantic query cache and tagged  invalidation
     def _check_semantic_cache(self, search_query, distance_threshold=0.05):
-        # Layer 1: Checking cache vector store. Distance <= 0.05 means near-identical meaning
         try:
             results = self.cache_collection.query(query_texts=[search_query], n_results=1)
             if results and results['ids'] and results['ids'][0]:
@@ -213,22 +191,18 @@ class RagEngine:
                     metadata = results['metadatas'][0][0]
                     cached_answer = metadata.get('answer', results['documents'][0][0])
                     citations = json.loads(metadata.get('citations', '[]'))
-                    print(
-                        f"[*] [Layer 1] CACHE HIT! Query Distance ({distance:.4f}) <= Threshold ({distance_threshold}).")
+                    print(f"[*] [Layer 1] CACHE HIT! Query Distance ({distance:.4f}) <= Threshold ({distance_threshold}).")
                     return cached_answer, citations
         except Exception as e:
             if "does not exist" in str(e).lower():
-                print("[!] Stale cache handle detected in lookup. Re-binding Layer 1 collection...")
                 self._init_cache_collection()
             else:
                 print(f"[!] [Layer 1] Cache lookup exception: {str(e)}")
         return None, None
 
     def _write_semantic_cache(self, search_query, answer, citations):
-        # Layer 1: Saving query-response pair with source document tagging for selective invalidation
         try:
             cache_id = f"cache_{uuid.uuid4()}"
-            # Extract and format cited source filenames into a tag string
             source_files = ",".join(sorted(list(set(c['filename'] for c in citations if isinstance(c, dict) and c.get('filename')))))
 
             self.cache_collection.add(
@@ -237,7 +211,7 @@ class RagEngine:
                     "original_query": search_query,
                     "answer": answer,
                     "citations": json.dumps(citations),
-                    "source_files": source_files,  # Tagged sources for selective invalidation
+                    "source_files": source_files,
                     "cached_at": datetime.utcnow().isoformat()
                 }],
                 ids=[cache_id]
@@ -245,7 +219,6 @@ class RagEngine:
             print(f"[*] [Layer 1] Saved query-response pair to cache ({cache_id}) with source tags: [{source_files}].")
         except Exception as e:
             if "does not exist" in str(e).lower():
-                print("[!] Stale cache handle detected in write. Re-binding Layer 1 collection...")
                 self._init_cache_collection()
                 try:
                     cache_id = f"cache_{uuid.uuid4()}"
@@ -261,14 +234,12 @@ class RagEngine:
                         }],
                         ids=[cache_id]
                     )
-                    print(f"[*] [Layer 1] Saved query-response pair to cache after recovery ({cache_id}).")
                 except Exception as retry_e:
                     print(f"[!] [Layer 1] Cache write retry exception: {str(retry_e)}")
             else:
                 print(f"[!] [Layer 1] Cache write exception: {str(e)}")
 
     def invalidate_cache_for_source(self, filename):
-        # Selective / Tagged Invalidation: Purges only Layer 1 cache entries dependent on a specific document
         try:
             cached_items = self.cache_collection.get(include=['metadatas'])
             if cached_items and cached_items.get('metadatas'):
@@ -282,17 +253,13 @@ class RagEngine:
                 if ids_to_delete:
                     self.cache_collection.delete(ids=ids_to_delete)
                     print(f"[*] [Layer 1] Selectively purged {len(ids_to_delete)} cache entries related to '{filename}'.")
-                else:
-                    print(f"[*] [Layer 1] No cached entries dependent on '{filename}' were found.")
         except Exception as e:
             if "does not exist" in str(e).lower():
                 self._init_cache_collection()
             else:
                 print(f"[!] [Layer 1] Selective cache invalidation exception: {str(e)}")
 
-    # Document ingestion and deletion handlers
     def process_and_index_pdf(self, pdf_path, clearance_level="public"):
-        #Parsing target PDF assets page by page using PyMuPDF and registers vectors in Archive Collection
         if not os.path.exists(pdf_path):
             print(f"Ingestion Alert: Specified target path does not exist: {pdf_path}")
             return
@@ -301,7 +268,7 @@ class RagEngine:
         doc = fitz.open(pdf_path)
         chunk_count = 0
 
-        WINDOW_SIZE = 150  # ~200 tokens
+        WINDOW_SIZE = 150
         WINDOW_OVERLAP = 30
 
         for page_num, page in enumerate(doc):
@@ -334,12 +301,10 @@ class RagEngine:
         doc.close()
         print(f"Processed '{filename}' with clearance '{clearance_level}': Vectorized {chunk_count} chunks into Archive Store.")
 
-        # Selective Invalidation: Purge cache entries referencing this file and rebuild Layer 2 RAM BM25
         self.invalidate_cache_for_source(filename)
         self._refresh_ram_buffer()
 
     def delete_source(self, filename):
-        # Deletes vector chunks for a specific file and selectively invalidates matching cache entries
         try:
             self.archive_collection.delete(where={"source": filename})
             try:
@@ -350,7 +315,6 @@ class RagEngine:
             if filename in self.hot_filenames:
                 self.hot_filenames.remove(filename)
 
-            # Selective Invalidation & RAM BM25 refresh
             self.invalidate_cache_for_source(filename)
             self._refresh_ram_buffer()
             return True
@@ -359,7 +323,6 @@ class RagEngine:
             return False
 
     def get_all_sources(self):
-        # Fetching all unique file sources and their respective clearance tiers from ChromaDB Archive."""
         try:
             results = self.archive_collection.get(include=['metadatas'])
             if not results or 'metadatas' not in results or not results['metadatas']:
@@ -372,17 +335,12 @@ class RagEngine:
                     clearance = meta.get('clearance', 'public')
                     source_dict[filename] = clearance
 
-            unique_sources = [
-                {"filename": fname, "clearance": tier}
-                for fname, tier in sorted(source_dict.items())
-            ]
-            return unique_sources
+            return [{"filename": fname, "clearance": tier} for fname, tier in sorted(source_dict.items())]
         except Exception as e:
             print(f"Error fetching ChromaDB sources: {str(e)}")
             return []
 
     def condense_query(self, question, chat_history, api_key):
-        # Query rewriting. Examines chat history and current question to generate a standalone query.
         if not chat_history:
             return question
 
@@ -400,10 +358,7 @@ class RagEngine:
             "Standalone Query:"
         )
 
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         payload = {
             "model": "llama-3.3-70b-versatile",
             "messages": [{"role": "user", "content": condense_prompt}],
@@ -424,24 +379,21 @@ class RagEngine:
 
         return question
 
-    # Main search and generation engine
     def search_and_generate(self, question, allowed_clearances, chat_history=None):
-        # Executes 3-Tier optimized retrieval
         api_key = os.environ.get('GROQ_API_KEY')
         if not api_key:
-            return "Configuration Error: GROQ_API_KEY missing from system .env file.", []
+            return "Configuration Error: GROQ_API_KEY missing from system .env file.", [], []
 
-        # Pre retrieval runtime: Condense query using conversational context
         search_query = self.condense_query(question, chat_history, api_key)
         print(f"[*] Original Question: {question}")
         print(f"[*] Rewritten Standalone Query: {search_query}")
 
-        # Tier 1 check: semantic cache lookup
+        # Tier 1 check: Semantic cache lookup
         cached_answer, cached_citations = self._check_semantic_cache(search_query)
         if cached_answer is not None:
-            return cached_answer, cached_citations
+            return cached_answer, cached_citations, []
 
-        # Tier 3 check: Two-tired vector routing
+        # Tier 3 check: Vector collections lookup
         vector_results = None
         used_hot_tier = False
 
@@ -456,7 +408,6 @@ class RagEngine:
                 if best_hot_dist <= 1.10:
                     vector_results = hot_results
                     used_hot_tier = True
-                    print(f"[*] [Layer 3] ROUTING HIT: Answered via Hot Collection (Distance: {best_hot_dist:.4f}).")
 
         if not used_hot_tier:
             vector_results = self.archive_collection.query(
@@ -464,11 +415,10 @@ class RagEngine:
                 n_results=15,
                 where={"clearance": {"$in": allowed_clearances}}
             )
-            print("[*] [Layer 3] ROUTING FALLBACK: Executed search across Full Archive Vector Store.")
 
-        # Tier 2 check: In memory BM25 scoring
+        # Tier 2 check: In-memory BM25
         if not self.in_memory_corpus_docs:
-            return "I am sorry, I don't have relevant information", []
+            return "I am sorry, I don't have relevant information.", [], []
 
         valid_indices = [
             i for i, meta in enumerate(self.in_memory_corpus_metas)
@@ -492,21 +442,23 @@ class RagEngine:
             if raw_bm25_scores[i] > 0
         ]
 
-        # RRF aggregation
         rrf_scores = {}
         K_CONSTANT = 60
 
-        # Accumulate Sparse BM25 Ranks
         for rank, local_idx in enumerate(sparse_ranked_indices[:15]):
             rrf_scores[local_idx] = rrf_scores.get(local_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
 
-        # O(1) Dictionary Lookup for ID indexing
         id_to_idx_map = {cid: idx for idx, cid in enumerate(self.in_memory_corpus_ids)}
+        L2_CUTOFF_THRESHOLD = 1.0
 
-        # Accumulate Dense Vector Ranks
         if vector_results and vector_results['ids'] and vector_results['ids'][0]:
             raw_ids = vector_results['ids'][0]
-            for rank, chunk_id in enumerate(raw_ids):
+            raw_distances = vector_results['distances'][0]
+
+            for rank, (chunk_id, dist) in enumerate(zip(raw_ids, raw_distances)):
+                if dist > L2_CUTOFF_THRESHOLD:
+                    continue
+
                 if chunk_id in id_to_idx_map:
                     global_idx = id_to_idx_map[chunk_id]
                     rrf_scores[global_idx] = rrf_scores.get(global_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
@@ -514,40 +466,49 @@ class RagEngine:
         fused_sorted_indices = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
         top_fused_indices = fused_sorted_indices[:4]
 
+        # --- SOLUTION 1: DYNAMIC REF TAGGING & CONTEXT PREPARATION ---
         valid_documents = []
-        citations_list = []
+        chunk_ref_map = {}
         cited_filenames = set()
 
-        for idx in top_fused_indices:
-            valid_documents.append(self.in_memory_corpus_docs[idx])
+        for i, idx in enumerate(top_fused_indices, start=1):
+            doc_text = self.in_memory_corpus_docs[idx]
             meta = self.in_memory_corpus_metas[idx]
             filename = meta.get('source')
             page = meta.get('page', 1)
 
+            ref_tag = f"REF{i}"
+            chunk_ref_map[ref_tag] = {"filename": filename, "page": page}
+
             if filename:
                 cited_filenames.add(filename)
-                source_tag = (filename, page)
-                if source_tag not in [(c['filename'], c['page']) for c in citations_list]:
-                    citations_list.append({"filename": filename, "page": page})
+
+            valid_documents.append(f"[{ref_tag}] Document: {filename} (Page {page})\n{doc_text}")
+
+        # Raw chunks array exported for evaluation harness accuracy
+        retrieved_chunks_for_eval = [
+            {
+                "filename": self.in_memory_corpus_metas[idx].get('source'),
+                "page": self.in_memory_corpus_metas[idx].get('page', 1),
+                "text": self.in_memory_corpus_docs[idx]
+            }
+            for idx in top_fused_indices
+        ]
 
         if not valid_documents:
-            return "I am sorry, I don't have relevant information.", []
+            return "I am sorry, I don't have relevant information.", [], []
 
         self._track_and_promote_hot_docs(cited_filenames)
 
-        # Groq LLM response generation (with rerty fir 429 rate limits)
         context_string = "\n\n".join(valid_documents)
         system_instruction = (
-            "You are an academic regulations assistant. Answer the user's question relying strictly on the provided context. "
-            "If the answer cannot be found within the provided context, or if the context is insufficient, you MUST reply with EXACTLY: "
+            "You are an academic regulations assistant. Answer the user's question relying strictly on the provided context.\n"
+            "CRITICAL INSTRUCTION: For any statement derived from the context, append its reference tag (e.g., [REF1], [REF2]) at the end of the sentence.\n"
+            "If the answer cannot be found within the provided context, or if the context is insufficient, you MUST reply with EXACTLY:\n"
             "\"I am sorry. I don't have relevant information\" and nothing else."
         )
 
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         messages = [{"role": "system", "content": system_instruction}]
 
         if chat_history:
@@ -593,39 +554,44 @@ class RagEngine:
                     is_negative_answer = any(phrase in answer_text.lower() for phrase in negative_indicators)
 
                     if not is_negative_answer:
-                        self._write_semantic_cache(search_query, answer_text, citations_list)
+                        # Extract used reference tags [REF1], [REF2], etc.
+                        referenced_tags = set(re.findall(r'\[REF(\d+)\]', answer_text))
+
+                        actual_citations = []
+                        for tag_num in sorted(referenced_tags, key=int):
+                            ref_key = f"REF{tag_num}"
+                            if ref_key in chunk_ref_map:
+                                cit = chunk_ref_map[ref_key]
+                                if cit not in actual_citations:
+                                    actual_citations.append(cit)
+
+                        # Clean reference tags from final UI text
+                        clean_answer_text = re.sub(r'\s*\[REF\d+\]', '', answer_text)
+
+                        self._write_semantic_cache(search_query, clean_answer_text, actual_citations)
+                        return clean_answer_text, actual_citations, retrieved_chunks_for_eval
                     else:
                         print("[*] [Layer 1] Skipped caching negative/fallback response.")
-                        citations_list = []
+                        return answer_text, [], retrieved_chunks_for_eval
 
-                    return answer_text, citations_list
                 elif response.status_code == 429:
                     wait_time = (attempt + 1) * 3
-                    print(
-                        f"[!] Groq Rate Limit (429) hit. Retrying in {wait_time}s... (Attempt {attempt + 1}/{max_retries})")
                     time.sleep(wait_time)
                 else:
-                    return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}. Detail: {response.text}", []
+                    return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}.", [], []
             except Exception as e:
                 if attempt == max_retries - 1:
-                    return f"Cloud Connection Outage: Unable to connect to Groq endpoints. Detail: {str(e)}", []
+                    return f"Cloud Connection Outage: {str(e)}", [], []
                 time.sleep(2)
 
-    # Flush all caches in Layer 1
     def clear_all_caches(self):
-        # Flushes full Layer 1 semantic query cache and rebuilds Layer 2 RAM BM25 index
         try:
             try:
                 self.chroma_client.delete_collection("query_response_cache")
             except Exception:
-                pass  # Safely ignore if collection didn't exist
-
-            # Re-bind cache collection handle
+                pass
             self._init_cache_collection()
-
-            # Refresh RAM BM25 buffer
             self._refresh_ram_buffer()
-            print("[*] All cache layers successfully invalidated and synchronized.")
             return True
         except Exception as e:
             print(f"[!] Cache flush exception: {str(e)}")

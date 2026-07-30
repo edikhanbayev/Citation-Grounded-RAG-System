@@ -10,7 +10,6 @@ rag = RagEngine()
 
 
 def generate_chat_title(first_question, api_key):
-    # Generating a brief 3-5 word title summarizing the user's initial query
     prompt = (
         "You are an automated UI title generator. Summarize the following user question "
         "into a brief, descriptive chat title (maximum of 5 words). "
@@ -40,14 +39,12 @@ def generate_chat_title(first_question, api_key):
 @chat_bp.route('/', methods=['GET'])
 @login_required
 def index():
-    # Rendering the workspace. Thread collections are populated asynchronously via AJAX
     return render_template('index.html')
 
 
 @chat_bp.route('/conversations', methods=['GET'])
 @login_required
 def get_conversations():
-    # Getting all past conversations for the authenticated user
     convs = Conversation.query.filter_by(user_id=current_user.id).order_by(Conversation.created_at.desc()).all()
     return jsonify([{
         "id": c.id,
@@ -59,7 +56,6 @@ def get_conversations():
 @chat_bp.route('/conversation/<conv_id>', methods=['GET'])
 @login_required
 def get_conversation_history(conv_id):
-    # Loads past history and mapped citations for a specific memory context container.
     conv = Conversation.query.filter_by(id=conv_id, user_id=current_user.id).first_or_404()
     msgs = ChatMessage.query.filter_by(conversation_id=conv_id).order_by(ChatMessage.timestamp.asc()).all()
 
@@ -79,10 +75,10 @@ def get_conversation_history(conv_id):
         })
     return jsonify(history_payload)
 
+
 @chat_bp.route('/ask', methods=['POST'])
 @login_required
 def ask():
-    # Ingesting multi-turn conversational sequences and returns targeted search matches
     data = request.get_json() or {}
     question = data.get('question', '').strip()
     conv_id = data.get('conversation_id')
@@ -94,7 +90,6 @@ def ask():
     is_new_thread = False
     active_conv = None
 
-    # Step 1: Thread validation
     if conv_id:
         active_conv = Conversation.query.filter_by(id=conv_id, user_id=current_user.id).first()
 
@@ -103,9 +98,8 @@ def ask():
         title_summary = generate_chat_title(question, api_key)
         active_conv = Conversation(title=title_summary, user_id=current_user.id)
         db.session.add(active_conv)
-        db.session.commit()  # Save first to establish UUID
+        db.session.commit()
 
-    # Step 2: Retrieve history scoped strictly to this thread for context memory
     past_messages = ChatMessage.query.filter_by(conversation_id=active_conv.id).order_by(
         ChatMessage.timestamp.asc()).all()
     chat_history_list = []
@@ -115,7 +109,6 @@ def ask():
         elif m.sender == 'bot' and chat_history_list:
             chat_history_list[-1]["bot"] = m.message
 
-    # Step 3: Resolve clearance levels
     if current_user.role == 'admin':
         allowed = ["public", "internal", "restricted"]
     elif current_user.role == 'faculty':
@@ -124,10 +117,9 @@ def ask():
         allowed = ["public"]
 
     try:
-        # Step 4: Run search and generate using current thread memory
-        answer, citations_list = rag.search_and_generate(question, allowed, chat_history=chat_history_list)
+        # Unpack the 3 tuple returns cleanly (ignoring raw evaluation chunks in UI production)
+        answer, citations_list, _ = rag.search_and_generate(question, allowed, chat_history=chat_history_list)
 
-        # Refusal Detection Guardrail
         refusal_indicators = [
             "cannot locate", "not found", "insufficient information",
             "don't know", "do not know", "no context", "does not mention",
@@ -137,14 +129,12 @@ def ask():
         if has_failed_to_find:
             citations_list = []
 
-        # Step 5: Save exchange logs
         user_msg = ChatMessage(conversation_id=active_conv.id, user_id=current_user.id, sender='user', message=question)
         bot_msg = ChatMessage(conversation_id=active_conv.id, user_id=current_user.id, sender='bot', message=answer)
         db.session.add(user_msg)
         db.session.add(bot_msg)
-        db.session.commit()  # Generates IDs for messaging assets
+        db.session.commit()
 
-        # Step 6: Map citation relationships with Self-Healing validation
         for cit in citations_list:
             filename = cit.get('filename')
             page_number = cit.get('page', 1)
@@ -152,15 +142,14 @@ def ask():
             if filename:
                 linked_doc = Document.query.filter_by(filename=filename).first()
 
-                #  SELF-HEALING: Document in ChromaDB but missing from SQL table
                 if not linked_doc:
                     linked_doc = Document(
                         filename=filename,
-                        clearance_level="public",  # Safe baseline clearance for dynamic records
+                        clearance_level="public",
                         status="Ready"
                     )
                     db.session.add(linked_doc)
-                    db.session.flush()  # Instantly writes to SQL transaction state to fetch a valid ID
+                    db.session.flush()
 
                 new_citation = Citation(
                     message_id=bot_msg.id,
@@ -190,8 +179,6 @@ def ask():
 @chat_bp.route('/conversation/<conv_id>', methods=['DELETE'])
 @login_required
 def delete_conversation(conv_id):
-    # Purges a conversational thread and cascaded logs after ownership verification
-    # Strict security check: Ensure the chat exists AND belongs to the current user
     conv = Conversation.query.filter_by(id=conv_id, user_id=current_user.id).first_or_404()
 
     try:
