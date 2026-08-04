@@ -1,0 +1,66 @@
+[
+    {
+        "question": "What is the primary role of a Personal Tutor?",
+        "ground_truth": "The primary role of a Personal Tutor is to discuss academic or pastoral issues with students, offer guidance on progress, feedback, module choices, and career options."
+    },
+    {
+        "question": "Who are the Senior Tutors overseeing pastoral support in the School of Computer Science?",
+        "ground_truth": "The Senior Tutors are Todd Waugh Ambridge (t.waughambridge@bham.ac.uk) and Ian Batten (i.g.batten@bham.ac.uk)."
+    },
+    {
+        "question": "What is the direct email address to contact the Computer Science Wellbeing Officers?",
+        "ground_truth": "You can contact them directly via cswelfare@contacts.bham.ac.uk. "
+    },
+    {
+        "question": "What are the standard teaching hours for Monday through Friday at the UK campus?",
+        "ground_truth": "Monday, Tuesday, Thursday: 09:00-19:00; Wednesday: 09:00-13:00; Friday: 09:00-18:00. "
+    },
+    {
+        "question": "Where is the Education Support Office (ESO) located, and what are its opening hours?",
+        "ground_truth": "Room UG44 (Building Y9) on the Upper Ground floor of the Computer Science Building; open Monday to Friday, 09:00–17:00 UK time.  "
+    },
+    {
+        "question": "What are the module pass marks for undergraduate and postgraduate taught programmes?",
+        "ground_truth": "The undergraduate pass mark is 40%, and the postgraduate pass mark is 50%.  "
+    },
+    {
+        "question": "How many total credits are required for a BSc degree, an MSci degree, and an MSc degree?",
+        "ground_truth": "A BSc requires 360 credits, an MSci requires 480 credits, and an MSc requires 180 credits (120 taught component + 60 project component).  "
+    },
+    {
+        "question": "How many hours of work are expected for a standard 20-credit module?",
+        "ground_truth": "200 hours of total work (including contact time, continuous assessment, and private study).  "
+    },
+    {
+        "question": "What is the minimum number of credits an undergraduate student must pass to progress to the next year of study?",
+        "ground_truth": "A minimum of 100 credits (out of 120).  "
+    },
+    {
+        "question": "What penalty is applied for late coursework submissions if late submissions are permitted?",
+        "ground_truth": "A lateness penalty of 5% per working day, up to a final cut-off of 1 week after the submission date. "
+    },
+    {
+        "question": "What phone numbers should students use to contact Security Services for emergencies and non-emergencies?",
+        "ground_truth": "Emergency: 0121 414 4444 (ext. 44444); Non-emergency: 0121 414 3000 (ext. 43000).  "
+    },
+    {
+        "question": "By when must an undergraduate student request a transfer to a Study Abroad variant of their programme?",
+        "ground_truth": "Before the end of Week 3 of Year 2.  "
+    },
+    {
+        "question": "What overall mark in Year 2 must a student achieve to proceed to the Year 3 Study Abroad module?",
+        "ground_truth": "An overall second-year mark of 55% or higher, with no outstanding reassessments.  "
+    },
+    {
+        "question": "What is the name of the official hacking and cyber security student club at the University of Birmingham?",
+        "ground_truth": "A Finite Number of Monkeys (AFNOM).  "
+    },
+    {
+        "question": "What are the two key components of the End Point Assessment (EPA) for Degree Apprenticeship students?",
+        "ground_truth": "1. Gateway Meeting; 2. EPA Presentation.  "
+    },
+    {
+        "question": "What software system is used by the university to monitor student attendance at in-person teaching sessions?",
+        "ground_truth": "MyAttendance.  "
+    }
+]

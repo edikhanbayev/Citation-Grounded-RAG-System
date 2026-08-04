@@ -1,0 +1,100 @@
+C:\Birmingham\Dissertation\AcademicHelper\.venv\Scripts\python.exe C:\Birmingham\Dissertation\AcademicHelper\tests\eval_ragas.py 
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1256.54it/s]
+🚀 Querying RagEngine...
+
+[1/16] Processing: What is the primary role of a Personal Tutor?
+[*] Original Question: What is the primary role of a Personal Tutor?
+[*] Rewritten Standalone Query: What is the primary role of a Personal Tutor?
+[*] [Layer 1] Saved query-response pair to cache (cache_29b1c9c6-0082-4d06-95a6-83857e149394) with source tags: [Academic_Wellbeing_and_Social_Support_CS_handbook.pdf].
+
+[2/16] Processing: Who are the Senior Tutors overseeing pastoral support in the School of Computer Science?
+[*] Original Question: Who are the Senior Tutors overseeing pastoral support in the School of Computer Science?
+[*] Rewritten Standalone Query: Who are the Senior Tutors overseeing pastoral support in the School of Computer Science?
+[*] [Layer 1] Saved query-response pair to cache (cache_66d01792-fce0-42ea-b294-e7a27211daf7) with source tags: [Academic_Wellbeing_and_Social_Support_CS_handbook.pdf].
+
+[3/16] Processing: What is the direct email address to contact the Computer Science Wellbeing Officers?
+[*] Original Question: What is the direct email address to contact the Computer Science Wellbeing Officers?
+[*] Rewritten Standalone Query: What is the direct email address to contact the Computer Science Wellbeing Officers?
+[*] [Layer 1] Saved query-response pair to cache (cache_a877dc6f-dd6c-4151-bf50-d1535970adcf) with source tags: [Academic_Wellbeing_and_Social_Support_CS_handbook.pdf].
+
+[4/16] Processing: What are the standard teaching hours for Monday through Friday at the UK campus?
+[*] Original Question: What are the standard teaching hours for Monday through Friday at the UK campus?
+[*] Rewritten Standalone Query: What are the standard teaching hours for Monday through Friday at the UK campus?
+[*] [Layer 1] Saved query-response pair to cache (cache_bcc348eb-a8d2-44dd-bfa8-65dabdae0e4f) with source tags: [General_Information_CS_handbook.pdf].
+
+[5/16] Processing: Where is the Education Support Office (ESO) located, and what are its opening hours?
+[*] Original Question: Where is the Education Support Office (ESO) located, and what are its opening hours?
+[*] Rewritten Standalone Query: Where is the Education Support Office (ESO) located, and what are its opening hours?
+[*] [Layer 1] Saved query-response pair to cache (cache_9f4e2541-356d-4192-a424-f8a451e9f47c) with source tags: [General_Information_CS_handbook.pdf].
+
+[6/16] Processing: What are the module pass marks for undergraduate and postgraduate taught programmes?
+[*] Original Question: What are the module pass marks for undergraduate and postgraduate taught programmes?
+[*] Rewritten Standalone Query: What are the module pass marks for undergraduate and postgraduate taught programmes?
+[*] [Layer 1] Saved query-response pair to cache (cache_0e342d87-268d-4b4c-a5d1-07598b594a9f) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[7/16] Processing: How many total credits are required for a BSc degree, an MSci degree, and an MSc degree?
+[*] Original Question: How many total credits are required for a BSc degree, an MSci degree, and an MSc degree?
+[*] Rewritten Standalone Query: How many total credits are required for a BSc degree, an MSci degree, and an MSc degree?
+[*] [Layer 1] Saved query-response pair to cache (cache_e16cf984-589f-486e-a10f-54dcaa1ed62c) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[8/16] Processing: How many hours of work are expected for a standard 20-credit module?
+[*] Original Question: How many hours of work are expected for a standard 20-credit module?
+[*] Rewritten Standalone Query: How many hours of work are expected for a standard 20-credit module?
+[*] [Layer 2 & 3] PROMOTION TRIGGERED: 'General_Information_CS_handbook.pdf' reached 5 hits. Syncing to Hot Tier.
+[*] [Layer 3] Added 34 chunks of 'General_Information_CS_handbook.pdf' into Hot Tier.
+[*] [Layer 1] Saved query-response pair to cache (cache_0ae2c46c-46b8-489b-b637-33dc9c309674) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[9/16] Processing: What is the minimum number of credits an undergraduate student must pass to progress to the next year of study?
+[*] Original Question: What is the minimum number of credits an undergraduate student must pass to progress to the next year of study?
+[*] Rewritten Standalone Query: What is the minimum number of credits an undergraduate student must pass to progress to the next year of study?
+[*] [Layer 2 & 3] PROMOTION TRIGGERED: 'Programme_Information_CS_handbook.pdf' reached 5 hits. Syncing to Hot Tier.
+[*] [Layer 3] Added 28 chunks of 'Programme_Information_CS_handbook.pdf' into Hot Tier.
+[*] [Layer 1] Saved query-response pair to cache (cache_e3043317-0966-47df-9e0d-3ee4bf44430f) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[10/16] Processing: What penalty is applied for late coursework submissions if late submissions are permitted?
+[*] Original Question: What penalty is applied for late coursework submissions if late submissions are permitted?
+[*] Rewritten Standalone Query: What penalty is applied for late coursework submissions if late submissions are permitted?
+[*] [Layer 1] Saved query-response pair to cache (cache_e85a5655-fbc1-43fe-8506-e95527e080b2) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[11/16] Processing: What phone numbers should students use to contact Security Services for emergencies and non-emergencies?
+[*] Original Question: What phone numbers should students use to contact Security Services for emergencies and non-emergencies?
+[*] Rewritten Standalone Query: What phone numbers should students use to contact Security Services for emergencies and non-emergencies?
+[*] [Layer 1] Saved query-response pair to cache (cache_6f75458d-1e08-4c8f-bf07-495f996e090b) with source tags: [General_Information_CS_handbook.pdf,Library_IT_Services_and_Security_CS_handbook.pdf].
+
+[12/16] Processing: By when must an undergraduate student request a transfer to a Study Abroad variant of their programme?
+[*] Original Question: By when must an undergraduate student request a transfer to a Study Abroad variant of their programme?
+[*] Rewritten Standalone Query: By when must an undergraduate student request a transfer to a Study Abroad variant of their programme?
+[*] [Layer 1] Saved query-response pair to cache (cache_7006e0a0-8e30-45e4-99c1-5816f9a9f183) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[13/16] Processing: What overall mark in Year 2 must a student achieve to proceed to the Year 3 Study Abroad module?
+[*] Original Question: What overall mark in Year 2 must a student achieve to proceed to the Year 3 Study Abroad module?
+[*] Rewritten Standalone Query: What overall mark in Year 2 must a student achieve to proceed to the Year 3 Study Abroad module?
+[*] [Layer 1] Saved query-response pair to cache (cache_5dd662dc-ab60-41cc-9d7c-cbaf6b64a306) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[14/16] Processing: What is the name of the official hacking and cyber security student club at the University of Birmingham?
+[*] Original Question: What is the name of the official hacking and cyber security student club at the University of Birmingham?
+[*] Rewritten Standalone Query: What is the name of the official hacking and cyber security student club at the University of Birmingham?
+[*] [Layer 1] Saved query-response pair to cache (cache_f63e2eb2-0066-47d0-91a1-6289249ecc50) with source tags: [Academic_Wellbeing_and_Social_Support_CS_handbook.pdf].
+
+[15/16] Processing: What are the two key components of the End Point Assessment (EPA) for Degree Apprenticeship students?
+[*] Original Question: What are the two key components of the End Point Assessment (EPA) for Degree Apprenticeship students?
+[*] Rewritten Standalone Query: What are the two key components of the End Point Assessment (EPA) for Degree Apprenticeship students?
+[*] [Layer 1] Saved query-response pair to cache (cache_0555f1b3-f438-4744-83dc-a876c436fbeb) with source tags: [Programme_Information_CS_handbook.pdf].
+
+[16/16] Processing: What software system is used by the university to monitor student attendance at in-person teaching sessions?
+[*] Original Question: What software system is used by the university to monitor student attendance at in-person teaching sessions?
+[*] Rewritten Standalone Query: What software system is used by the university to monitor student attendance at in-person teaching sessions?
+[*] [Layer 1] Saved query-response pair to cache (cache_9e6d86d4-bc56-4be0-810a-a6c8eee84959) with source tags: [General_Information_CS_handbook.pdf].
+
+📊 Evaluating outputs with RAGAS + Groq (llama-3.1-8b-instant)...
+Evaluating: 100%|██████████| 64/64 [23:10<00:00, 21.72s/it]
+
+=== REAL RAGAS BENCHMARK RESULTS ===
+{'faithfulness': 0.8861, 'answer_relevancy': 0.8745, 'context_precision': 0.9427, 'context_recall': 0.9792}
+
+Saved output to real_ragas_results.csv!
