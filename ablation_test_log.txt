@@ -1,0 +1,25 @@
+(.venv) PS C:\Birmingham\Dissertation\AcademicHelper> python tests\test_ablation.py
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 171 chunks indexed.
+
+=================================================================================
+   OBJECTIVE 6: ABLATION BENCHMARK EXPERIMENT REPORT (Top K = 4)
+   (Evaluation strictly includes File Name and Page Number matching)
+=================================================================================
+Retrieval Mode       | Hit Rate @ 4       | MRR @ 4         | Status    
+---------------------------------------------------------------------------------
+dense_only           | 94.3%              | 0.8524          | Active
+sparse_only          | 97.1%              | 0.8976          | Active
+hybrid               | 100.0%             | 0.9214          | Active
+---------------------------------------------------------------------------------
+HYPOTHESIS EMPIRICAL VALIDATION (Based on MRR Gains):
+  [H1] Hybrid vs. Dense-Only  : +8.10% MRR Relative Improvement
+  [H2] Hybrid vs. Sparse-Only : +2.65% MRR Relative Improvement
+
+  ==> VERDICT: Hypotheses H1 & H2 VALIDATED. Hybrid RRF achieves optimal MRR retrieval.
+=================================================================================
+
+[*] Results successfully exported to JSON: C:\Birmingham\Dissertation\AcademicHelper\ablation_results.json
+[*] Raw evaluation data exported to CSV: C:\Birmingham\Dissertation\AcademicHelper\ablation_results.csv

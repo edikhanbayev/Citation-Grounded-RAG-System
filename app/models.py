@@ -1,21 +1,22 @@
+import os, re, json, time, requests, chromadb, uuid
+from datetime import datetime, timezone
+from collections import defaultdict
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlalchemy.orm as so
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import UserMixin
 from app import db, login
-import os, re
-import json
-import time
-import requests
-import chromadb
 from chromadb.utils import embedding_functions
-from datetime import datetime
-from collections import defaultdict
 import fitz  # PyMuPDF engine
-import uuid
 from rank_bm25 import BM25Okapi
 
+STOP_WORDS = {
+    "how", "to", "use", "the", "a", "of", "and", "is", "for", "on", "in",
+    "at", "by", "with", "about", "an", "it", "this", "that", "your", "can", "you", "i",
+    "when", "where", "what", "who", "which", "why", "whose", "whom", "are", "was", "were",
+    "do", "does", "did", "could", "would", "should", "has", "have", "had", "been", "will", "shall"
+}
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -24,11 +25,10 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
     student_id = db.Column(db.String(32), unique=True, nullable=True)
-    role = db.Column(db.String(20), default='student', nullable=False)  # student, faculty, admin
+    role = db.Column(db.String(20), default='student', nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     is_approved = db.Column(db.Boolean, default=False, nullable=False)
 
-    # Relationships
     conversations = db.relationship('Conversation', backref='user', lazy='dynamic', cascade="all, delete-orphan")
 
     def set_password(self, password):
@@ -44,9 +44,8 @@ class Conversation(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     title = db.Column(db.String(100), nullable=False, default="New Conversation")
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
-    # Relationships
     messages = db.relationship('ChatMessage', backref='conversation', lazy='dynamic', cascade="all, delete-orphan")
 
 
@@ -56,10 +55,9 @@ class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(255), unique=True, nullable=False)
     clearance_level = db.Column(db.String(50), default='public', nullable=False)
-    status = db.Column(db.String(50), default='Processing', nullable=False)  # Processing, Ready, Failed
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    status = db.Column(db.String(50), default='Processing', nullable=False)
+    uploaded_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
-    # Relationships
     citations = db.relationship('Citation', backref='document', lazy='dynamic', cascade="all, delete")
 
 
@@ -69,11 +67,10 @@ class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     conversation_id = db.Column(db.String(36), db.ForeignKey('conversations.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    sender = db.Column(db.String(10), nullable=False)  # user, bot
+    sender = db.Column(db.String(10), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow, nullable=False)
+    timestamp = db.Column(db.DateTime, index=True, default=lambda: datetime.now(timezone.utc), nullable=False)
 
-    # Relationships
     citations = db.relationship('Citation', backref='message', lazy='dynamic', cascade="all, delete-orphan")
 
 
@@ -86,7 +83,6 @@ class Citation(db.Model):
     page_number = db.Column(db.Integer, nullable=False)
 
 
-# Retrieval Augmented Generation (RAG) Engine
 class RagEngine:
     def __init__(self):
         base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -94,7 +90,6 @@ class RagEngine:
         self.chroma_client = chromadb.PersistentClient(path=self.chroma_path)
         self.default_ef = embedding_functions.DefaultEmbeddingFunction()
 
-        # Vector storage collections
         self.archive_collection = self.chroma_client.get_or_create_collection(
             "uni_regs_archive",
             embedding_function=self.default_ef
@@ -141,13 +136,6 @@ class RagEngine:
                 self.in_memory_corpus_metas = metas
                 self.in_memory_corpus_ids = ids
 
-                STOP_WORDS = {
-                    "how", "to", "use", "the", "a", "of", "and", "is", "for", "on", "in",
-                    "at", "by", "with", "about", "an", "it", "this", "that", "your", "can", "you", "i",
-                    "when", "where", "what", "who", "which", "why", "whose", "whom", "are", "was", "were",
-                    "do", "does", "did", "could", "would", "should", "has", "have", "had", "been", "will", "shall"
-                }
-
                 tokenized_corpus = []
                 for doc in self.in_memory_corpus_docs:
                     tokens = [w for w in self.tokenize_text(doc) if w not in STOP_WORDS]
@@ -171,7 +159,7 @@ class RagEngine:
             count = self.doc_access_counts[filename]
 
             if count >= self.HOT_PROMOTION_THRESHOLD and filename not in self.hot_filenames:
-                print(f"[*] [Layer 2 & 3] PROMOTION TRIGGERED: '{filename}' reached {count} hits. Syncing to Hot Tier.")
+                print(f"[*] PROMOTION TRIGGERED: '{filename}' reached {count} hits.")
                 self.hot_filenames.add(filename)
 
                 payload = self.archive_collection.get(where={"source": filename})
@@ -181,9 +169,8 @@ class RagEngine:
                         metadatas=payload['metadatas'],
                         ids=payload['ids']
                     )
-                    print(f"[*] [Layer 3] Added {len(payload['documents'])} chunks of '{filename}' into Hot Tier.")
 
-    def _check_semantic_cache(self, search_query, distance_threshold=0.05):
+    def _check_semantic_cache(self, search_query, distance_threshold=0.18):
         try:
             results = self.cache_collection.query(query_texts=[search_query], n_results=1)
             if results and results['ids'] and results['ids'][0]:
@@ -213,32 +200,13 @@ class RagEngine:
                     "answer": answer,
                     "citations": json.dumps(citations),
                     "source_files": source_files,
-                    "cached_at": datetime.utcnow().isoformat()
+                    "cached_at": datetime.now(timezone.utc).isoformat()
                 }],
                 ids=[cache_id]
             )
-            print(f"[*] [Layer 1] Saved query-response pair to cache ({cache_id}) with source tags: [{source_files}].")
+            print(f"[*] [Layer 1] Saved query-response pair to cache ({cache_id}).")
         except Exception as e:
-            if "does not exist" in str(e).lower():
-                self._init_cache_collection()
-                try:
-                    cache_id = f"cache_{uuid.uuid4()}"
-                    source_files = ",".join(sorted(list(set(c['filename'] for c in citations if isinstance(c, dict) and c.get('filename')))))
-                    self.cache_collection.add(
-                        documents=[search_query],
-                        metadatas=[{
-                            "original_query": search_query,
-                            "answer": answer,
-                            "citations": json.dumps(citations),
-                            "source_files": source_files,
-                            "cached_at": datetime.utcnow().isoformat()
-                        }],
-                        ids=[cache_id]
-                    )
-                except Exception as retry_e:
-                    print(f"[!] [Layer 1] Cache write retry exception: {str(retry_e)}")
-            else:
-                print(f"[!] [Layer 1] Cache write exception: {str(e)}")
+            print(f"[!] [Layer 1] Cache write exception: {str(e)}")
 
     def invalidate_cache_for_source(self, filename):
         try:
@@ -253,12 +221,9 @@ class RagEngine:
 
                 if ids_to_delete:
                     self.cache_collection.delete(ids=ids_to_delete)
-                    print(f"[*] [Layer 1] Selectively purged {len(ids_to_delete)} cache entries related to '{filename}'.")
+                    print(f"[*] [Layer 1] Purged {len(ids_to_delete)} cache entries for '{filename}'.")
         except Exception as e:
-            if "does not exist" in str(e).lower():
-                self._init_cache_collection()
-            else:
-                print(f"[!] [Layer 1] Selective cache invalidation exception: {str(e)}")
+            print(f"[!] Selective cache invalidation exception: {str(e)}")
 
     def process_and_index_pdf(self, pdf_path, clearance_level="public"):
         if not os.path.exists(pdf_path):
@@ -300,7 +265,7 @@ class RagEngine:
                 i += (WINDOW_SIZE - WINDOW_OVERLAP)
 
         doc.close()
-        print(f"Processed '{filename}' with clearance '{clearance_level}': Vectorized {chunk_count} chunks into Archive Store.")
+        print(f"Processed '{filename}' with clearance '{clearance_level}': Vectorized {chunk_count} chunks.")
 
         self.invalidate_cache_for_source(filename)
         self._refresh_ram_buffer()
@@ -381,52 +346,29 @@ class RagEngine:
         return question
 
     def _format_chunk_payload(self, idx: int) -> dict:
-        #Helper to construct standard retrieved chunk payload
         return {
             "filename": self.in_memory_corpus_metas[idx].get('source'),
             "page": self.in_memory_corpus_metas[idx].get('page', 1),
             "text": self.in_memory_corpus_docs[idx]
         }
 
-    # DECOUPLED RETRIEVAL ENGINE (Native Support for Hybrid & Ablation Modes)
     def retrieve(self, query: str, allowed_clearances: list, mode: str = "hybrid", top_k: int = 4) -> list:
-        """
-        Isolated Retrieval Pipeline.
-        Modes supported:
-            - 'hybrid': Reciprocal Rank Fusion of Dense + Sparse BM25
-            - 'dense_only': Pure vector semantic search via ChromaDB
-            - 'sparse_only': Pure lexical search via BM25Okapi
-        """
         if not self.in_memory_corpus_docs:
             return []
 
-        # 1. DENSE RETRIEVAL (ChromaDB Hot/Archive Tier)
+        # 1. DENSE RETRIEVAL (ChromaDB Vector Store)
         dense_indices_with_ranks = []
         if mode in ("hybrid", "dense_only"):
-            vector_results = None
-            used_hot_tier = False
-
-            if self.hot_collection.count() > 0:
-                hot_results = self.hot_collection.query(
-                    query_texts=[query],
-                    n_results=10,
-                    where={"clearance": {"$in": allowed_clearances}}
-                )
-                if hot_results and hot_results['distances'] and hot_results['distances'][0]:
-                    best_hot_dist = hot_results['distances'][0][0]
-                    if best_hot_dist <= 1.10:
-                        vector_results = hot_results
-                        used_hot_tier = True
-
-            if not used_hot_tier:
-                vector_results = self.archive_collection.query(
-                    query_texts=[query],
-                    n_results=15,
-                    where={"clearance": {"$in": allowed_clearances}}
-                )
+            # Query the primary archive directly to prevent short-circuiting valid matches
+            vector_results = self.archive_collection.query(
+                query_texts=[query],
+                n_results=15,
+                where={"clearance": {"$in": allowed_clearances}}
+            )
 
             id_to_idx_map = {cid: idx for idx, cid in enumerate(self.in_memory_corpus_ids)}
-            L2_CUTOFF_THRESHOLD = 1.0
+            # Relaxed distance threshold (1.40 allows standard MiniLM embedding distances)
+            L2_CUTOFF_THRESHOLD = 1.40
 
             if vector_results and vector_results['ids'] and vector_results['ids'][0]:
                 raw_ids = vector_results['ids'][0]
@@ -445,20 +387,13 @@ class RagEngine:
                 top_dense_indices = [idx for idx, _ in dense_indices_with_ranks[:top_k]]
                 return [self._format_chunk_payload(idx) for idx in top_dense_indices]
 
-        # 2. SPARSE RETRIEVAL (BM25Okapi In-Memory Buffer)
+        # 2. SPARSE RETRIEVAL (BM25 Lexical Store)
         sparse_indices_with_ranks = []
         if mode in ("hybrid", "sparse_only"):
             valid_indices = [
                 i for i, meta in enumerate(self.in_memory_corpus_metas)
                 if meta.get('clearance') in allowed_clearances
             ]
-
-            STOP_WORDS = {
-                "how", "to", "use", "the", "a", "of", "and", "is", "for", "on", "in",
-                "at", "by", "with", "about", "an", "it", "this", "that", "your", "can", "you", "i",
-                "when", "where", "what", "who", "which", "why", "whose", "whom", "are", "was", "were",
-                "do", "does", "did", "could", "would", "should", "has", "have", "had", "been", "will", "shall"
-            }
 
             tokenized_query = [w for w in self.tokenize_text(query) if w not in STOP_WORDS]
             if not tokenized_query:
@@ -491,13 +426,7 @@ class RagEngine:
 
         return [self._format_chunk_payload(idx) for idx in top_fused_indices]
 
-    # DECOUPLED GENERATION ENGINE (LLM Call, Citation Tagging & Parsing)
     def generate_response(self, question: str, retrieved_chunks: list, chat_history: list = None, api_key: str = None) -> tuple:
-        """
-        Takes retrieved context chunks, formats reference tags, invokes the LLM API with exponential backoff,
-        and parses cited references.
-        Returns: (clean_answer_text, actual_citations)
-        """
         if not retrieved_chunks:
             return "I am sorry, I don't have relevant information.", []
 
@@ -518,7 +447,7 @@ class RagEngine:
             "You are an academic regulations assistant. Answer the user's question relying strictly on the provided context.\n"
             "CRITICAL INSTRUCTION: For any statement derived from the context, append its reference tag (e.g., [REF1], [REF2]) at the end of the sentence.\n"
             "If the answer cannot be found within the provided context, or if the context is insufficient, you MUST reply with EXACTLY:\n"
-            "\"I am sorry. I don't have relevant information\" and nothing else."
+            "\"I am sorry, I don't have relevant information.\" and nothing else."
         )
 
         headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
@@ -564,9 +493,8 @@ class RagEngine:
                     ]
 
                     if any(phrase in answer_text.lower() for phrase in negative_indicators):
-                        return answer_text, []
+                        return "I am sorry, I don't have relevant information.", []
 
-                    # Extract used reference tags [REF1], [REF2], etc.
                     referenced_tags = set(re.findall(r'\[REF(\d+)\]', answer_text))
 
                     actual_citations = []
@@ -577,15 +505,13 @@ class RagEngine:
                             if cit not in actual_citations:
                                 actual_citations.append(cit)
 
-                    # Clean reference tags from final UI text
                     clean_answer_text = re.sub(r'\s*\[REF\d+\]', '', answer_text)
                     return clean_answer_text, actual_citations
 
                 elif response.status_code == 429:
-                    wait_time = (attempt + 1) * 3
-                    time.sleep(wait_time)
+                    time.sleep((attempt + 1) * 3)
                 else:
-                    return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}.", []
+                    return "I am sorry, I don't have relevant information.", []
 
             except Exception as e:
                 if attempt == max_retries - 1:
@@ -594,51 +520,33 @@ class RagEngine:
 
         return "I am sorry, I don't have relevant information.", []
 
-    # PIPELINE ORCHESTRATOR
     def search_and_generate(self, question, allowed_clearances, chat_history=None, mode="hybrid"):
-        """
-        Master RAG Pipeline Orchestrator coordinating:
-        1. Query condensation
-        2. Semantic Cache lookup
-        3. Retrieval execution (hybrid / dense_only / sparse_only)
-        4. Hot Tier promotion tracking
-        5. LLM Answer generation
-        6. Cache writing
-        """
         api_key = os.environ.get('GROQ_API_KEY')
         if not api_key:
             return "Configuration Error: GROQ_API_KEY missing from system .env file.", [], []
 
-        # Step 1: Condense follow-up query into standalone search string
         search_query = self.condense_query(question, chat_history, api_key)
         print(f"[*] Original Question: {question}")
         print(f"[*] Rewritten Standalone Query: {search_query}")
 
-        # Step 2: Tier 1 Check - Semantic Cache lookup
         cached_answer, cached_citations = self._check_semantic_cache(search_query)
         if cached_answer is not None:
             return cached_answer, cached_citations, []
 
-        # Step 3: Run Decoupled Retrieval Engine
         retrieved_chunks = self.retrieve(search_query, allowed_clearances, mode=mode, top_k=4)
         if not retrieved_chunks:
             return "I am sorry, I don't have relevant information.", [], []
 
-        # Step 4: Hot Tier Promotion Tracking
         cited_filenames = {chunk['filename'] for chunk in retrieved_chunks if chunk.get('filename')}
         self._track_and_promote_hot_docs(cited_filenames)
 
-        # Step 5: Run Decoupled Generation Engine
         answer_text, actual_citations = self.generate_response(question, retrieved_chunks, chat_history, api_key)
 
-        # Step 6: Tier 1 Write - Save positive answer to semantic cache
-        negative_indicators = ["don't have relevant information", "cannot locate", "cannot find"]
+        negative_indicators = ["don't have relevant information", "cannot locate", "cannot find", "cloud connection outage"]
         is_negative = any(phrase in answer_text.lower() for phrase in negative_indicators)
 
         if not is_negative and actual_citations:
             self._write_semantic_cache(search_query, answer_text, actual_citations)
-        else:
-            print("[*] [Layer 1] Skipped caching negative/uncited response.")
 
         return answer_text, actual_citations, retrieved_chunks
 
@@ -653,4 +561,28 @@ class RagEngine:
             return True
         except Exception as e:
             print(f"[!] Cache flush exception: {str(e)}")
+            return False
+
+    def clear_hot_documents(self) -> bool:
+        """
+        Completely purges all documents from the hot tier collection on disk
+        and resets in-memory tracking state.
+        """
+        try:
+            # 1. Delete and recreate the hot collection in ChromaDB
+            self.chroma_client.delete_collection("uni_regs_hot")
+            self.hot_collection = self.chroma_client.get_or_create_collection(
+                "uni_regs_hot",
+                embedding_function=self.default_ef
+            )
+
+            # 2. Reset in-memory state variables
+            self.hot_filenames.clear()
+            self.doc_access_counts.clear()
+
+            print("[*] [Hot Tier] Successfully cleared all hot documents and reset access counters.")
+            return True
+
+        except Exception as e:
+            print(f"[!] Exception occurred while clearing hot documents: {str(e)}")
             return False
