@@ -71,11 +71,11 @@ Documents are processed and converted into vector embeddings using a page-aware 
 │   ├── forms.py              # Login, Registration, and Document Upload forms
 │   ├── templates/            # directory for HTML templates
 │   ├── routes/
-│   │   ├── admin.py          # Admin dashboard & source management
-│   │   ├── auth.py           # Registration, approval, & authentication
-│   │   └── chat.py           # Query execution, session memory, & citation handling
+│   │   ├ admin_routes.py     # Admin dashboard & source management
+│   │   ├ auth_routes.py      # Registration, approval, & authentication
+│   │   └ chat_routes.py      # Query execution, session memory, & citation handling
 │   └── services/
-│       └── document_service.py # Background async PDF processing & file cleanup
+│       └ document_service.py # Background async PDF processing & file cleanup
 ├── tests/                    # Evaluation & integration testing scripts
 │   ├── eval_project.py       # Groq LLM-as-a-Judge dataset evaluator, custom made test
 │   ├── eval_ragas.py         # RAGAS test for evaluating on 4 criteria
