@@ -69,6 +69,7 @@ Documents are processed and converted into vector embeddings using a page-aware 
 │   ├── __init__.py           # Application factory & extensions setup
 │   ├── models.py             # Database models & RagEngine (3-Tier RAG Engine)
 │   ├── forms.py              # Login, Registration, and Document Upload forms
+│   ├── templates/            # directory for HTML templates
 │   ├── routes/
 │   │   ├── admin.py          # Admin dashboard & source management
 │   │   ├── auth.py           # Registration, approval, & authentication
@@ -76,10 +77,12 @@ Documents are processed and converted into vector embeddings using a page-aware 
 │   └── services/
 │       └── document_service.py # Background async PDF processing & file cleanup
 ├── tests/                    # Evaluation & integration testing scripts
-│   ├── test_eval.py          # Groq LLM-as-a-Judge dataset evaluator
-│   ├── test_multiturn.py     # HTTP multi-turn session & cache integration test
-│   └── test_load.py          # Hot-tier promotion load & latency benchmark
-├── instance/                 # SQLite database storage (app.db)
+│   ├── eval_project.py       # Groq LLM-as-a-Judge dataset evaluator, custom made test
+│   ├── eval_ragas.py         # RAGAS test for evaluating on 4 criteria
+│   ├── test_ablation.py      # Hybrid search test VS dense, sparse tests
+│   ├── test_multiturn.py     # HTTP multi-turn session and cache integration test
+│   └── test_hot_tier.py      # Hot-tier promotion load
+├── app.db                    # SQLAlchemy database storage (app.db)
 ├── uploads/                  # Raw uploaded PDF documents
 ├── chroma_db/                # Persistent vector database store
 ├── requirements.txt          # Project dependencies
