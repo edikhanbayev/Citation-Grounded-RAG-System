@@ -26,3 +26,6 @@ pymupdf
 rank-bm25
 groq
 pandas
+ragas
+datasets
+langchain-groq

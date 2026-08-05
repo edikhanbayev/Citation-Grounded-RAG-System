@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from app import db, login
 import os, re
 import json
+import time
 import requests
 import chromadb
 from chromadb.utils import embedding_functions
@@ -379,126 +380,138 @@ class RagEngine:
 
         return question
 
-    def search_and_generate(self, question, allowed_clearances, chat_history=None):
-        api_key = os.environ.get('GROQ_API_KEY')
-        if not api_key:
-            return "Configuration Error: GROQ_API_KEY missing from system .env file.", [], []
-
-        search_query = self.condense_query(question, chat_history, api_key)
-        print(f"[*] Original Question: {question}")
-        print(f"[*] Rewritten Standalone Query: {search_query}")
-
-        # Tier 1 check: Semantic cache lookup
-        cached_answer, cached_citations = self._check_semantic_cache(search_query)
-        if cached_answer is not None:
-            return cached_answer, cached_citations, []
-
-        # Tier 3 check: Vector collections lookup
-        vector_results = None
-        used_hot_tier = False
-
-        if self.hot_collection.count() > 0:
-            hot_results = self.hot_collection.query(
-                query_texts=[search_query],
-                n_results=10,
-                where={"clearance": {"$in": allowed_clearances}}
-            )
-            if hot_results and hot_results['distances'] and hot_results['distances'][0]:
-                best_hot_dist = hot_results['distances'][0][0]
-                if best_hot_dist <= 1.10:
-                    vector_results = hot_results
-                    used_hot_tier = True
-
-        if not used_hot_tier:
-            vector_results = self.archive_collection.query(
-                query_texts=[search_query],
-                n_results=15,
-                where={"clearance": {"$in": allowed_clearances}}
-            )
-
-        # Tier 2 check: In-memory BM25
-        if not self.in_memory_corpus_docs:
-            return "I am sorry, I don't have relevant information.", [], []
-
-        valid_indices = [
-            i for i, meta in enumerate(self.in_memory_corpus_metas)
-            if meta.get('clearance') in allowed_clearances
-        ]
-
-        STOP_WORDS = {
-            "how", "to", "use", "the", "a", "of", "and", "is", "for", "on", "in",
-            "at", "by", "with", "about", "an", "it", "this", "that", "your", "can", "you", "i",
-            "when", "where", "what", "who", "which", "why", "whose", "whom", "are", "was", "were",
-            "do", "does", "did", "could", "would", "should", "has", "have", "had", "been", "will", "shall"
+    def _format_chunk_payload(self, idx: int) -> dict:
+        #Helper to construct standard retrieved chunk payload
+        return {
+            "filename": self.in_memory_corpus_metas[idx].get('source'),
+            "page": self.in_memory_corpus_metas[idx].get('page', 1),
+            "text": self.in_memory_corpus_docs[idx]
         }
 
-        tokenized_query = [w for w in self.tokenize_text(search_query) if w not in STOP_WORDS]
-        if not tokenized_query:
-            tokenized_query = self.tokenize_text(search_query)
+    # DECOUPLED RETRIEVAL ENGINE (Native Support for Hybrid & Ablation Modes)
+    def retrieve(self, query: str, allowed_clearances: list, mode: str = "hybrid", top_k: int = 4) -> list:
+        """
+        Isolated Retrieval Pipeline.
+        Modes supported:
+            - 'hybrid': Reciprocal Rank Fusion of Dense + Sparse BM25
+            - 'dense_only': Pure vector semantic search via ChromaDB
+            - 'sparse_only': Pure lexical search via BM25Okapi
+        """
+        if not self.in_memory_corpus_docs:
+            return []
 
-        raw_bm25_scores = self.in_memory_bm25.get_scores(tokenized_query)
-        sparse_ranked_indices = [
-            i for i in sorted(valid_indices, key=lambda i: raw_bm25_scores[i], reverse=True)
-            if raw_bm25_scores[i] > 0
-        ]
+        # 1. DENSE RETRIEVAL (ChromaDB Hot/Archive Tier)
+        dense_indices_with_ranks = []
+        if mode in ("hybrid", "dense_only"):
+            vector_results = None
+            used_hot_tier = False
 
-        rrf_scores = {}
+            if self.hot_collection.count() > 0:
+                hot_results = self.hot_collection.query(
+                    query_texts=[query],
+                    n_results=10,
+                    where={"clearance": {"$in": allowed_clearances}}
+                )
+                if hot_results and hot_results['distances'] and hot_results['distances'][0]:
+                    best_hot_dist = hot_results['distances'][0][0]
+                    if best_hot_dist <= 1.10:
+                        vector_results = hot_results
+                        used_hot_tier = True
+
+            if not used_hot_tier:
+                vector_results = self.archive_collection.query(
+                    query_texts=[query],
+                    n_results=15,
+                    where={"clearance": {"$in": allowed_clearances}}
+                )
+
+            id_to_idx_map = {cid: idx for idx, cid in enumerate(self.in_memory_corpus_ids)}
+            L2_CUTOFF_THRESHOLD = 1.0
+
+            if vector_results and vector_results['ids'] and vector_results['ids'][0]:
+                raw_ids = vector_results['ids'][0]
+                raw_distances = vector_results['distances'][0]
+
+                valid_rank = 1
+                for chunk_id, dist in zip(raw_ids, raw_distances):
+                    if dist > L2_CUTOFF_THRESHOLD:
+                        continue
+                    if chunk_id in id_to_idx_map:
+                        global_idx = id_to_idx_map[chunk_id]
+                        dense_indices_with_ranks.append((global_idx, valid_rank))
+                        valid_rank += 1
+
+            if mode == "dense_only":
+                top_dense_indices = [idx for idx, _ in dense_indices_with_ranks[:top_k]]
+                return [self._format_chunk_payload(idx) for idx in top_dense_indices]
+
+        # 2. SPARSE RETRIEVAL (BM25Okapi In-Memory Buffer)
+        sparse_indices_with_ranks = []
+        if mode in ("hybrid", "sparse_only"):
+            valid_indices = [
+                i for i, meta in enumerate(self.in_memory_corpus_metas)
+                if meta.get('clearance') in allowed_clearances
+            ]
+
+            STOP_WORDS = {
+                "how", "to", "use", "the", "a", "of", "and", "is", "for", "on", "in",
+                "at", "by", "with", "about", "an", "it", "this", "that", "your", "can", "you", "i",
+                "when", "where", "what", "who", "which", "why", "whose", "whom", "are", "was", "were",
+                "do", "does", "did", "could", "would", "should", "has", "have", "had", "been", "will", "shall"
+            }
+
+            tokenized_query = [w for w in self.tokenize_text(query) if w not in STOP_WORDS]
+            if not tokenized_query:
+                tokenized_query = self.tokenize_text(query)
+
+            raw_bm25_scores = self.in_memory_bm25.get_scores(tokenized_query)
+            sorted_sparse_indices = [
+                i for i in sorted(valid_indices, key=lambda i: raw_bm25_scores[i], reverse=True)
+                if raw_bm25_scores[i] > 0
+            ]
+
+            sparse_indices_with_ranks = [(idx, rank + 1) for rank, idx in enumerate(sorted_sparse_indices[:15])]
+
+            if mode == "sparse_only":
+                top_sparse_indices = [idx for idx, _ in sparse_indices_with_ranks[:top_k]]
+                return [self._format_chunk_payload(idx) for idx in top_sparse_indices]
+
+        # 3. HYBRID RECIPROCAL RANK FUSION (RRF)
+        rrf_scores = defaultdict(float)
         K_CONSTANT = 60
 
-        for rank, local_idx in enumerate(sparse_ranked_indices[:15]):
-            rrf_scores[local_idx] = rrf_scores.get(local_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
+        for global_idx, rank in sparse_indices_with_ranks:
+            rrf_scores[global_idx] += 1.0 / (K_CONSTANT + rank)
 
-        id_to_idx_map = {cid: idx for idx, cid in enumerate(self.in_memory_corpus_ids)}
-        L2_CUTOFF_THRESHOLD = 1.0
-
-        if vector_results and vector_results['ids'] and vector_results['ids'][0]:
-            raw_ids = vector_results['ids'][0]
-            raw_distances = vector_results['distances'][0]
-
-            for rank, (chunk_id, dist) in enumerate(zip(raw_ids, raw_distances)):
-                if dist > L2_CUTOFF_THRESHOLD:
-                    continue
-
-                if chunk_id in id_to_idx_map:
-                    global_idx = id_to_idx_map[chunk_id]
-                    rrf_scores[global_idx] = rrf_scores.get(global_idx, 0.0) + (1.0 / (K_CONSTANT + (rank + 1)))
+        for global_idx, rank in dense_indices_with_ranks:
+            rrf_scores[global_idx] += 1.0 / (K_CONSTANT + rank)
 
         fused_sorted_indices = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
-        top_fused_indices = fused_sorted_indices[:4]
+        top_fused_indices = fused_sorted_indices[:top_k]
 
-        # --- SOLUTION 1: DYNAMIC REF TAGGING & CONTEXT PREPARATION ---
+        return [self._format_chunk_payload(idx) for idx in top_fused_indices]
+
+    # DECOUPLED GENERATION ENGINE (LLM Call, Citation Tagging & Parsing)
+    def generate_response(self, question: str, retrieved_chunks: list, chat_history: list = None, api_key: str = None) -> tuple:
+        """
+        Takes retrieved context chunks, formats reference tags, invokes the LLM API with exponential backoff,
+        and parses cited references.
+        Returns: (clean_answer_text, actual_citations)
+        """
+        if not retrieved_chunks:
+            return "I am sorry, I don't have relevant information.", []
+
         valid_documents = []
         chunk_ref_map = {}
-        cited_filenames = set()
 
-        for i, idx in enumerate(top_fused_indices, start=1):
-            doc_text = self.in_memory_corpus_docs[idx]
-            meta = self.in_memory_corpus_metas[idx]
-            filename = meta.get('source')
-            page = meta.get('page', 1)
+        for i, chunk in enumerate(retrieved_chunks, start=1):
+            filename = chunk.get('filename')
+            page = chunk.get('page', 1)
+            doc_text = chunk.get('text', '')
 
             ref_tag = f"REF{i}"
             chunk_ref_map[ref_tag] = {"filename": filename, "page": page}
-
-            if filename:
-                cited_filenames.add(filename)
-
             valid_documents.append(f"[{ref_tag}] Document: {filename} (Page {page})\n{doc_text}")
-
-        # Raw chunks array exported for evaluation harness accuracy
-        retrieved_chunks_for_eval = [
-            {
-                "filename": self.in_memory_corpus_metas[idx].get('source'),
-                "page": self.in_memory_corpus_metas[idx].get('page', 1),
-                "text": self.in_memory_corpus_docs[idx]
-            }
-            for idx in top_fused_indices
-        ]
-
-        if not valid_documents:
-            return "I am sorry, I don't have relevant information.", [], []
-
-        self._track_and_promote_hot_docs(cited_filenames)
 
         context_string = "\n\n".join(valid_documents)
         system_instruction = (
@@ -527,7 +540,6 @@ class RagEngine:
             "temperature": 0.0
         }
 
-        import time
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -551,38 +563,84 @@ class RagEngine:
                         "no relevant documentation"
                     ]
 
-                    is_negative_answer = any(phrase in answer_text.lower() for phrase in negative_indicators)
+                    if any(phrase in answer_text.lower() for phrase in negative_indicators):
+                        return answer_text, []
 
-                    if not is_negative_answer:
-                        # Extract used reference tags [REF1], [REF2], etc.
-                        referenced_tags = set(re.findall(r'\[REF(\d+)\]', answer_text))
+                    # Extract used reference tags [REF1], [REF2], etc.
+                    referenced_tags = set(re.findall(r'\[REF(\d+)\]', answer_text))
 
-                        actual_citations = []
-                        for tag_num in sorted(referenced_tags, key=int):
-                            ref_key = f"REF{tag_num}"
-                            if ref_key in chunk_ref_map:
-                                cit = chunk_ref_map[ref_key]
-                                if cit not in actual_citations:
-                                    actual_citations.append(cit)
+                    actual_citations = []
+                    for tag_num in sorted(referenced_tags, key=int):
+                        ref_key = f"REF{tag_num}"
+                        if ref_key in chunk_ref_map:
+                            cit = chunk_ref_map[ref_key]
+                            if cit not in actual_citations:
+                                actual_citations.append(cit)
 
-                        # Clean reference tags from final UI text
-                        clean_answer_text = re.sub(r'\s*\[REF\d+\]', '', answer_text)
-
-                        self._write_semantic_cache(search_query, clean_answer_text, actual_citations)
-                        return clean_answer_text, actual_citations, retrieved_chunks_for_eval
-                    else:
-                        print("[*] [Layer 1] Skipped caching negative/fallback response.")
-                        return answer_text, [], retrieved_chunks_for_eval
+                    # Clean reference tags from final UI text
+                    clean_answer_text = re.sub(r'\s*\[REF\d+\]', '', answer_text)
+                    return clean_answer_text, actual_citations
 
                 elif response.status_code == 429:
                     wait_time = (attempt + 1) * 3
                     time.sleep(wait_time)
                 else:
-                    return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}.", [], []
+                    return f"Cloud Ingestion Warning: Groq API returned status code {response.status_code}.", []
+
             except Exception as e:
                 if attempt == max_retries - 1:
-                    return f"Cloud Connection Outage: {str(e)}", [], []
+                    return f"Cloud Connection Outage: {str(e)}", []
                 time.sleep(2)
+
+        return "I am sorry, I don't have relevant information.", []
+
+    # PIPELINE ORCHESTRATOR
+    def search_and_generate(self, question, allowed_clearances, chat_history=None, mode="hybrid"):
+        """
+        Master RAG Pipeline Orchestrator coordinating:
+        1. Query condensation
+        2. Semantic Cache lookup
+        3. Retrieval execution (hybrid / dense_only / sparse_only)
+        4. Hot Tier promotion tracking
+        5. LLM Answer generation
+        6. Cache writing
+        """
+        api_key = os.environ.get('GROQ_API_KEY')
+        if not api_key:
+            return "Configuration Error: GROQ_API_KEY missing from system .env file.", [], []
+
+        # Step 1: Condense follow-up query into standalone search string
+        search_query = self.condense_query(question, chat_history, api_key)
+        print(f"[*] Original Question: {question}")
+        print(f"[*] Rewritten Standalone Query: {search_query}")
+
+        # Step 2: Tier 1 Check - Semantic Cache lookup
+        cached_answer, cached_citations = self._check_semantic_cache(search_query)
+        if cached_answer is not None:
+            return cached_answer, cached_citations, []
+
+        # Step 3: Run Decoupled Retrieval Engine
+        retrieved_chunks = self.retrieve(search_query, allowed_clearances, mode=mode, top_k=4)
+        if not retrieved_chunks:
+            return "I am sorry, I don't have relevant information.", [], []
+
+        # Step 4: Hot Tier Promotion Tracking
+        cited_filenames = {chunk['filename'] for chunk in retrieved_chunks if chunk.get('filename')}
+        self._track_and_promote_hot_docs(cited_filenames)
+
+        # Step 5: Run Decoupled Generation Engine
+        answer_text, actual_citations = self.generate_response(question, retrieved_chunks, chat_history, api_key)
+
+        # Step 6: Tier 1 Write - Save positive answer to semantic cache
+        negative_indicators = ["don't have relevant information", "cannot locate", "cannot find"]
+        is_negative = any(phrase in answer_text.lower() for phrase in negative_indicators)
+
+        if not is_negative and actual_citations:
+            self._write_semantic_cache(search_query, answer_text, actual_citations)
+        else:
+            print("[*] [Layer 1] Skipped caching negative/uncited response.")
+
+        return answer_text, actual_citations, retrieved_chunks
 
     def clear_all_caches(self):
         try:
