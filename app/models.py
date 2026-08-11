@@ -105,6 +105,15 @@ class RagEngine:
         self.HOT_PROMOTION_THRESHOLD = 5
         self.hot_filenames = set()
 
+        # Hot tier: Load hot tier state from persistent disk storage on startup
+        try:
+            hot_payload = self.hot_collection.get(include=['metadatas'])
+            if hot_payload and hot_payload.get('metadatas'):
+                self.hot_filenames = {m['source'] for m in hot_payload['metadatas'] if m and 'source' in m}
+                print(f"[*] [Hot Tier] Hydrated {len(self.hot_filenames)} active hot document source(s) from disk.")
+        except Exception as e:
+            print(f"[!] [Hot Tier] State hydration exception: {str(e)}")
+
         self.in_memory_bm25 = None
         self.in_memory_corpus_docs = []
         self.in_memory_corpus_metas = []
@@ -164,19 +173,28 @@ class RagEngine:
 
                 payload = self.archive_collection.get(where={"source": filename})
                 if payload and payload['documents']:
-                    self.hot_collection.add(
+                    # FIX 2 (HOT TIER): Use upsert to safely write without duplicate ID errors
+                    self.hot_collection.upsert(
                         documents=payload['documents'],
                         metadatas=payload['metadatas'],
                         ids=payload['ids']
                     )
 
-    def _check_semantic_cache(self, search_query, distance_threshold=0.18):
+    def _check_semantic_cache(self, search_query, allowed_clearances, distance_threshold=0.18):
+        # (CACHE RBAC): Validate user's allowed clearances against required clearance tier
         try:
             results = self.cache_collection.query(query_texts=[search_query], n_results=1)
             if results and results['ids'] and results['ids'][0]:
                 distance = results['distances'][0][0]
                 if distance <= distance_threshold:
                     metadata = results['metadatas'][0][0]
+
+                    # RBAC Clearance Enforcement
+                    required_clearance = metadata.get('required_clearance', 'restricted')
+                    if required_clearance not in allowed_clearances:
+                        print(f"[*] [Layer 1] CACHE HIT BLOCKED! Query requires '{required_clearance}' clearance, user has {allowed_clearances}.")
+                        return None, None
+
                     cached_answer = metadata.get('answer', results['documents'][0][0])
                     citations = json.loads(metadata.get('citations', '[]'))
                     print(f"[*] [Layer 1] CACHE HIT! Query Distance ({distance:.4f}) <= Threshold ({distance_threshold}).")
@@ -189,9 +207,18 @@ class RagEngine:
         return None, None
 
     def _write_semantic_cache(self, search_query, answer, citations):
+        # CACHE RBAC: Store the highest clearance level required by citations into cache metadata
         try:
             cache_id = f"cache_{uuid.uuid4()}"
             source_files = ",".join(sorted(list(set(c['filename'] for c in citations if isinstance(c, dict) and c.get('filename')))))
+
+            cited_clearances = [c.get('clearance', 'public') for c in citations if isinstance(c, dict)]
+            if 'restricted' in cited_clearances:
+                required_clearance = 'restricted'
+            elif 'internal' in cited_clearances:
+                required_clearance = 'internal'
+            else:
+                required_clearance = 'public'
 
             self.cache_collection.add(
                 documents=[search_query],
@@ -200,11 +227,12 @@ class RagEngine:
                     "answer": answer,
                     "citations": json.dumps(citations),
                     "source_files": source_files,
+                    "required_clearance": required_clearance,
                     "cached_at": datetime.now(timezone.utc).isoformat()
                 }],
                 ids=[cache_id]
             )
-            print(f"[*] [Layer 1] Saved query-response pair to cache ({cache_id}).")
+            print(f"[*] [Layer 1] Saved query-response pair to cache ({cache_id}) [Required Clearance: '{required_clearance}'].")
         except Exception as e:
             print(f"[!] [Layer 1] Cache write exception: {str(e)}")
 
@@ -281,6 +309,9 @@ class RagEngine:
             if filename in self.hot_filenames:
                 self.hot_filenames.remove(filename)
 
+            # HOT TIER: Reset hit tracking counter on file deletion
+            self.doc_access_counts.pop(filename, None)
+
             self.invalidate_cache_for_source(filename)
             self._refresh_ram_buffer()
             return True
@@ -346,9 +377,11 @@ class RagEngine:
         return question
 
     def _format_chunk_payload(self, idx: int) -> dict:
+        # CACHE RBAC: Include chunk clearance in formatted payload dictionary
         return {
             "filename": self.in_memory_corpus_metas[idx].get('source'),
             "page": self.in_memory_corpus_metas[idx].get('page', 1),
+            "clearance": self.in_memory_corpus_metas[idx].get('clearance', 'public'),
             "text": self.in_memory_corpus_docs[idx]
         }
 
@@ -356,19 +389,40 @@ class RagEngine:
         if not self.in_memory_corpus_docs:
             return []
 
-        # 1. DENSE RETRIEVAL (ChromaDB Vector Store)
+        # 1. DENSE RETRIEVAL (Query Hot Tier First, Fall Back to Primary Archive)
         dense_indices_with_ranks = []
         if mode in ("hybrid", "dense_only"):
-            # Query the primary archive directly to prevent short-circuiting valid matches
-            vector_results = self.archive_collection.query(
-                query_texts=[query],
-                n_results=15,
-                where={"clearance": {"$in": allowed_clearances}}
-            )
+            vector_results = None
+            HOT_SIMILARITY_THRESHOLD = 0.85  # Strict distance cutoff for hot collection hits
+            L2_CUTOFF_THRESHOLD = 1.40
+
+            # HOT TIER: Query hot collection first if hot documents exist
+            if self.hot_filenames:
+                try:
+                    hot_query_res = self.hot_collection.query(
+                        query_texts=[query],
+                        n_results=15,
+                        where={"clearance": {"$in": allowed_clearances}}
+                    )
+                    if hot_query_res and hot_query_res['ids'] and hot_query_res['ids'][0]:
+                        raw_distances = hot_query_res['distances'][0]
+                        if raw_distances and min(raw_distances) <= HOT_SIMILARITY_THRESHOLD:
+                            print(f"[*] [Hot Tier] HIT! Best similarity distance: {min(raw_distances):.4f} <= {HOT_SIMILARITY_THRESHOLD}")
+                            vector_results = hot_query_res
+                        else:
+                            print(f"[*] [Hot Tier] LOW CONFIDENCE ({min(raw_distances):.4f} > {HOT_SIMILARITY_THRESHOLD}). Falling back to Archive.")
+                except Exception as e:
+                    print(f"[!] [Hot Tier] Query exception, falling back to Archive: {str(e)}")
+
+            # Fall back to primary archive if Hot Tier produced no high-confidence hits
+            if vector_results is None:
+                vector_results = self.archive_collection.query(
+                    query_texts=[query],
+                    n_results=15,
+                    where={"clearance": {"$in": allowed_clearances}}
+                )
 
             id_to_idx_map = {cid: idx for idx, cid in enumerate(self.in_memory_corpus_ids)}
-            # Relaxed distance threshold (1.40 allows standard MiniLM embedding distances)
-            L2_CUTOFF_THRESHOLD = 1.40
 
             if vector_results and vector_results['ids'] and vector_results['ids'][0]:
                 raw_ids = vector_results['ids'][0]
@@ -433,13 +487,15 @@ class RagEngine:
         valid_documents = []
         chunk_ref_map = {}
 
+        # (CACHE RBAC): Pass chunk clearance into chunk_ref_map for cache writing
         for i, chunk in enumerate(retrieved_chunks, start=1):
             filename = chunk.get('filename')
             page = chunk.get('page', 1)
+            clearance = chunk.get('clearance', 'public')
             doc_text = chunk.get('text', '')
 
             ref_tag = f"REF{i}"
-            chunk_ref_map[ref_tag] = {"filename": filename, "page": page}
+            chunk_ref_map[ref_tag] = {"filename": filename, "page": page, "clearance": clearance}
             valid_documents.append(f"[{ref_tag}] Document: {filename} (Page {page})\n{doc_text}")
 
         context_string = "\n\n".join(valid_documents)
@@ -529,7 +585,8 @@ class RagEngine:
         print(f"[*] Original Question: {question}")
         print(f"[*] Rewritten Standalone Query: {search_query}")
 
-        cached_answer, cached_citations = self._check_semantic_cache(search_query)
+        # CACHE RBAC: Pass allowed_clearances directly to semantic cache checker
+        cached_answer, cached_citations = self._check_semantic_cache(search_query, allowed_clearances)
         if cached_answer is not None:
             return cached_answer, cached_citations, []
 
@@ -569,14 +626,12 @@ class RagEngine:
         and resets in-memory tracking state.
         """
         try:
-            # 1. Delete and recreate the hot collection in ChromaDB
             self.chroma_client.delete_collection("uni_regs_hot")
             self.hot_collection = self.chroma_client.get_or_create_collection(
                 "uni_regs_hot",
                 embedding_function=self.default_ef
             )
 
-            # 2. Reset in-memory state variables
             self.hot_filenames.clear()
             self.doc_access_counts.clear()
 
