@@ -538,6 +538,9 @@ class RagEngine:
                 if response.status_code == 200:
                     answer_text = response.json()['choices'][0]['message']['content']
 
+                    # Convert full-width Unicode brackets to standard ASCII brackets. Because of Model change
+                    answer_text = answer_text.replace('【', '[').replace('】', ']')
+
                     negative_indicators = [
                         "don't have relevant information",
                         "do not have relevant information",
