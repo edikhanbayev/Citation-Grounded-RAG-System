@@ -357,7 +357,7 @@ class RagEngine:
 
         headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": "openai/gpt-oss-120b",
             "messages": [{"role": "user", "content": condense_prompt}],
             "temperature": 0.0
         }
@@ -520,7 +520,7 @@ class RagEngine:
         })
 
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": "openai/gpt-oss-120b",
             "messages": messages,
             "temperature": 0.0
         }
