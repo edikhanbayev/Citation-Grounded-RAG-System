@@ -173,7 +173,7 @@ class RagEngine:
 
                 payload = self.archive_collection.get(where={"source": filename})
                 if payload and payload['documents']:
-                    # FIX 2 (HOT TIER): Use upsert to safely write without duplicate ID errors
+                    # HOT TIER: Use upsert to safely write without duplicate ID errors
                     self.hot_collection.upsert(
                         documents=payload['documents'],
                         metadatas=payload['metadatas'],

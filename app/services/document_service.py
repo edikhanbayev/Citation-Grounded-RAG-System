@@ -14,16 +14,16 @@ def process_async_upload(file_data, clearance_level):
     # Saving file to disk instantly, handling duplicates, then schedules background RAG vector indexing
     filename = secure_filename(file_data.filename)
 
-    # Step 1: Query the SQLite DB to see if this filename is a duplicate
+    # Query the SQLite to see if this filename is a duplicate
     existing_doc = Document.query.filter_by(filename=filename).first()
 
     if existing_doc:
         print(f"[*] Re-upload Detected: '{filename}' already exists. Initiating overwrite sequence...")
 
-        # Step 2: Clear old matching vector fragments and selective cache entries from ChromaDB
+        # Clear old matching vector fragments and selective cache entries from ChromaDB
         rag.delete_source(filename)
 
-        # Step 3: Repurpose the existing record instead of inserting a duplicate row
+        # Repurpose the existing record instead of inserting a duplicate row
         existing_doc.clearance_level = clearance_level
         existing_doc.status = 'Processing'
         db.session.commit()

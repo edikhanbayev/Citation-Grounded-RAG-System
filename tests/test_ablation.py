@@ -13,13 +13,9 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# Import RagEngine from app/models.py
 from app.models import RagEngine
 
-
-# =====================================================================
 # 1. EVALUATION DATASET (35 QUESTION-ANSWER BENCHMARK PAIRS)
-# =====================================================================
 
 @dataclass
 class QuestionAnswerPair:
@@ -328,10 +324,7 @@ TEST_DATASET: List[QuestionAnswerPair] = [
     )
 ]
 
-
-# =====================================================================
 # 2. EVALUATION METRIC CALCULATIONS & HELPER EXTRACTORS
-# =====================================================================
 
 def parse_expected_pages(page_str: str) -> List[int]:
     """
@@ -437,9 +430,7 @@ def evaluate_retrieved_chunks(
     return {"hit": hit, "mrr": mrr}
 
 
-# =====================================================================
 # 3. ABLATION EXPERIMENT RUNNER
-# =====================================================================
 
 class AblationTestRunner:
 
