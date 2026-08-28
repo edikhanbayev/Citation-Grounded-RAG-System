@@ -1,0 +1,267 @@
+
+[
+    {
+        "id" :1,
+        "category" :"Academic, Wellbeing and Social Support",
+        "question" :"Who are the Senior Tutors in the School of Computer Science and what are their email addresses?",
+        "expected_answer" :"The Senior Tutors are Todd Waugh Ambridge (t.waughambridge@bham.ac.uk} and Ian Batten (i.g.batten@bham.ac.uk}.",
+        "source" :"academic_wellbeing_and_social_support_cs_handbook.pdf",
+        "page" :"Page 1"
+    },
+    {
+        "id" :2,
+        "category" :"Academic, Wellbeing and Social Support",
+        "question" :"What is the direct email address for contacting the Computer Science Wellbeing Officers?",
+        "expected_answer" :"cswelfare@contacts.bham.ac.uk",
+        "source" :"academic_wellbeing_and_social_support_cs_handbook.pdf",
+        "page" :"Page 2"
+    },
+    {
+        "id" :3,
+        "category" :"Academic, Wellbeing and Social Support",
+        "question" :"What specific facility in the Main Library is highlighted for neurodiverse students to use for studying?",
+        "expected_answer" :"Bookable Assistive Technology Booths.",
+        "source" :"academic_wellbeing_and_social_support_cs_handbook.pdf",
+        "page" :"Page 4"
+    },
+    {
+        "id" :4,
+        "category" :"Academic, Wellbeing and Social Support",
+        "question" :"What Academic English support program is provided free of charge to international students by the Birmingham International Academy (BIA}, and what is its contact email address?",
+        "expected_answer" :"The BIA Academic English Programme; contact email is bia@contacts.bham.ac.uk.",
+        "source" :"academic_wellbeing_and_social_support_cs_handbook.pdf",
+        "page" :"Page 5"
+    },
+    {
+        "id" :5,
+        "category" :"Academic, Wellbeing and Social Support",
+        "question" :"What is the name of the student-led hacking club at the University of Birmingham, what is its website, and what primary topic do they cover weekly?",
+        "expected_answer" :"A Finite Number of Monkeys (AFNOM}; website is https://afnom.net; they focus on offensive hacking and cyber security.",
+        "source" :"academic_wellbeing_and_social_support_cs_handbook.pdf",
+        "page" :"Page 7"
+    },
+    {
+        "id" :6,
+        "category" :"Academic, Wellbeing and Social Support",
+        "question" :"Where is the Multi-Faith Chaplaincy located on campus?",
+        "expected_answer" :"Located at St Francis Hall, adjacent to the Guild of Students.",
+        "source" :"academic_wellbeing_and_social_support_cs_handbook.pdf",
+        "page" :"Page 8"
+    },
+    {
+        "id" :7,
+        "category" :"General Information",
+        "question" :"What is the room number, floor, and building location of the Education Support Office (ESO}?",
+        "expected_answer" :"Room UG44, Upper Ground floor of the Computer Science Building (Building Y9 on the Campus Map}.",
+        "source" :"general_information_cs_handbook.pdf",
+        "page" :"Page 3"
+    },
+    {
+        "id" :8,
+        "category" :"General Information",
+        "question" :"What are the contact email addresses for undergraduate and postgraduate taught (MSc} students to reach the Education Support Office (ESO}?",
+        "expected_answer" :"Undergraduate: ug-cs@contacts.bham.ac.uk; Postgraduate Taught (MSc}: msc-cs@contacts.bham.ac.uk.",
+        "source" :"general_information_cs_handbook.pdf",
+        "page" :"Page 3"
+    },
+    {
+        "id" :9,
+        "category" :"General Information",
+        "question" :"What are the standard teaching hours on Wednesday and Friday during the UK University teaching week?",
+        "expected_answer" :"Wednesday: 09:00–13:00; Friday: 09:00–18:00.",
+        "source" :"general_information_cs_handbook.pdf",
+        "page" :"Page 6"
+    },
+    {
+        "id" :10,
+        "category" :"General Information",
+        "question" :"What are the three study spaces/facilities mentioned within the Computer Science building that are dedicated or available to Computer Science students?",
+        "expected_answer" :"1. Sloman Lounge; 2. CS Meeting Rooms; 3. CS Labs.",
+        "source" :"general_information_cs_handbook.pdf",
+        "page" :"Page 7"
+    },
+    {
+        "id" :11,
+        "category" :"General Information",
+        "question" :"What is the maximum duration permitted for an Authorised Absence, and which group of students is eligible for it?",
+        "expected_answer" :"Up to 8 weeks; strictly for Student Route Visa holders.",
+        "source" :"general_information_cs_handbook.pdf",
+        "page" :"Page 9"
+    },
+    {
+        "id" :12,
+        "category" :"General Information",
+        "question" :"What are the emergency and non-emergency telephone numbers for Security Services?",
+        "expected_answer" :"Emergency: 0121 414 4444; Non-emergency: 0121 414 3000.",
+        "source" :"general_information_cs_handbook.pdf",
+        "page" :"Page 12"
+    },
+    {
+        "id" :13,
+        "category" :"Library, IT Services, and Security",
+        "question" :"How many printed books/manuscripts and electronic books are accessible through Library Services?",
+        "expected_answer" :"Over 2 million printed books/manuscripts, over 500,000 electronic books.",
+        "source" :"library_it_services_and_security_cs_handbook.pdf",
+        "page" :"Page 1"
+    },
+    {
+        "id" :14,
+        "category" :"Library, IT Services, and Security",
+        "question" :"What URL address is provided to search the University Library catalogue?",
+        "expected_answer" :"www.findit.bham.ac.uk",
+        "source" :"library_it_services_and_security_cs_handbook.pdf",
+        "page" :"Page 1"
+    },
+    {
+        "id" :15,
+        "category" :"Library, IT Services, and Security",
+        "question" :"Where is the Security Office located on campus, and what are its operating hours?",
+        "expected_answer" :"Rear of Aston Webb in B Block courtyard; operates 24/7.",
+        "source" :"library_it_services_and_security_cs_handbook.pdf",
+        "page" :"Page 3"
+    },
+    {
+        "id" :16,
+        "category" :"Programme Information",
+        "question" :"How many total credits are required to be awarded a BSc, an MSci, and an MSc degree?",
+        "expected_answer" :"BSc: 360 credits; MSci: 480 credits; MSc: 180 credits.",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 1"
+    },
+    {
+        "id" :17,
+        "category" :"Programme Information",
+        "question" :"How many total learning hours are expected for a 20-credit module, and what do these hours comprise?",
+        "expected_answer" :"200 hours total covering contact hours and private study/coursework.",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 1"
+    },
+    {
+        "id" :18,
+        "category" :"Programme Information",
+        "question" :"What are the standard module pass marks for undergraduate and postgraduate programmes?",
+        "expected_answer" :"Undergraduate: 40; Postgraduate: 50.",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 1"
+    },
+    {
+        "id" :19,
+        "category" :"Programme Information",
+        "question" :"What is a 'repeat-only' module, and what two examples are given in the handbook?",
+        "expected_answer" :"Module must be repeated in full next academic year. Examples: Final year projects and group work modules.",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 3"
+    },
+    {
+        "id" :20,
+        "category" :"Programme Information",
+        "question" :"What is the default policy for late submission of coursework in the School of Computer Science, and what penalty applies if late submissions are explicitly allowed?",
+        "expected_answer" :"Default: No late submissions accepted. If allowed: 5% penalty per working day up to 1 week.",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 5"
+    },
+    {
+        "id" :21,
+        "category" :"Programme Information",
+        "question" :"What is the expected timeframe for feedback return on mid-module assessments versus all other assessments?",
+        "expected_answer" :"15 working days for mid-module assessments; 20 working days for all others.",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 5"
+    },
+    {
+        "id" :22,
+        "category" :"Programme Information",
+        "question" :"How is the overall degree mark calculated across study years for a student undertaking a Study Abroad program?",
+        "expected_answer" :"20% Year 2, 5% Year 3 (Study Abroad}, 75% Year 4.",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 7"
+    },
+    {
+        "id" :23,
+        "category" :"Student Representation",
+        "question" :"How many total students does the Guild of Students represent, and how many student groups does it house?",
+        "expected_answer" :"Represents over 38,000 students and houses over 350 student groups.",
+        "source" :"student_representation_cs_handbook.pdf",
+        "page" :"Pages 1–2"
+    },
+    {
+        "id" :24,
+        "category" :"Student Representation",
+        "question" :"Approximately how many Student Reps operate across the University of Birmingham?",
+        "expected_answer" :"Over 1,000 Student Reps.",
+        "source" :"student_representation_cs_handbook.pdf",
+        "page" :"Page 2"
+    },
+    {
+        "id" :25,
+        "category" :"Student Representation",
+        "question" :"What exact web address contains the agendas and minutes for the Staff Student Forums (SSFs}?",
+        "expected_answer" :"https://www.cs.bham.ac.uk/internal/local/committees/staffstudent",
+        "source" :"student_representation_cs_handbook.pdf",
+        "page" :"Page 3"
+    },
+    {
+        "id" :26,
+        "category" :"University Legislation",
+        "question" :"Explain how 'cohort legislation' determines which regulations apply to a student who entered in 2024-25 versus 2025-26.",
+        "expected_answer" :"Cohort legislation binds a student to regulations of their entry year throughout their degree.",
+        "source" :"university_legislation_cs_handbook.pdf",
+        "page" :"Page 2"
+    },
+    {
+        "id" :27,
+        "category" :"University Legislation",
+        "question" :"Where and when are details of extenuating circumstances considered to ensure student privacy, rather than at full Board of Examiners meetings?",
+        "expected_answer" :"At Extenuating Circumstances Panels after each assessment period.",
+        "source" :"university_legislation_cs_handbook.pdf",
+        "page" :"Page 4"
+    },
+    {
+        "id" :28,
+        "category" :"University Legislation",
+        "question" :"What rules apply regarding wristwatches, mobile phones, and coats during in-person campus examinations?",
+        "expected_answer" :"Phones and smart watches off under desk; simple watches allowed; coats in designated area.",
+        "source" :"university_legislation_cs_handbook.pdf",
+        "page" :"Pages 12–13"
+    },
+    {
+        "id" :29,
+        "category" :"University Legislation",
+        "question" :"What are three prohibited uses and three permitted uses of Generative AI during assessment preparation according to University policy?",
+        "expected_answer" :"Prohibited: Altering text arguments, correcting accuracy, translating to reduce length. Permitted: Spelling/punctuation advice, grammar checks, shortening without content change.",
+        "source" :"university_legislation_cs_handbook.pdf",
+        "page" :"Page 15"
+    },
+    {
+        "id" :30,
+        "category" :"University Legislation",
+        "question" :"What is the primary role of the two External Advisors on Academic Standards appointed by the University?",
+        "expected_answer" :"One scrutinises UG standards and the other PGT standards for external quality assurance.",
+        "source" :"university_legislation_cs_handbook.pdf",
+        "page" :"Page 16"
+    },
+    {
+        "id" :31,
+        "category" :"University Legislation",
+        "question" :"How do I request a deadline extension if I get sick?",
+        "expected_answer" :"Should get in contact with Wellbeing Team",
+        "source" :"programme_information_cs_handbook.pdf",
+        "page" :"Page 5"
+    },
+    {
+        "id" :32,
+        "category" :"University Legislation",
+        "question" :"Can I use automated software like ChatGPT to refine the logic and argument structure of my essay draft?",
+        "expected_answer" :"No, use of automated software to refine the logic and argument structure is not allowed.",
+        "source" :"university_legislation_cs_handbook.pdf",
+        "page" :"Page 15"
+    },
+    {
+        "id" :33,
+        "category" :"University Legislation",
+        "question" :"What happens if an invigilator catches a student with handwriting on their skin during an assessment?",
+        "expected_answer" :"It will be treated as breach of exam",
+        "source" :"university_legislation_cs_handbook.pdf",
+        "page" :"Page 13"
+    }
+]

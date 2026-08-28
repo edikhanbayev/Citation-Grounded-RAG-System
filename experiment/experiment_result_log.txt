@@ -1,0 +1,1689 @@
+Running Experiment A with 33 questions.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 170 chunks indexed.
+[*] [Layer 2] Refreshed RAM BM25 Buffer: 170 chunks indexed.
+[RAG] Semantic caches cleared.
+
+================================================================================
+QUESTION 1/33
+ID: 1
+Question: Who are the Senior Tutors in the School of Computer Science and what are their email addresses?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I can’t provide that information.
+Tokens: 327
+Latency: 2.18s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: Who are the Senior Tutors in the School of Computer Science and what are their email addresses?
+[*] Rewritten Standalone Query: Who are the Senior Tutors in the School of Computer Science and what are their email addresses?
+[*] [Layer 1] Saved query-response pair to cache (cache_14c4dae0-ed68-4c2f-b61d-4b6208090b40) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Senior Tutors in the School of Computer Science are:
+
+- Todd Waugh Ambridge – email: t.waughambridge@bham.ac.uk  
+- Ian Batten – email: i.g.batten@bham.ac.uk
+
+[RAG CITATIONS]
+[{'filename': 'Academic_Wellbeing_and_Social_Support_CS_handbook.pdf', 'page': 1, 'clearance': 'public'}]
+
+RAG latency: 5.43s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 2/33
+ID: 2
+Question: What is the direct email address for contacting the Computer Science Wellbeing Officers?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have that specific contact information. If you need the email address for the Computer Science Wellbeing Officers, I recommend checking your department’s official website or contacting your university’s main help desk or student services for the most accurate and up‑to‑date details.
+Tokens: 313
+Latency: 2.15s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is the direct email address for contacting the Computer Science Wellbeing Officers?
+[*] Rewritten Standalone Query: What is the direct email address for contacting the Computer Science Wellbeing Officers?
+[*] [Layer 1] Saved query-response pair to cache (cache_26f42d8e-0265-4d52-86a6-1961d6d14f32) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The direct email address for contacting the Computer Science Wellbeing Officers is cswelfare@contacts.bham.ac.uk.
+
+[RAG CITATIONS]
+[{'filename': 'Academic_Wellbeing_and_Social_Support_CS_handbook.pdf', 'page': 2, 'clearance': 'public'}]
+
+RAG latency: 8.05s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 3/33
+ID: 3
+Question: What specific facility in the Main Library is highlighted for neurodiverse students to use for studying?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m not aware of the particular facility you’re referring to. If you have more context—such as the university or library name—I can try to help further, but based on the information I have, I don’t know which specific space in the Main Library is highlighted for neurodiverse students.
+Tokens: 453
+Latency: 2.23s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What specific facility in the Main Library is highlighted for neurodiverse students to use for studying?
+[*] Rewritten Standalone Query: What specific facility in the Main Library is highlighted for neurodiverse students to use for studying?
+[*] [Layer 1] Saved query-response pair to cache (cache_23cfe288-8df5-4bf5-acdc-0b9fe29642ec) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+Neurodiverse students are encouraged to use the Main Library’s bookable Assistive Technology Booths for studying.
+
+[RAG CITATIONS]
+[{'filename': 'Academic_Wellbeing_and_Social_Support_CS_handbook.pdf', 'page': 4, 'clearance': 'public'}]
+
+RAG latency: 4.33s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 4/33
+ID: 4
+Question: What Academic English support program is provided free of charge to international students by the Birmingham International Academy (BIA}, and what is its contact email address?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific details about the free Academic English support program offered by the Birmingham International Academy or its contact email address. I recommend checking the Birmingham International Academy’s official website or contacting the university’s international student services directly for the most accurate and up‑to‑date information.
+Tokens: 352
+Latency: 2.24s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What Academic English support program is provided free of charge to international students by the Birmingham International Academy (BIA}, and what is its contact email address?
+[*] Rewritten Standalone Query: What Academic English support program is provided free of charge to international students by the Birmingham International Academy (BIA}, and what is its contact email address?
+[*] [Layer 1] Saved query-response pair to cache (cache_15e0d998-80a8-4ec6-9502-f63196e0181c) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Birmingham International Academy (BIA) offers the **Academic English Programme**, which provides Academic English language and skills development free of charge to all international students whose first language is not English.  
+For enquiries, you can contact the programme at **bia@contacts.bham.ac.uk**.
+
+[RAG CITATIONS]
+[{'filename': 'Academic_Wellbeing_and_Social_Support_CS_handbook.pdf', 'page': 5, 'clearance': 'public'}]
+
+RAG latency: 4.20s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 5/33
+ID: 5
+Question: What is the name of the student-led hacking club at the University of Birmingham, what is its website, and what primary topic do they cover weekly?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have that specific information.
+Tokens: 332
+Latency: 2.02s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is the name of the student-led hacking club at the University of Birmingham, what is its website, and what primary topic do they cover weekly?
+[*] Rewritten Standalone Query: What is the name of the student-led hacking club at the University of Birmingham, what is its website, and what primary topic do they cover weekly?
+[*] PROMOTION TRIGGERED: 'Academic_Wellbeing_and_Social_Support_CS_handbook.pdf' reached 5 hits.
+[*] [Layer 1] Saved query-response pair to cache (cache_cde3d149-a878-4ee0-91c8-16cf299c9d58) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The student‑led hacking club at the University of Birmingham is called **Finite Number of Monkeys (AFNOM)**.  
+Its website is **https://afnom.net**.  
+Each week the club meets to focus on **offensive hacking and cyber security**.
+
+[RAG CITATIONS]
+[{'filename': 'Academic_Wellbeing_and_Social_Support_CS_handbook.pdf', 'page': 7, 'clearance': 'public'}]
+
+RAG latency: 12.39s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 6/33
+ID: 6
+Question: Where is the Multi-Faith Chaplaincy located on campus?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m not sure which university you’re referring to. Could you let me know the name of the campus you have in mind? Then I can try to help you locate its Multi‑Faith Chaplaincy.
+Tokens: 289
+Latency: 1.96s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: Where is the Multi-Faith Chaplaincy located on campus?
+[*] Rewritten Standalone Query: Where is the Multi-Faith Chaplaincy located on campus?
+[*] [Hot Tier] HIT! Best similarity distance: 0.6222 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_a1328b6c-2e31-4dc6-8534-7ee374169d80) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Multi‑Faith Chaplaincy is located at St Francis Hall, adjacent to the Guild of Students.
+
+[RAG CITATIONS]
+[{'filename': 'Academic_Wellbeing_and_Social_Support_CS_handbook.pdf', 'page': 8, 'clearance': 'public'}]
+
+RAG latency: 3.45s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 7/33
+ID: 7
+Question: What is the room number, floor, and building location of the Education Support Office (ESO}?
+================================================================================
+
+[1/2] Running Plain LLM...
+[Groq] Waiting 0.55s before next request...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific room number, floor, or building location for the Education Support Office (ESO). I recommend checking your university’s official website, campus map, or contacting the office directly for the most accurate and up‑to‑date information.
+Tokens: 376
+Latency: 2.72s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is the room number, floor, and building location of the Education Support Office (ESO}?
+[*] Rewritten Standalone Query: What is the room number, floor, and building location of the Education Support Office (ESO}?
+[*] [Hot Tier] LOW CONFIDENCE (1.3015 > 0.85). Falling back to Archive.
+[*] PROMOTION TRIGGERED: 'General_Information_CS_handbook.pdf' reached 5 hits.
+[*] [Layer 1] Saved query-response pair to cache (cache_b59e1611-2a72-4e7e-bd99-9ad4a86468ab) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Education Support Office (ESO) is located in Room UG44 on the Upper Ground floor of the Computer Science Building (Building Y9).
+
+[RAG CITATIONS]
+[{'filename': 'General_Information_CS_handbook.pdf', 'page': 3, 'clearance': 'public'}]
+
+RAG latency: 30.85s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 8/33
+ID: 8
+Question: What are the contact email addresses for undergraduate and postgraduate taught (MSc} students to reach the Education Support Office (ESO}?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific email addresses for the Education Support Office (ESO) for undergraduate or postgraduate‑taught (MSc) students. The best way to obtain that information is to consult your university’s official website, student handbook, or the contact page for the Education Support Office, or to ask a member of your department’s administrative staff. They will be able to provide you with the correct and up‑to‑date email addresses.
+Tokens: 361
+Latency: 2.25s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What are the contact email addresses for undergraduate and postgraduate taught (MSc} students to reach the Education Support Office (ESO}?
+[*] Rewritten Standalone Query: What are the contact email addresses for undergraduate and postgraduate taught (MSc} students to reach the Education Support Office (ESO}?
+[*] [Hot Tier] HIT! Best similarity distance: 0.6839 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_058e501f-a986-4754-8773-779b4465167c) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+Undergraduate students should email ug‑cs@contacts.bham.ac.uk to contact the Education Support Office (ESO).
+
+Postgraduate Taught (MSc) students should email msc‑cs@contacts.bham.ac.uk to contact the Education Support Office (ESO).
+
+[RAG CITATIONS]
+[{'filename': 'General_Information_CS_handbook.pdf', 'page': 3, 'clearance': 'public'}]
+
+RAG latency: 4.15s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 9/33
+ID: 9
+Question: What are the standard teaching hours on Wednesday and Friday during the UK University teaching week?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+There isn’t a single, UK‑wide timetable that dictates exactly what hours are taught on any particular day of a “teaching week.”  Each university (and often each faculty or department within a university) sets its own contact‑hour schedule, so the start‑ and finish‑times on Wednesday and Friday can differ quite a lot from one institution to another.
+
+**What you’ll usually see in practice**
+
+| Typical pattern | Why it looks that way | Rough time‑range you might encounter |
+|-----------------|----------------------|--------------------------------------|
+| **Monday‑Friday, 9 am‑5 pm** (with a 1‑hour lunch break) | Mirrors a conventional office day and makes it easy to slot lectures, seminars and labs into a regular block. | Lectures often run 9‑11 am, 11‑1 pm, 2‑4 pm; a Friday afternoon slot may be used for labs, tutorials or assessment. |
+| **Staggered start times** (e.g., 8:30 am‑4:30 pm or 10 am‑6 pm) | Allows departments to fit more sessions into a day or to accommodate part‑time staff and students. | Same total contact hours, just shifted earlier or later. |
+| **Reduced Friday schedule** (e.g., no teaching after 3 pm) | Many institutions reserve late‑Friday for seminars, workshops, field trips, or administrative duties. | Lectures may finish by 2‑3 pm, with optional labs or tutorials later. |
+| **Block teaching** (e.g., two‑hour blocks with a longer lunch) | Helps avoid “lecture fatigue” and gives students time for independent study. | 9‑11 am, 12‑2 pm, 3‑5 pm blocks are common. |
+| **Hybrid/online days** | Some universities blend face‑to‑face and virtual sessions, especially after the pandemic. | A Wednesday might have a mix of in‑person and online tutorials, with the same overall contact‑hour total. |
+
+**Typical weekly contact‑hour totals**
+
+- **Undergraduate programmes** often aim for **12–15 contact hours per week** (spread over 2–4 days).  
+- **Post‑graduate taught programmes** may have **6–12 contact hours per week**, sometimes concentrated on fewer days.  
+
+If a programme spreads those hours evenly, you might see roughly **2–3 contact hours on each weekday**, meaning a Wednesday could have two 2‑hour lectures (e.g., 10 am‑12 pm) and a Friday could have a single 3‑hour lab (e.g., 1‑4 pm). But many courses cluster sessions (e.g., two back‑to‑back lectures on Monday and a longer workshop on Thursday), so the pattern can be irregular.
+
+**What to do if you need the exact schedule**
+
+1. **Check the university’s academic calendar** – it will list the start/end dates of teaching weeks, holidays, and any “no‑teaching” days.  
+2. **Look at the department’s timetable** – most institutions publish a weekly timetable (often via a student portal such as Moodle, Blackboard, or a dedicated timetabling system).  
+3. **Ask the programme coordinator or student services** – they can confirm whether there are any university‑wide conventions (e.g., “no teaching after 4 pm on Fridays”).  
+
+**Bottom line**
+
+- There is **no UK‑wide statutory standard** for teaching hours on Wednesday or Friday.  
+- Most universities operate within a **9 am‑5 pm window**, with variations for early‑ or late‑starting days, reduced Friday afternoons, or block‑style scheduling.  
+- The exact hours you’ll encounter depend on the **specific university, faculty, and programme** you’re looking at. If you need the precise schedule for a particular institution, the best source is that university’s own timetabling portal or the relevant academic office.
+Tokens: 1272
+Latency: 3.87s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What are the standard teaching hours on Wednesday and Friday during the UK University teaching week?
+[*] Rewritten Standalone Query: What are the standard teaching hours on Wednesday and Friday during the UK University teaching week?
+[*] [Hot Tier] HIT! Best similarity distance: 0.3692 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_5ced16ad-1231-4834-91b7-20a3d60d77d1) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+Wednesday: 09:00 – 13:00 and Friday: 09:00 – 18:00
+
+[RAG CITATIONS]
+[{'filename': 'General_Information_CS_handbook.pdf', 'page': 6, 'clearance': 'public'}]
+
+RAG latency: 4.55s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 10/33
+ID: 10
+Question: What are the three study spaces/facilities mentioned within the Computer Science building that are dedicated or available to Computer Science students?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific information about the three study spaces or facilities that are mentioned within the Computer Science building. If you can provide more details or the source where they’re listed, I’d be happy to help interpret that information.
+Tokens: 466
+Latency: 2.32s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What are the three study spaces/facilities mentioned within the Computer Science building that are dedicated or available to Computer Science students?
+[*] Rewritten Standalone Query: What are the three study spaces/facilities mentioned within the Computer Science building that are dedicated or available to Computer Science students?
+[*] [Hot Tier] HIT! Best similarity distance: 0.5694 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_4908e8f8-5b55-4873-bafb-1fc6ed6c63d8) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Computer Science building provides three dedicated or available study spaces/facilities for Computer Science students:
+
+1. **Sloman Lounge** – a large ground‑floor space in the School of Computer Science equipped with individual work desks, sofas, group meeting tables and a small collection of reference books.  
+2. **CS Meeting Rooms** – three meeting rooms located within the Sloman Lounge that can be used by students when they are empty and not booked by staff.  
+3. **CS Labs** – several labs on the Upper and Lower Ground floors that are reserved for Computer Science students only and can be accessed with a student ID swipe card when no teaching is scheduled.
+
+[RAG CITATIONS]
+[{'filename': 'General_Information_CS_handbook.pdf', 'page': 7, 'clearance': 'public'}]
+
+RAG latency: 4.64s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 11/33
+ID: 11
+Question: What is the maximum duration permitted for an Authorised Absence, and which group of students is eligible for it?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific details about the maximum permitted length of an Authorised Absence or the particular group of students who are eligible for it. If you can provide the relevant policy text or additional context, I’ll be happy to help interpret it.
+Tokens: 418
+Latency: 2.23s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is the maximum duration permitted for an Authorised Absence, and which group of students is eligible for it?
+[*] Rewritten Standalone Query: What is the maximum duration permitted for an Authorised Absence, and which group of students is eligible for it?
+[*] [Hot Tier] HIT! Best similarity distance: 0.6088 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_3337107f-0ca7-4ea8-8361-a657166059a2) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The maximum duration allowed for an Authorised Absence is up to 8 weeks.  
+Authorised Absences are only available to students who hold a Student Route Visa.
+
+[RAG CITATIONS]
+[{'filename': 'General_Information_CS_handbook.pdf', 'page': 9, 'clearance': 'public'}]
+
+RAG latency: 3.96s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 12/33
+ID: 12
+Question: What are the emergency and non-emergency telephone numbers for Security Services?
+================================================================================
+
+[1/2] Running Plain LLM...
+[Groq] Waiting 0.03s before next request...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific emergency and non‑emergency telephone numbers for Security Services. I recommend checking your university’s official website, campus safety portal, or contacting the main campus switchboard for the most accurate and up‑to‑date contact information.
+Tokens: 368
+Latency: 1.93s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What are the emergency and non-emergency telephone numbers for Security Services?
+[*] Rewritten Standalone Query: What are the emergency and non-emergency telephone numbers for Security Services?
+[*] [Hot Tier] LOW CONFIDENCE (1.0418 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_95d36b3c-7127-4b08-b53d-4d0458a965aa) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The emergency telephone number for Security Services is 0121 414 4444.  
+The non‑emergency telephone number for Security Services is 0121 414 3000.
+
+[RAG CITATIONS]
+[{'filename': 'General_Information_CS_handbook.pdf', 'page': 12, 'clearance': 'public'}, {'filename': 'Library_IT_Services_and_Security_CS_handbook.pdf', 'page': 3, 'clearance': 'public'}]
+
+RAG latency: 5.27s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 13/33
+ID: 13
+Question: How many printed books/manuscripts and electronic books are accessible through Library Services?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific figures for the number of printed books/manuscripts and electronic books available through Library Services. If you can tell me which institution or library you’re referring to, I can try to point you toward the appropriate resources where you can find that information.
+Tokens: 352
+Latency: 2.24s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: How many printed books/manuscripts and electronic books are accessible through Library Services?
+[*] Rewritten Standalone Query: How many printed books/manuscripts and electronic books are accessible through Library Services?
+[*] [Hot Tier] LOW CONFIDENCE (1.2753 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_ed7aaa0b-cf18-4b57-a1e6-48e9d5ef6928) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Library provides **more than 2 million printed books and manuscripts** and **around 500,000 electronic books** through its services.
+
+[RAG CITATIONS]
+[{'filename': 'Library_IT_Services_and_Security_CS_handbook.pdf', 'page': 1, 'clearance': 'public'}]
+
+RAG latency: 5.37s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 14/33
+ID: 14
+Question: What URL address is provided to search the University Library catalogue?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific URL for your university’s library catalogue. You can usually find it by visiting your university’s main website and looking for a link to the library or its “catalogue/search” page, or by contacting the library directly for the correct address.
+Tokens: 331
+Latency: 2.06s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What URL address is provided to search the University Library catalogue?
+[*] Rewritten Standalone Query: What URL address is provided to search the University Library catalogue?
+[*] [Hot Tier] LOW CONFIDENCE (1.0753 > 0.85). Falling back to Archive.
+[*] PROMOTION TRIGGERED: 'Library_IT_Services_and_Security_CS_handbook.pdf' reached 5 hits.
+[*] [Layer 1] Saved query-response pair to cache (cache_33611526-30f8-4ef1-a827-9dfc341636f8) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The URL to search the University Library catalogue is www.findit.bham.ac.uk.
+
+[RAG CITATIONS]
+[{'filename': 'Library_IT_Services_and_Security_CS_handbook.pdf', 'page': 1, 'clearance': 'public'}]
+
+RAG latency: 7.22s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 15/33
+ID: 15
+Question: Where is the Security Office located on campus, and what are its operating hours?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific location or operating hours for the Security Office at your campus. You may want to check your university’s official website, campus map, or contact the main administrative office for the most accurate and up‑to‑date information.
+Tokens: 339
+Latency: 1.87s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: Where is the Security Office located on campus, and what are its operating hours?
+[*] Rewritten Standalone Query: Where is the Security Office located on campus, and what are its operating hours?
+[*] [Hot Tier] HIT! Best similarity distance: 0.7089 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_cb4b7fda-2eaf-40b8-8e03-f8682179aaef) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Security Office is located at the rear of the Aston Webb Building in the B Block courtyard, next to the Great Hall, just off Ring Road South (between R5 and R6 on the campus map).  
+It is staffed and operates 24 hours a day, all year round (24/7).
+
+[RAG CITATIONS]
+[{'filename': 'Library_IT_Services_and_Security_CS_handbook.pdf', 'page': 3, 'clearance': 'public'}]
+
+RAG latency: 4.28s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 16/33
+ID: 16
+Question: How many total credits are required to be awarded a BSc, an MSci, and an MSc degree?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+The number of credits you need to earn before a degree is formally awarded is not the same everywhere – it depends on the country’s credit‑system, the type of institution, and sometimes the specific programme. Below is a **general overview of the most common credit‑requirements** you’ll encounter for the three degrees you mentioned, together with the typical credit‑systems they belong to.
+
+---
+
+## 1. Bachelor of Science (BSc)
+
+| Region / Credit System | Typical Total Credits* | How the credits are usually organised |
+|------------------------|------------------------|---------------------------------------|
+| **United Kingdom (CATS – Credit Accumulation and Transfer Scheme)** | **360 credits** (equivalent to 3 years full‑time) | 120 credits per academic year; a mix of Level 4 (first year) and Level 5 (second year) modules, plus Level 6 (final year) modules that often include a dissertation or project. |
+| **United States & Canada (Semester Credit Hours)** | **≈120 credit‑hours** (≈ 4 years full‑time) | Usually 30 credit‑hours per semester (or 15 per term). A typical BSc includes 40–45 courses, with a mix of general education, core science courses, electives, and often a capstone or senior project. |
+| **European Union (ECTS – European Credit Transfer and Accumulation System)** | **180–240 ECTS credits** (3–4 years) | 60 ECTS per academic year. The lower end (180 ECTS) is common for three‑year programmes; some countries (e.g., Germany, France) require 240 ECTS for a four‑year “integrated” bachelor. |
+| **Australia (Australian Credit Points)** | **≈144–192 credit points** (3–4 years) | 48 credit points per year; each point roughly equals 10 hours of student workload. |
+
+\*These figures are **typical**; some universities may require a few credits more (e.g., a mandatory research project) or fewer (e.g., a fast‑track programme).
+
+---
+
+## 2. Integrated Master of Science (MSci)
+
+An **MSci** (or “Integrated Master”) is a *four‑year* (sometimes five‑year) programme that combines undergraduate and master‑level study into a single award. It is most common in the UK and a few other European systems.
+
+| Region / Credit System | Typical Total Credits* | How the credits are usually organised |
+|------------------------|------------------------|---------------------------------------|
+| **United Kingdom (CATS)** | **480 credits** (4 years full‑time) | 120 credits per year, with the final year (Level 7) delivering master‑level modules and a substantial research project or dissertation. |
+| **European Union (ECTS)** | **300 ECTS credits** (5 years in many countries) | 60 ECTS per year; the last year(s) are at Level 7 (master level). Some countries (e.g., the Netherlands) run a 5‑year “integrated master” that totals 300 ECTS. |
+| **Australia (Australian Credit Points)** | **≈192–240 credit points** (4–5 years) | Similar to a BSc plus an additional year of advanced coursework and research. |
+
+*Again, the exact number can vary: a 4‑year MSci in the UK is 480 CATS credits, while a 5‑year integrated master in many EU countries is 300 ECTS.*
+
+---
+
+## 3. Master of Science (MSc)
+
+| Region / Credit System | Typical Total Credits* | Typical Structure |
+|------------------------|------------------------|-------------------|
+| **United Kingdom (CATS)** | **180 credits** (1 year full‑time) | 120 credits of taught modules + 60 credits for a dissertation/project. Part‑time routes often spread the 180 credits over 2 years. |
+| **European Union (ECTS)** | **90 ECTS credits** (1 year full‑time) | Usually 60 ECTS of taught courses + 30 ECTS for a thesis or research project. |
+| **United States & Canada (Semester Credit Hours)** | **≈30–36 credit‑hours** (1 year full‑time) | Typically 8–10 courses (3 credit‑hours each) plus a 6‑credit thesis or practicum. Some professional MSc programmes may be 12–18 credit‑hours longer. |
+| **Australia (Australian Credit Points)** | **48–72 credit points** (1–2 years) | 48 points for a 1‑year full‑time MSc (equivalent to 4 subjects + a research project); 72 points for a 2‑year part‑time or research‑intensive option. |
+
+---
+
+### Quick Reference Summary
+
+| Degree | Common Credit System | Approx. Total Credits |
+|--------|----------------------|----------------------|
+| **BSc** | UK CATS | **360** |
+|        | US semester hrs | **≈120** |
+|        | EU ECTS | **180–240** |
+| **MSci** (integrated) | UK CATS | **480** |
+|        | EU ECTS | **≈300** |
+| **MSc** | UK CATS | **180** |
+|        | EU ECTS | **90** |
+|        | US semester hrs | **≈30–36** |
+
+---
+
+## Why the Numbers Differ
+
+1. **Credit‑definition** – In the UK, **1 CATS credit = 10 hours of total student workload** (lectures, labs, self‑study, assessment). In the EU, **1 ECTS credit = 25–30 hours**. In the US, **1 credit‑hour = roughly 1 hour of contact time per week plus an estimated 2 hours of independent work**. Because the “hour‑per‑credit” conversion isn’t the same, the raw numbers look different even though the overall workload is comparable.
+
+2. **Programme length** – A BSc is usually 3 years in the UK (360 CATS) but 4 years in the US (≈120 semester hrs). An MSci adds an extra year of master‑level study, so the credit total jumps accordingly.
+
+3. **Institutional flexibility** – Some universities allow “top‑up” modules, optional placements, or extended research projects that can add a handful of credits beyond the baseline requirement.
+
+---
+
+### How to Find the Exact Requirement for a Specific Programme
+
+1. **Check the university’s programme handbook or website** – Most institutions list the total credit requirement and a breakdown of required, elective, and dissertation credits.
+2. **Look for the credit‑system label** – The handbook will usually state whether it uses CATS, ECTS, credit‑hours, or another system.
+3. **Contact the programme coordinator** – If the published information is ambiguous (e.g., “minimum 180 credits, up to 210”), a quick email can clarify the exact number you need to graduate.
+
+---
+
+#### Bottom line
+
+- **BSc**: roughly **360 CATS (UK)**, **120 semester hrs (US)**, **180–240 ECTS (EU)**.  
+- **MSci** (integrated master): roughly **480 CATS (UK)** or **≈300 ECTS (EU)**.  
+- **MSc**: roughly **180 CATS (UK)**, **90 ECTS (EU)**, **30–36 semester hrs (US)**.
+
+If you have a particular university or country in mind, let me know and I can point you to the typical credit‑rules for that institution’s catalogue.
+Tokens: 1952
+Latency: 5.47s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: How many total credits are required to be awarded a BSc, an MSci, and an MSc degree?
+[*] Rewritten Standalone Query: How many total credits are required to be awarded a BSc, an MSci, and an MSc degree?
+[*] [Hot Tier] LOW CONFIDENCE (1.3611 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_247b51ba-b982-4218-8cc2-8eb23c5cfe92) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+A BSc degree is awarded on the basis of 360 credits.  
+An MSci degree is awarded on the basis of 480 credits.  
+An MSc degree is made up of 180 credits.
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 1, 'clearance': 'public'}]
+
+RAG latency: 4.80s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 17/33
+ID: 17
+Question: How many total learning hours are expected for a 20-credit module, and what do these hours comprise?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+A 20‑credit module is normally expected to involve **about 200 learning hours** in total.  
+
+These 200 hours are made up of two main components:
+
+| Component | Typical proportion (varies by programme) | What it includes |
+|-----------|-------------------------------------------|------------------|
+| **Contact (guided) learning** | Roughly 30‑40 % (≈ 60‑80 h) | Lectures, seminars, tutorials, laboratory or workshop sessions, field trips, and any other scheduled face‑to‑face or virtual teaching activities. |
+| **Independent (self‑directed) learning** | Roughly 60‑70 % (≈ 120‑140 h) | Reading and research, preparing for and reviewing lectures, working on assignments, projects, essays, problem‑sets, revision for exams, and any other study you do on your own. |
+
+So, for a 20‑credit module you can expect to spend **around 200 hours** overall, split between the structured teaching sessions you attend and the self‑study work you complete outside of class. The exact split may differ slightly between departments or specific courses, but the total credit‑to‑hour conversion (1 credit ≈ 10 learning hours) remains the standard guideline.
+Tokens: 581
+Latency: 2.51s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: How many total learning hours are expected for a 20-credit module, and what do these hours comprise?
+[*] Rewritten Standalone Query: How many total learning hours are expected for a 20-credit module, and what do these hours comprise?
+[*] [Hot Tier] LOW CONFIDENCE (1.2515 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_818b530e-8299-423b-a6ab-0d5fc214e8fa) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+A 20‑credit module is expected to require **200 hours of work** in total.  
+These 200 hours are split between **contact time** (such as lectures, laboratories and other scheduled teaching sessions) and **private study/continuous‑assessment activities** (including writing laboratory reports, completing tutorial problems and coursework, reading, and revising).
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 1, 'clearance': 'public'}]
+
+RAG latency: 5.30s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 18/33
+ID: 18
+Question: What are the standard module pass marks for undergraduate and postgraduate programmes?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+**In most higher‑education systems the “pass” mark for a module is set by the university (or sometimes by the faculty/department) and can differ between undergraduate and postgraduate study. Below is a summary of the most common conventions you’ll encounter, but keep in mind that the exact figure can vary from one institution to another, and some programmes use additional grading bands (e.g., merit, distinction).**
+
+---
+
+## 1. Undergraduate programmes  
+
+| Region / System | Typical minimum pass mark* | Common grading bands (optional) |
+|-----------------|---------------------------|---------------------------------|
+| **United Kingdom** | **40 %** (some universities require 50 % for certain programmes such as medicine, engineering, or professional accreditation) | 40 % – 49 % = Pass; 50 % – 59 % = Merit (or “2:2” in degree classification); 60 % – 69 % = Merit/2:1; 70 %+ = Distinction/First |
+| **United States** | **70 %** is often considered a “C‑” (the lowest passing grade) in many colleges; some institutions set the floor at **60 %** (C) for core courses. | A (90‑100 %), B (80‑89 %), C (70‑79 %), D (60‑69 %) – D may be the minimum passing grade in some schools. |
+| **Europe (ECTS‑based)** | **50 %** of the total assessment points (or the equivalent ECTS grade “C”) | 50‑59 % = S (Sufficient/Pass); 60‑69 % = S‑ (Satisfactory); 70‑79 % = B (Good); 80‑100 % = A (Excellent) |
+| **Australia / New Zealand** | **50 %** (some universities require 55 % for certain professional courses) | 50‑64 % = Pass; 65‑74 % = Credit; 75‑84 % = Distinction; 85 %+ = High Distinction |
+| **Canada** | Usually **50 %** (C‑) is the lowest passing grade; some faculties set a higher floor (e.g., 55 % for engineering). | 50‑59 % = D; 60‑69 % = C; 70‑79 % = B; 80‑100 % = A (exact letter boundaries differ by institution). |
+
+\*These figures are “typical” thresholds; individual modules may have higher requirements (e.g., a lab component that must be passed separately) or lower ones for remedial courses.
+
+### Key points for undergraduates
+- **Module vs. final degree classification:** A module may be passed with 40 % in the UK, but the overall degree classification (first, 2:1, 2:2, third) is calculated from the weighted average of all module marks.
+- **Professional accreditation:** Courses that lead to professional registration (e.g., engineering, nursing, teaching) often have a higher pass floor (often 50 % or 55 %).
+- **Resits:** Many institutions allow a single resit; the pass mark for a resit is sometimes higher (e.g., 50 % even if the original pass was 40 %).  
+
+---
+
+## 2. Postgraduate programmes  
+
+| Region / System | Typical minimum pass mark* | Common grading bands (taught PG) |
+|-----------------|---------------------------|----------------------------------|
+| **United Kingdom** | **50 %** (some programmes, especially professional or research‑intensive ones, require 55 % or 60 % for a pass) | 50‑59 % = Pass; 60‑69 % = Merit; 70 %+ = Distinction |
+| **United States** | **70 %** (C‑) is usually the lowest passing grade for graduate‑level courses; many schools set the floor at **75 %** for core courses. | A (90‑100 %); B (80‑89 %); C (70‑79 %); D (60‑69 %) – D often not acceptable for a graduate credit. |
+| **Europe (ECTS‑based)** | **55 %** (or the equivalent ECTS grade “C”) is common for master‑level modules. | 55‑64 % = S (Sufficient/Pass); 65‑74 % = Good; 75‑84 % = Very Good; 85 %+ = Excellent |
+| **Australia / New Zealand** | **50 %** (some research‑oriented courses require 55 % or 60 %). | 50‑64 % = Pass; 65‑74 % = Credit; 75‑84 % = Distinction; 85 %+ = High Distinction |
+| **Canada** | **60 %** (C) is a common minimum for graduate courses; professional programmes may require 65 % or higher. | 60‑69 % = C; 70‑79 % = B; 80‑100 % = A (letter boundaries vary). |
+
+\*Again, these are typical thresholds; individual modules, research projects, or theses may have separate criteria (e.g., a thesis may need a “pass with minor corrections” before a final grade is awarded).
+
+### Key points for postgraduates
+- **Higher expectations:** Because postgraduate study assumes a higher level of prior knowledge, many institutions set the pass floor at 50 % or higher, and some professional programmes (e.g., MBA, LLM, MSc in Nursing) may require 55 %–60 % for a pass.
+- **Research components:** For taught master’s programmes, the dissertation or project often carries a larger weight (e.g., 30‑40 % of the total mark) and may have its own pass threshold (commonly 50 % or 55 %).
+- **Doctoral level:** While not a “module” in the usual sense, PhD candidates typically need to submit a thesis that is judged “pass” by examiners; there is no numeric pass mark, but the thesis must meet the university’s standards for originality and contribution to knowledge.
+
+---
+
+## 3. Practical tips if you need the exact figure for a specific programme  
+
+1. **Check the programme handbook or module guide** – most universities publish the pass/fail criteria for each module in the course handbook (often available on the department’s website).  
+2. **Look at the assessment rubric** – many modules list the minimum mark required for each grade band.  
+3. **Ask the module convenor or programme director** – they can confirm whether any special conditions (e.g., mandatory lab pass, compulsory attendance) apply.  
+4. **Consider accreditation requirements** – professional bodies (e.g., Engineers UK, ACCA, Nursing and Midwifery Council) sometimes dictate a higher pass threshold for modules that count toward accreditation.
+
+---
+
+### Bottom line  
+
+- **Undergraduate modules** most commonly require **40 %–50 %** to pass, with the UK leaning toward 40 % and many other systems using 50 % as the floor.  
+- **Postgraduate modules** usually set the pass mark at **50 %–60 %**, with many UK taught master’s programmes using 50 % (and adding merit/distinction bands) and other countries often requiring 55 %–60 % for a clean pass.  
+
+Because the exact number can differ by institution, faculty, and even by individual module, always verify the specific requirements for the programme you are interested in. If you’re unsure, the safest assumption is that a **pass will be somewhere between 40 % and 60 %**, with postgraduate work generally leaning toward the higher end of that range.
+Tokens: 1989
+Latency: 5.51s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What are the standard module pass marks for undergraduate and postgraduate programmes?
+[*] Rewritten Standalone Query: What are the standard module pass marks for undergraduate and postgraduate programmes?
+[*] [Hot Tier] LOW CONFIDENCE (1.0815 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_14e59bd1-eb5b-433c-b920-58b9e46ca6c3) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The standard module pass mark for undergraduate programmes is 40 %.  
+The standard module pass mark for postgraduate programmes is 50 %.
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 3, 'clearance': 'public'}, {'filename': 'Programme_Information_CS_handbook.pdf', 'page': 1, 'clearance': 'public'}]
+
+RAG latency: 6.24s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 19/33
+ID: 19
+Question: What is a 'repeat-only' module, and what two examples are given in the handbook?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+A **“repeat‑only” module** is a course that a student is allowed to enrol in *only* as a repeat of a previous attempt. In other words, the module cannot be taken for the first time; it may be registered for again only if the student has already attempted it (and usually did not achieve a passing grade or met some other condition that requires a retake). Universities use this designation to manage curriculum requirements, limit the number of times a module can be attempted, and ensure that students are not repeatedly enrolling in the same introductory content.
+
+Because I don’t have the specific handbook you’re referring to, I can’t tell you the exact two examples that are listed there. If you can share the relevant excerpt or give more context (e.g., the institution or the name of the handbook), I’d be happy to help interpret the examples. Otherwise, you may need to consult the handbook directly—look in the sections on module classifications, repeat policies, or academic regulations, where “repeat‑only” modules are typically listed.
+Tokens: 517
+Latency: 12.06s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is a 'repeat-only' module, and what two examples are given in the handbook?
+[*] Rewritten Standalone Query: What is a 'repeat-only' module, and what two examples are given in the handbook?
+[*] [Hot Tier] LOW CONFIDENCE (1.5155 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_b8ab550c-0ec1-4427-bce6-a1204cf43178) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+A “repeat‑only” module is one that, if it is not passed on the first attempt, must be taken again in full during the next academic year – the student must attend the lectures again, pay the fees again, and there is no supplementary reassessment available.  
+
+The handbook gives two examples of repeat‑only modules: (1) final‑year projects, and (2) modules whose assessment is based primarily on group work.
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 3, 'clearance': 'public'}, {'filename': 'Programme_Information_CS_handbook.pdf', 'page': 4, 'clearance': 'public'}]
+
+RAG latency: 11.14s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 20/33
+ID: 20
+Question: What is the default policy for late submission of coursework in the School of Computer Science, and what penalty applies if late submissions are explicitly allowed?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific details of the School of Computer Science’s default policy on late coursework submissions or the exact penalty that applies when late submissions are explicitly permitted. Policies can vary between institutions and even between different programs within the same school, and they are typically outlined in the department’s handbook, course syllabi, or on the university’s official website.
+
+If you need the precise wording and any associated penalties, I recommend:
+
+1. **Checking the department’s handbook or student guide** – many schools publish a “Student Handbook” or “Academic Regulations” document that includes the default late‑submission policy.
+2. **Reviewing the specific course syllabus** – individual modules often state the late‑submission rules that apply to that coursework.
+3. **Contacting the School of Computer Science directly** – you can reach out to the administrative office, the course coordinator, or the student support team for clarification.
+4. **Visiting the university’s academic regulations portal** – most universities have an online portal where you can search for “late submission policy” or similar terms.
+
+If you obtain the relevant document or excerpt and share it here, I can help you interpret the policy or explain how the penalty works.
+Tokens: 553
+Latency: 2.68s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is the default policy for late submission of coursework in the School of Computer Science, and what penalty applies if late submissions are explicitly allowed?
+[*] Rewritten Standalone Query: What is the default policy for late submission of coursework in the School of Computer Science, and what penalty applies if late submissions are explicitly allowed?
+[*] [Hot Tier] LOW CONFIDENCE (1.1443 > 0.85). Falling back to Archive.
+[*] PROMOTION TRIGGERED: 'Programme_Information_CS_handbook.pdf' reached 5 hits.
+[*] [Layer 1] Saved query-response pair to cache (cache_e6132888-71d4-4a74-a588-2557493549e6) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The default policy is that, unless a module states otherwise in writing, **no late submissions will be accepted for any coursework**.  
+
+If a module does permit late submissions, the penalty applied is **a deduction of 5 % of the mark for each working day late, up to a maximum of one week after the original submission date**.
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 5, 'clearance': 'public'}]
+
+RAG latency: 16.60s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 21/33
+ID: 21
+Question: What is the expected timeframe for feedback return on mid-module assessments versus all other assessments?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+The exact turnaround time for feedback can differ from one university (or even one department) to another, but many institutions follow a set of informal “best‑practice” timelines that you’ll often see reflected in module handbooks or assessment policies:
+
+| Type of assessment | Typical target for returning feedback* |
+|--------------------|----------------------------------------|
+| **Mid‑module (formative) assessments** | **1–2 weeks** after the submission deadline.  Because these tasks are designed to help you gauge your progress and adjust your study approach before the final exam or project, staff usually aim to get the feedback back fairly quickly. |
+| **Other assessments (summative, end‑of‑module, major projects, dissertations, exams, etc.)** | **2–4 weeks** after the deadline (sometimes up to 6 weeks for very large pieces such as dissertations).  The longer window reflects the greater volume of marking, the need for more detailed written comments, and, in some cases, external moderation. |
+
+\*These are **general expectations** rather than hard‑and‑fast rules.  Actual turnaround can be influenced by:
+
+* **Size of the cohort** – large first‑year classes often have tighter deadlines, while small postgraduate groups may have more flexibility.  
+* **Complexity of the task** – a short quiz or reflective journal can be marked quickly, whereas a 10,000‑word dissertation or a portfolio with multiple components naturally takes longer.  
+* **External moderation or exam board schedules** – some final‑year projects or exams must be sent to an external examiner before feedback can be issued, extending the timeline.  
+* **Staff workload and holidays** – periods of heavy marking (e.g., after a semester ends) or staff leave can push dates back a few days.
+
+### How to know the exact dates for your module
+
+1. **Check the module handbook or syllabus** – most universities list the expected feedback window for each assessment item.  
+2. **Look at the assessment brief** – lecturers often write “Feedback will be returned within X weeks of the submission deadline.”  
+3. **Ask the teaching team** – a quick email to the module coordinator or tutor can clarify any uncertainties, especially if you have a tight deadline for another piece of work.  
+4. **Student portals / LMS** – some systems (e.g., Blackboard, Canvas, Moodle) display a “feedback due” date next to each uploaded assignment.
+
+### What to do if feedback is delayed
+
+* **Send a polite reminder** after the expected date has passed (e.g., “I was wondering if there is an updated estimate for when we might receive feedback on the mid‑module essay?”).  
+* **Check for announcements** – sometimes staff post a brief notice about a delay (e.g., “Due to a high volume of submissions, feedback will be returned next week”).  
+* **Use the university’s academic support services** – if a delay is affecting your ability to meet other deadlines, the student support office can often intervene or help you arrange an extension.
+
+---
+
+**Bottom line:**  
+- **Mid‑module assessments:** aim for **1–2 weeks**.  
+- **All other (summative) assessments:** aim for **2–4 weeks**, with longer periods for very large or externally moderated pieces.
+
+Always verify the specific dates for your course, as those are the definitive source.
+Tokens: 1021
+Latency: 3.64s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is the expected timeframe for feedback return on mid-module assessments versus all other assessments?
+[*] Rewritten Standalone Query: What is the expected timeframe for feedback return on mid-module assessments versus all other assessments?
+[*] [Hot Tier] LOW CONFIDENCE (1.0141 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_757b8d94-b73c-4c6e-9f18-4a81642d671c) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+Feedback is normally made available to students within 15 working days for mid‑module assessments, and within 20 working days for all other assessments.
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 5, 'clearance': 'public'}]
+
+RAG latency: 4.59s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 22/33
+ID: 22
+Question: How is the overall degree mark calculated across study years for a student undertaking a Study Abroad program?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+**In most universities the “overall degree mark” (or final classification) is a weighted average of the marks you earn in every module you complete during the whole programme.**  
+When you spend a semester or a year abroad the same principle applies – the modules you take overseas are simply added to the pool of credit‑bearing modules, but there are a few extra steps you need to be aware of because the grading scale used by the host institution is often different from the one used at home.
+
+Below is a generic, step‑by‑step outline of how the calculation is usually done.  The exact numbers (credit values, weighting percentages, conversion tables, etc.) will differ from one university to another, so you should always check your own institution’s handbook or the Study‑Abroad office for the precise rules that apply to you.
+
+---
+
+## 1.  Every module has a **credit value** (or credit points)
+
+| Year | Typical credit load | Example credit values |
+|------|--------------------|-----------------------|
+| Year 1 | 120 credits (full‑time) | 20 credits per module (6 modules) |
+| Year 2 | 120 credits | same as Year 1 |
+| Year 3 (or 4) | 120 credits | same as Year 1 |
+| Study‑abroad semester | 60 credits (or whatever the host university awards) | often 30 credits per semester |
+
+*The total number of credits you need to graduate is usually fixed (e.g., 360 credits for a three‑year programme).*
+
+---
+
+## 2.  Convert **overseas grades** to the home‑university scale
+
+1. **Obtain the host‑university grading rubric** (e.g., A‑B‑C‑D‑E, 1‑5, percentages, etc.).  
+2. **Use the conversion table** supplied by your home institution.  
+   * Example (UK → UK conversion):  
+     * 70 % + → First‑class (70)  
+     * 60‑69 % → Upper Second (2:1) (60)  
+     * 50‑59 % → Lower Second (2:2) (50)  
+     * 40‑49 % → Third (40)  
+   * Example (US GPA → UK %):  
+     * A = 75 %  
+     * B = 65 %  
+     * C = 55 %  
+     * D = 45 %  
+   * Some universities simply **record the overseas module as “Pass/Fail”**; in that case it contributes the credit value but does not affect the numeric average (it only satisfies the credit requirement).
+
+3. **Round or adjust** according to any specific rules (e.g., “round up to the nearest whole number” or “apply a 5‑point bonus for accredited study‑abroad modules”).
+
+---
+
+## 3.  Compute a **weighted average for each academic year**
+
+For each year you do:
+
+\[
+\text{Year‑average} = \frac{\sum (\text{module mark} \times \text{module credits})}{\sum (\text{module credits})}
+\]
+
+*All modules taken that year—including the abroad ones—are included in the numerator and denominator.*
+
+**Example (Year 2 with a semester abroad):**
+
+| Module | Credits | Mark (home scale) |
+|--------|---------|-------------------|
+| Accounting | 20 | 68 |
+| Marketing | 20 | 72 |
+| Study‑abroad: International Business | 30 | 65 (converted) |
+| Study‑abroad: Language | 10 | 70 (converted) |
+| **Total** | **80** | — |
+
+\[
+\text{Year‑average}= \frac{(68\times20)+(72\times20)+(65\times30)+(70\times10)}{80}= \frac{1360+1440+1950+700}{80}= \frac{5450}{80}=68.1
+\]
+
+---
+
+## 4.  Combine the **year‑averages** into the **overall degree mark**
+
+Most institutions weight the later years more heavily because they contain the “core” or “advanced” modules. A common weighting scheme is:
+
+| Year | Weight (percentage of final mark) |
+|------|-----------------------------------|
+| Year 1 | 0 % (often excluded from final classification) |
+| Year 2 | 30 % |
+| Year 3 | 40 % |
+| Year 4 (if applicable) | 30 % |
+
+If your programme is three years, the weights might be 30 % + 30 % + 40 % (or 33 % each).  The study‑abroad semester is already baked into the year‑average, so you do **not** apply any extra weight to it.
+
+The overall mark is then:
+
+\[
+\text{Overall mark}= \sum (\text{Year‑average} \times \text{Year‑weight})
+\]
+
+**Continuing the example (three‑year programme, Year 1 excluded):**
+
+| Year | Year‑average | Weight | Contribution |
+|------|--------------|--------|--------------|
+| Year 1 | 62 | 0 % | 0 |
+| Year 2 | 68.1 | 30 % | 20.43 |
+| Year 3 | 71.5 | 40 % | 28.60 |
+| Year 4 (if present) | – | – | – |
+| **Overall** | – | – | **49.03** (rounded to 49 %) |
+
+The final classification would then be assigned according to the university’s thresholds (e.g., 70 %+ = First, 60‑69 % = 2:1, etc.).
+
+---
+
+## 5.  Special cases you may encounter
+
+| Situation | Typical handling |
+|-----------|------------------|
+| **Pass/Fail abroad module** | Credits count toward the total required, but the module contributes **0** to the numeric average (or sometimes a fixed “pass” value such as 40 %). |
+| **Different credit systems** (e.g., ECTS vs. UK credits) | Convert credits to the home system (e.g., 1 ECTS ≈ 2 UK credits) before weighting. |
+| **Repeated modules** (you retake a failed module) | Usually the **latest** mark replaces the earlier one in the calculation, but the credit is only counted once. |
+| **Cap on maximum contribution from abroad** | Some universities limit the proportion of the final mark that can come from overseas modules (e.g., “no more than 25 % of the total weighted average”). |
+| **Honours vs. ordinary degree** | If you achieve a certain overall mark (e.g., ≥ 40 % for an ordinary degree) you may be awarded an honours classification only if you also meet a minimum in the final year(s). |
+
+---
+
+## 6.  What you should do next
+
+1. **Locate your university’s official calculation policy** – usually in the “Programme Handbook”, “Academic Regulations”, or the Study‑Abroad office’s guide.  
+2. **Obtain the conversion table** for the host institution you will attend.  Most universities publish a PDF that maps the host grades to the home scale.  
+3. **Check credit equivalence** – confirm how many home‑university credits your overseas modules will be worth.  
+4. **Run a “what‑if” calculation** (many student portals have a calculator) to see how a particular set of overseas grades would affect your final mark.  
+5. **Ask the academic advisor** if you have any unusual circumstances (e.g., a double‑major, a joint‑degree, or a year‑long research placement).
+
+---
+
+### TL;DR
+
+1. **All modules (including abroad) are given credit values.**  
+2. **Overseas grades are converted** to the home‑university scale using an official table.  
+3. **Year‑average = Σ(mark × credits) / Σcredits** for that year.  
+4. **Overall degree mark = Σ(year‑average × year‑weight).**  
+5. The final classification follows the university’s threshold table; any special caps or pass/fail rules are applied as described in the institution’s regulations.
+
+If you need the exact numbers for your programme, the safest route is to consult your university’s handbook or speak directly with the Study‑Abroad coordinator—they’ll have the precise conversion tables, credit‑mapping rules, and weighting scheme that apply to your degree.
+Tokens: 2193
+Latency: 5.80s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: How is the overall degree mark calculated across study years for a student undertaking a Study Abroad program?
+[*] Rewritten Standalone Query: How is the overall degree mark calculated across study years for a student undertaking a Study Abroad program?
+[*] [Hot Tier] HIT! Best similarity distance: 0.8122 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_69e58f8d-8b63-4eb1-a4ac-5e52dde28a0a) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The degree mark is a weighted average of the three later years:
+
+* Years 2 and 3 are treated as a single stage that counts for 25 % of the degree, with the stage mark calculated from 80 % of the Year 2 mark and 20 % of the Year 3 (Study‑Abroad) mark.  
+* Consequently, the contribution of each year to the final degree mark is:  
+  * Year 2 = 0.80 × 25 % = 20 % of the overall degree mark,  
+  * Year 3 (Study‑Abroad) = 0.20 × 25 % = 5 % of the overall degree mark,  
+  * Year 4 = the remaining 75 % of the overall degree mark.
+
+Thus, the overall degree mark is calculated as 20 % from Year 2, 5 % from Year 3 (Study‑Abroad), and 75 % from Year 4.
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 7, 'clearance': 'public'}]
+
+RAG latency: 5.10s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 23/33
+ID: 23
+Question: How many total students does the Guild of Students represent, and how many student groups does it house?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific figures for how many students the Guild of Students represents or how many student groups it houses. For the most accurate and up‑to‑date information, I recommend checking the Guild’s official website or contacting their student services directly.
+Tokens: 439
+Latency: 2.28s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: How many total students does the Guild of Students represent, and how many student groups does it house?
+[*] Rewritten Standalone Query: How many total students does the Guild of Students represent, and how many student groups does it house?
+[*] [Hot Tier] HIT! Best similarity distance: 0.7241 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_c5428c07-712f-47ac-8e95-ad441a338387) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The Guild of Students represents over 38,000 students.  
+It provides access to 350 plus student groups.
+
+[RAG CITATIONS]
+[{'filename': 'Student_Representation_CS_handbook.pdf', 'page': 1, 'clearance': 'public'}]
+
+RAG latency: 3.90s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 24/33
+ID: 24
+Question: Approximately how many Student Reps operate across the University of Birmingham?
+================================================================================
+
+[1/2] Running Plain LLM...
+[Groq] Waiting 0.08s before next request...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the exact figure for how many Student Representatives are active across the University of Birmingham. The number can vary from year to year and depends on the structure of the university’s student‑representation bodies (e.g., faculty reps, society reps, course reps, etc.). For the most up‑to‑date information, I’d recommend checking the University of Birmingham’s Student Representation or Student Union website, or contacting their student‑affairs office directly.
+Tokens: 455
+Latency: 2.22s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: Approximately how many Student Reps operate across the University of Birmingham?
+[*] Rewritten Standalone Query: Approximately how many Student Reps operate across the University of Birmingham?
+[*] [Hot Tier] LOW CONFIDENCE (0.9844 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_2ff7b83f-dea0-4608-844e-534aa7b83ff8) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+Approximately over 1,000 Student Reps operate across the University of Birmingham.
+
+[RAG CITATIONS]
+[{'filename': 'Student_Representation_CS_handbook.pdf', 'page': 2, 'clearance': 'public'}]
+
+RAG latency: 6.25s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 25/33
+ID: 25
+Question: What exact web address contains the agendas and minutes for the Staff Student Forums (SSFs}?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+I’m sorry, but I don’t have the specific web address for the Staff Student Forums (SSFs) agendas and minutes. You may want to check your university’s main website—often under sections such as “Governance,” “Committees,” or “Student‑Staff Relations”—or contact the office that coordinates the SSFs for the correct link.
+Tokens: 355
+Latency: 2.13s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What exact web address contains the agendas and minutes for the Staff Student Forums (SSFs}?
+[*] Rewritten Standalone Query: What exact web address contains the agendas and minutes for the Staff Student Forums (SSFs}?
+[*] [Hot Tier] LOW CONFIDENCE (1.1133 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_143f331d-a77c-4db6-9b1d-a2df74eb0def) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The agendas and minutes for the Staff‑Student Forums (SSFs) are posted at: https://www.cs.bham.ac.uk/internal/local/committees/staffstudent
+
+[RAG CITATIONS]
+[{'filename': 'Student_Representation_CS_handbook.pdf', 'page': 3, 'clearance': 'public'}]
+
+RAG latency: 5.36s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 26/33
+ID: 26
+Question: Explain how 'cohort legislation' determines which regulations apply to a student who entered in 2024-25 versus 2025-26.
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+**What “cohort legislation” means**
+
+In many higher‑education systems the law (or a set of regulations) is written so that it applies to a *cohort*—the group of students who first enrol in a particular academic year.  The idea is to give students a stable set of rules for the duration of their programme, even if the government later changes the underlying legislation.  When a new cohort begins, the next version of the law “takes effect” for that group, while the previous cohort continues to be governed by the rules that were in place when they started.
+
+---
+
+### How it works in practice
+
+| Step | What happens for the **2024‑25 cohort** | What happens for the **2025‑26 cohort** |
+|------|------------------------------------------|------------------------------------------|
+| **1. Legislation is passed** | A law (or amendment) is enacted *before* the 2024‑25 intake. It sets tuition caps, funding formulas, eligibility criteria, residency rules, etc. | A new law (or amendment) is enacted *before* the 2025‑26 intake. It may change any of the same parameters. |
+| **2. “Effective date”** | The legislation specifies that it becomes effective for students who **first enrol** in the 2024‑25 academic year. | The same legislation (or a later amendment) specifies that it becomes effective for students who **first enrol** in the 2025‑26 academic year. |
+| **3. “Grand‑fathering” / transitional provisions** | The 2024‑25 cohort is *grand‑fathered* under the rules that were in force at the moment they started. Even if the law is amended in 2025, those changes do **not** retroactively alter their tuition rates, funding eligibility, or other rights, unless the legislation explicitly says otherwise. | The 2025‑26 cohort is subject to the new rules from day one. They cannot claim the older rates or eligibility criteria unless the new law includes a special transition clause. |
+| **4. Ongoing study** | Throughout the length of their programme (e.g., 3‑ or 4‑year degree), the 2024‑25 cohort continues to be governed by the 2024‑25 version of the regulations, even if the university later adopts a different policy for new entrants. | The 2025‑26 cohort follows the 2025‑26 version of the regulations for the whole of their study period. |
+| **5. Institutional implementation** | The university publishes a “cohort‑specific policy” (often in the student handbook or on its website) that references the 2024‑25 legislation. | The university publishes a separate policy document that references the 2025‑26 legislation. |
+
+---
+
+### Typical areas that differ between cohorts
+
+| Policy area | What might change from one cohort to the next? |
+|-------------|-----------------------------------------------|
+| **Tuition fee caps** | Government may raise or lower the maximum amount a university can charge for a given programme. |
+| **Student‑financial‑aid formulas** | Funding per credit hour, eligibility thresholds, or the mix of grants vs. loans can be revised. |
+| **Residency / domicile rules** | The length of time a student must have lived in a province/state to qualify for “in‑province” tuition may be altered. |
+| **Program‑duration requirements** | Minimum credit loads per term, maximum time to complete a degree, or mandatory co‑op placements can be updated. |
+| **Admission standards** | Minimum GPA, language‑proficiency scores, or prerequisite courses may be tightened or relaxed. |
+| **Leave‑of‑absence and re‑entry rules** | The number of permitted leaves, the process for returning, or the impact on funding may be changed. |
+| **Graduation requirements** | New capstone projects, internship hours, or competency assessments can be introduced for a new cohort. |
+
+---
+
+### Why the distinction matters to students
+
+1. **Financial planning** – A student who entered in 2024‑25 can rely on the tuition rates and financial‑aid rules that were announced at the time of admission; they won’t be hit with a sudden increase if the government raises caps for the 2025‑26 cohort.
+
+2. **Eligibility for scholarships or bursaries** – Many awards are tied to the legislation that defines who qualifies (e.g., “students who began their studies in 2024‑25 or later”). A change in the law can open or close eligibility for a particular cohort.
+
+3. **Program expectations** – If a new cohort is required to complete a mandatory internship that did not exist for the previous cohort, the university will apply that requirement only to the later entrants.
+
+4. **Legal certainty** – Cohort legislation reduces the risk of retroactive policy changes, which could otherwise create disputes over contracts between the student and the institution.
+
+---
+
+### How you can find out which rules apply to you
+
+1. **Check the university’s student handbook or policy portal.**  Most institutions label the relevant version (e.g., “Policy 2024‑25 – Tuition Fees”).  
+2. **Look for the legislative citation.**  The document will often reference the specific act or regulation (e.g., “Provincial Higher‑Education Act, s. 12(1), effective for students first enrolled in 2024‑25”).  
+3. **Contact the registrar or student‑services office.**  They can confirm which cohort‑specific regulations govern your programme.  
+4. **Review any “transition” notices.**  When a new law is passed, universities usually publish a brief explaining which cohorts are affected and whether any special provisions apply.
+
+---
+
+### Bottom line
+
+- **Cohort legislation ties a set of rules to the year a student first enrols.**  
+- **Students entering in 2024‑25 are governed by the version of the law that took effect for that intake.**  
+- **Students entering in 2025‑26 are governed by the next version, which may contain different tuition caps, funding formulas, residency requirements, and other programme rules.**  
+- **Because the rules are “grand‑fathered,” changes made after a cohort’s start date generally do not affect those students, providing stability and predictability for each group.**  
+
+If you need the exact wording of the legislation for your jurisdiction, you’ll need to consult the official government publication or your university’s policy documents; the general principles above apply in most systems that use cohort‑based regulation.
+Tokens: 1802
+Latency: 5.23s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: Explain how 'cohort legislation' determines which regulations apply to a student who entered in 2024-25 versus 2025-26.
+[*] Rewritten Standalone Query: Explain how 'cohort legislation' determines which regulations apply to a student who entered in 2024-25 versus 2025-26.
+[*] [Hot Tier] LOW CONFIDENCE (1.1511 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_d41fb850-2232-4402-9ba1-3ef652a428fa) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+‘Cohort legislation’ means that the set of Regulations, Codes of Practice, Policies and Guidance that apply to you is determined by the academic session in which you began your first year of study.  
+
+* If you started the first year of your programme in the **2024‑25 academic session**, you will be bound by the **2024‑25 legislation** (i.e., the 2024‑25 Regulations and the accompanying 2024‑25 Codes of Practice, Policies and Guidance) for the whole duration of your programme.  
+
+* If you started the first year of your programme in the **2025‑26 academic session**, you will be bound by the **2025‑26 legislation** (the 2025‑26 Regulations and the corresponding 2025‑26 Codes of Practice, Policies and Guidance) for the whole duration of your programme.  
+
+For students who enter directly into a later year or transfer between programmes, the university normally aligns them with the legislation that applies to the majority of students in that year. For example, a student who enters directly into the second year of a programme in 2025‑26 will normally be subject to the **2024‑25 legislation**, so that they follow the same rules as peers who began in 2024‑25.  
+
+[RAG CITATIONS]
+[{'filename': 'University_Legislation_CS_handbook.pdf', 'page': 2, 'clearance': 'public'}]
+
+RAG latency: 5.15s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 27/33
+ID: 27
+Question: Where and when are details of extenuating circumstances considered to ensure student privacy, rather than at full Board of Examiners meetings?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+The short answer is that, at most universities, the **actual facts and documentation of an extenuating‑circumstances claim are examined in a small, confidential forum (often a dedicated “Extenuating‑Circumstances Panel” or a meeting of the Dean/Faculty Office) before any information ever reaches the full Board of Examiners**.  Only the **outcome** of that confidential review – e.g., “the student’s assessment will be adjusted” or “the appeal is denied” – is recorded in the Board’s minutes.
+
+Below is a typical outline of **where** and **when** that confidential review takes place, together with the reasons it is kept separate from the full Board meeting:
+
+| Stage | Who is involved | Where it happens | When it happens | Why it protects privacy |
+|-------|----------------|------------------|----------------|------------------------|
+| **Initial submission** | Student → Student‑services office / Academic registry | Online portal or in‑person at the registrar’s office | Immediately after the exam period (often within a 2‑week window) | The claim is logged in a secure system that only authorized staff can access. |
+| **Pre‑screening** | Academic advisor, course convenor, or a designated **Extenuating‑Circumstances Officer** | Private office or secure virtual meeting | Within a few days of receipt, before any formal decision | Only the officer and the advisor see the supporting evidence; the rest of the faculty are not involved. |
+| **Confidential panel review** | Small panel (e.g., Dean, senior faculty member, student‑services representative) – sometimes called an **Extenuating‑Circumstances Committee** | Closed meeting room or secure video‑conference; minutes are kept confidential and are not part of the public record | Usually **before** the Board of Examiners convenes to finalize grades – often a week or two after the exam period, depending on the institution’s calendar | The panel can discuss the sensitive details (medical certificates, personal hardship, etc.) without exposing them to the larger Board. |
+| **Decision communicated to student** | Panel chair or designated officer | Email/letter to the student (often via the secure student portal) | Immediately after the panel’s decision, well before the Board meets | The student receives a clear outcome without the Board ever seeing the underlying documentation. |
+| **Board of Examiners meeting** | Full faculty Board (all examiners for the programme) | Formal Board meeting (often in a lecture hall or via a secure online platform) | At the scheduled grade‑finalisation date (e.g., the week after the panel review) | The Board only records the **result** (e.g., “Student X’s final grade for Course Y is adjusted to a Pass”) and does not discuss the personal circumstances that led to the adjustment. |
+
+### Key Points to Keep in Mind
+
+1. **Legal and policy drivers** – Data‑protection legislation (e.g., FERPA in the U.S., GDPR in the EU, or comparable national privacy laws) obliges universities to treat personal health or hardship information as confidential.  This is why the detailed review is isolated from the full Board.
+
+2. **Institution‑specific terminology** – Different schools may call the confidential body something else (e.g., “Student Welfare Committee,” “Academic Appeals Panel,” “Special Consideration Committee”).  The principle is the same: a **small, authorised group** handles the sensitive material.
+
+3. **Timing is usually tied to the exam calendar** – Most universities set a **“special‑consideration window”** that opens after the last exam of a term and closes a set number of days later (often 7–14 days).  The confidential panel meets **within that window** so that any adjustments can be incorporated before the Board signs off the final grades.
+
+4. **Outcome‑only reporting** – When the Board of Examiners records the decision, the entry is typically phrased in a way that does not reveal the nature of the circumstance (e.g., “Grade adjusted per Extenuating‑Circumstances Panel recommendation”).  This satisfies both transparency for the Board’s work and privacy for the student.
+
+5. **Where to find the exact process for a given university** –  
+   * The **Student Handbook** or **Academic Regulations** (often available on the university’s website).  
+   * The **Policy on Extenuating Circumstances / Special Consideration** – usually a separate PDF or web page.  
+   * The **Office of the Registrar** or **Student Services** can provide the specific dates and the composition of the confidential panel.
+
+### Example (generic illustration)
+
+- **Date of exam:** 10 May  
+- **Special‑consideration window:** 11 May – 24 May  
+- **Confidential panel meeting:** 15 May (closed session, 5‑person panel)  
+- **Decision communicated to student:** 16 May  
+- **Board of Examiners meeting:** 22 May (full faculty, only the outcome “Grade adjusted” appears on the agenda)
+
+In this example, the student’s medical certificate and personal statement are never shown to the full Board; they are examined only by the panel on 15 May, ensuring the student’s privacy while still allowing the Board to finalize grades with the correct information.
+
+---
+
+**Bottom line:**  
+Details of extenuating circumstances are normally reviewed **in a small, confidential panel or by a designated officer** **before** the full Board of Examiners meets, and the Board only records the **final decision**, not the personal details.  The exact location (office, meeting room, secure video call) and timing (usually within a set post‑exam window) vary by institution, so consult your university’s official policy documents for the precise schedule.
+Tokens: 1687
+Latency: 4.90s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: Where and when are details of extenuating circumstances considered to ensure student privacy, rather than at full Board of Examiners meetings?
+[*] Rewritten Standalone Query: Where and when are details of extenuating circumstances considered to ensure student privacy, rather than at full Board of Examiners meetings?
+[*] [Hot Tier] LOW CONFIDENCE (1.0176 > 0.85). Falling back to Archive.
+[*] PROMOTION TRIGGERED: 'University_Legislation_CS_handbook.pdf' reached 5 hits.
+[*] [Layer 1] Saved query-response pair to cache (cache_094c1e27-84ba-470e-9f65-11eb76faf1a3) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+Details of extenuating circumstances are discussed at Extenuating Circumstances Panels, which are held after each University assessment period to ensure timely consideration and to protect student privacy, rather than at the full Board of Examiners meetings held at the end of the academic year.
+
+[RAG CITATIONS]
+[{'filename': 'University_Legislation_CS_handbook.pdf', 'page': 4, 'clearance': 'public'}]
+
+RAG latency: 24.62s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 28/33
+ID: 28
+Question: What rules apply regarding wristwatches, mobile phones, and coats during in-person campus examinations?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+**Typical campus‑exam rules for personal items**
+
+| Item | Common rule | Reason & practical tips |
+|------|-------------|--------------------------|
+| **Wristwatch** | • **Analog (non‑digital) watches are usually allowed**.<br>• **Smart watches, digital watches with alarms, timers, Bluetooth, or any connectivity** are generally prohibited. | • An analog watch lets you keep track of time without the risk of storing or transmitting information.<br>• If you’re unsure, leave the watch in the designated storage area (e.g., a bag or the front desk) or wear a simple analog watch. |
+| **Mobile phone** | • Must be **turned off, silenced, and stored away** (often in a bag, locker, or a “phone‑drop” box) for the entire duration of the exam.<br>• Some institutions require you to **hand the phone to the invigilator** or place it in a sealed pouch. | • Phones can be used to look up answers, take photos, or communicate with others, which violates academic integrity.<br>• If the exam is a “bring‑your‑own‑device” (BYOD) test (e.g., a computer‑based assessment), the rules will be spelled out in the exam instructions; otherwise, assume the phone is not allowed. |
+| **Coat / outerwear** | • Usually you must **remove coats, jackets, hoodies, and large bags** before entering the exam room.<br>• Items are typically placed **under the desk, on a designated rack, or in a storage area** provided by the exam venue. | • Large garments can be used to hide notes or devices.<br>• Keeping the exam space clear helps invigilators monitor the room more effectively. |
+
+### Why these rules exist
+1. **Prevent cheating** – Electronic devices can store or transmit information.
+2. **Maintain a fair environment** – All students are subject to the same constraints.
+3. **Safety and comfort** – Removing bulky items reduces the chance of accidental obstruction or distraction.
+
+### How to prepare
+- **Read the specific exam handbook** or any pre‑exam email from your department. Universities often publish a concise “Exam Conduct” sheet that lists allowed and prohibited items.
+- **Pack a small bag** with only the items you’re sure are permitted (e.g., pens, pencils, erasers, a simple analog watch, student ID).
+- **Arrive early** so you have time to store your coat and any prohibited items before the exam starts.
+- **Ask the invigilator** if you’re uncertain about a particular item (e.g., a fitness tracker that looks like a watch). It’s better to get clarification than risk a violation.
+
+### What to do if you’re caught with a prohibited item
+- **Cooperate** with the invigilator. Most institutions will confiscate the item for the duration of the exam and note the incident in the exam record.
+- **Expect a formal report** to the academic integrity office. Consequences can range from a warning to a grade penalty or more serious disciplinary action, depending on the institution’s policy and the nature of the violation.
+
+### Bottom line
+- **Analog watch → usually OK**.<br>
+- **Smart/digital watch, phone, tablet, or any device with connectivity → not allowed** (must be turned off and stored).<br>
+- **Coats and large outerwear → must be removed and stored** before the exam begins.
+
+Always double‑check the specific guidelines issued by your university or faculty, because there can be small variations (e.g., some schools allow a “watch‑only” device that has no display or connectivity). If the policy isn’t clear, ask the exam coordinator ahead of time.
+Tokens: 1066
+Latency: 3.56s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What rules apply regarding wristwatches, mobile phones, and coats during in-person campus examinations?
+[*] Rewritten Standalone Query: What rules apply regarding wristwatches, mobile phones, and coats during in-person campus examinations?
+[*] [Hot Tier] HIT! Best similarity distance: 0.6276 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_5261a84b-4acb-4159-8ee0-c69dd4e4eeb4) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+During an on‑campus, invigilated exam you must:
+
+- Turn off any mobile phone or smart wristwatch completely (not merely set to Air‑plane/Do‑Not‑Disturb mode) and place the device under your desk or in the area specified by the invigilator.
+
+- Put your coat, jacket (and any other outerwear such as scarves, hats or caps) in the designated storage area; you are not permitted to keep a coat or jacket on the back of your chair.
+
+[RAG CITATIONS]
+[{'filename': 'University_Legislation_CS_handbook.pdf', 'page': 13, 'clearance': 'public'}]
+
+RAG latency: 3.97s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 29/33
+ID: 29
+Question: What are three prohibited uses and three permitted uses of Generative AI during assessment preparation according to University policy?
+================================================================================
+
+[1/2] Running Plain LLM...
+[Groq] Waiting 0.02s before next request...
+
+[PLAIN LLM ANSWER]
+I’m not able to quote a specific university’s policy document, but many institutions that have issued guidance on the use of generative‑AI tools (such as ChatGPT, Claude, Gemini, etc.) during the **assessment‑preparation** phase draw a fairly consistent line between what is considered **prohibited** and what is considered **permitted**. Below is a typical set of examples that you’ll often see in those policies. If you need the exact wording for your own university, you’ll have to consult that school’s official AI‑use guidelines or the relevant faculty handbook.
+
+---
+
+## Commonly **Prohibited** Uses
+
+| # | Typical Prohibited Use | Why it’s disallowed |
+|---|------------------------|---------------------|
+| 1 | **Submitting AI‑generated answers, essays, code, or other work as your own** (i.e., claiming the output as original student work). | This undermines academic integrity; the work is not the student’s own intellectual contribution. |
+| 2 | **Using AI to complete any part of a graded assessment that is meant to be an individual effort** (e.g., solving exam questions, writing a take‑home essay, completing a lab report). | The assessment is designed to evaluate the student’s personal mastery of the material. |
+| 3 | **Relying on AI to produce data analysis, calculations, or design solutions that will be submitted for marking** without independent verification and attribution. | AI can hallucinate or produce incorrect results; the student must be able to justify and verify any technical output. |
+
+*Other variations that often appear in the same category include: using AI to generate citations that are not verified, having AI write entire literature reviews, or employing AI to produce code that will be graded without the student understanding how it works.*
+
+---
+
+## Commonly **Permitted** Uses (when used responsibly)
+
+| # | Typical Permitted Use | How to stay within policy |
+|---|-----------------------|---------------------------|
+| 1 | **Brainstorming ideas or outlines** (e.g., asking the model for possible essay topics, structure suggestions, or research questions). | Treat the output as a starting point; you must develop the final work yourself and cite any ideas that are not original. |
+| 2 | **Language polishing and proofreading** (e.g., checking grammar, improving phrasing, or ensuring clarity). | Use the AI as a tool for editing, not for generating substantive content; keep a copy of the original draft to show your own work. |
+| 3 | **Clarifying concepts or getting explanations of background material** (e.g., “Explain the difference between supervised and unsupervised learning”). | Use the explanation to aid your understanding, but do not copy the AI’s text verbatim into a submission without proper attribution. |
+
+*Additional permissible activities that many policies mention include: using AI to format references (provided you verify them), generating simple code snippets for learning purposes (as long as you understand and can explain them), and employing AI‑driven citation managers or plagiarism‑check tools.*
+
+---
+
+### How to Demonstrate Compliance
+
+1. **Document your workflow** – Keep notes or screenshots showing which parts of the AI output you used and how you transformed them.
+2. **Attribute when required** – If you incorporate any AI‑generated text, ideas, or code, cite it according to your department’s citation style (e.g., “Generated with ChatGPT, OpenAI, 2024”).
+3. **Verify accuracy** – Double‑check any factual claims, data, or calculations produced by the model before including them in your work.
+4. **Check the specific policy** – Some universities have a “low‑risk” vs. “high‑risk” classification for AI use; make sure your activity falls in the low‑risk (permitted) category.
+
+---
+
+### Bottom line
+
+- **Prohibited:** Submitting AI‑generated work as your own, using AI to complete graded tasks meant to be individual, and relying on AI for unverified technical outputs.
+- **Permitted:** Using AI for brainstorming, language editing, and concept clarification—provided you retain authorship, verify the output, and give appropriate attribution.
+
+If you need the exact language for your campus, look for the section titled something like “Generative AI – Assessment Preparation” in the university’s academic integrity or AI‑use policy, or ask your course coordinator or the office of student affairs.
+Tokens: 1296
+Latency: 4.27s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What are three prohibited uses and three permitted uses of Generative AI during assessment preparation according to University policy?
+[*] Rewritten Standalone Query: What are three prohibited uses and three permitted uses of Generative AI during assessment preparation according to University policy?
+[*] [Hot Tier] HIT! Best similarity distance: 0.7024 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_aa50cf1b-7163-4282-8647-5624309ad399) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+**Prohibited uses of Generative AI (must not be used):**  
+1. To alter text in order to clarify or develop the ideas, arguments, and explanations in your work.  
+2. To correct the accuracy of the information presented in your assessment.  
+3. To translate text into or from the language being studied, or to reduce the length of the submission to meet a word‑limit requirement.
+
+**Permitted uses of Generative AI (may be used for advice and guidance only):**  
+1. To correct spelling and punctuation errors.  
+2. To ensure the text follows the conventions of grammar and syntax in written English.  
+3. To shorten long sentences or reduce long paragraphs without changing the overall content.
+
+[RAG CITATIONS]
+[{'filename': 'University_Legislation_CS_handbook.pdf', 'page': 15, 'clearance': 'public'}]
+
+RAG latency: 5.09s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 30/33
+ID: 30
+Question: What is the primary role of the two External Advisors on Academic Standards appointed by the University?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+The two External Advisors on Academic Standards are appointed to give the university an independent, outside‑the‑institution perspective on how its academic quality and integrity are being maintained. Their primary responsibilities typically include:
+
+* **Providing expert, impartial advice** to senior academic leadership (e.g., the Vice‑Chancellor, Provost, or Academic Board) on the development, interpretation, and application of the university’s academic‑standards policies.  
+* **Ensuring that the university’s standards are consistent with national and international best practices** and with any external accreditation or regulatory requirements.  
+* **Reviewing and commenting on particularly complex or high‑profile cases** (such as appeals, allegations of misconduct, or disputes over grading) to help guarantee that decisions are fair, transparent, and defensible.  
+* **Offering recommendations for improvement**—for example, suggesting revisions to assessment criteria, monitoring mechanisms, or quality‑assurance processes—so that the institution continuously upholds high academic standards.  
+
+In short, the external advisors act as an objective check on the university’s academic‑standards framework, helping to safeguard academic integrity and to align the institution’s practices with broader scholarly expectations.
+Tokens: 578
+Latency: 2.41s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What is the primary role of the two External Advisors on Academic Standards appointed by the University?
+[*] Rewritten Standalone Query: What is the primary role of the two External Advisors on Academic Standards appointed by the University?
+[*] [Hot Tier] HIT! Best similarity distance: 0.6621 <= 0.85
+[*] [Layer 1] Saved query-response pair to cache (cache_4f1b4b34-911b-4028-b774-fe872851b0f0) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+The two External Advisors on Academic Standards are senior academic officers who provide external scrutiny, quality‑assurance and advice on the University’s ongoing review of degree classifications and academic outcomes for students, complementing the work of subject‑ and programme‑level External Examiners in setting and maintaining academic standards.
+
+[RAG CITATIONS]
+[{'filename': 'University_Legislation_CS_handbook.pdf', 'page': 16, 'clearance': 'public'}]
+
+RAG latency: 4.04s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 31/33
+ID: 31
+Question: How do I request a deadline extension if I get sick?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+**Step‑by‑step guide to asking for a deadline extension when you’re ill**
+
+| Step | What to do | Why it matters |
+|------|------------|----------------|
+| **1. Check the course policy** | Look at the syllabus, Canvas/Blackboard announcements, or any departmental guidelines that describe how extensions are handled. | Many professors require a certain amount of notice or a specific form of documentation. Knowing the rules helps you follow the correct procedure. |
+| **2. Act quickly** | As soon as you realize you won’t be able to meet the deadline (ideally before the due date), draft your request. | The earlier you ask, the more likely the instructor can accommodate you and the less disruption it causes for grading. |
+| **3. Gather supporting evidence** | If you have a doctor’s note, a hospital discharge summary, or a screenshot of an appointment confirmation, keep it handy. Some instructors only need a brief statement; others may ask for a formal note. | Documentation shows that your request is legitimate and satisfies any institutional requirements. |
+| **4. Choose the right communication channel** | • **Email** is the most common and creates a written record.<br>• If the professor prefers office‑hour visits or a learning‑management‑system (LMS) messaging tool, use that instead. | Using the preferred method shows you respect the instructor’s workflow and ensures your request isn’t missed. |
+| **5. Write a concise, polite email** | Use a clear subject line (e.g., “Request for Extension on [Assignment] – [Course #]”). In the body: <br>1. Greet the professor.<br>2. Briefly explain the situation (you’re ill and unable to complete the work).<br>3. State the original due date and the new date you’re requesting.<br>4. Offer to provide documentation if needed.<br>5. Thank them for their consideration and sign off with your name, student ID, and course section. | A well‑structured email makes it easy for the professor to understand your request and act on it. |
+| **6. Follow up (if needed)** | If you don’t hear back within 24–48 hours (or the timeframe the professor usually replies in), send a short, courteous follow‑up. | Professors receive many messages; a gentle reminder ensures yours isn’t overlooked. |
+| **7. Keep records** | Save copies of all correspondence and any attached documents. | If there’s any later dispute or if you need to reference the agreement, you’ll have proof. |
+| **8. Adjust your plan** | Once the extension is granted, set a realistic schedule to complete the work before the new deadline. If you need additional help (e.g., tutoring, office‑hour time), reach out now. | Demonstrates responsibility and reduces the chance of missing the new deadline. |
+| **9. Inform other stakeholders (if applicable)** | If the assignment is a group project, let teammates know about the extension and any impact on their work. | Keeps the team coordinated and avoids misunderstandings. |
+| **10. Know your rights** | If you have a chronic health condition or disability, you may be entitled to accommodations through your university’s disability services office. Contact that office early. | Formal accommodations can provide longer extensions or alternative assessments without needing to negotiate each time. |
+
+---
+
+### Sample email template
+
+```
+Subject: Request for Extension on [Assignment Title] – [Course Code & Section]
+
+Dear Professor [Last Name],
+
+I hope you are well. I am writing to let you know that I have been ill with [brief description, e.g., a severe flu] since [date]. Because of my symptoms and the need to rest/see a doctor, I have been unable to work on the [assignment name] that is due on [original due date].
+
+Would it be possible to receive an extension until [proposed new date]? I can provide a doctor’s note or any other documentation you require.
+
+Thank you for considering my request. I appreciate your understanding and will make sure to submit the assignment promptly by the new deadline.
+
+Sincerely,
+
+[Your Full Name]  
+[Student ID]  
+[Course Code – Section]  
+[University Email]
+```
+
+*Tips for customizing the template*  
+- **Keep the illness description brief**; you don’t need to share private medical details.  
+- **Propose a realistic new date**—give yourself enough time to recover but avoid an overly long extension.  
+- **Offer documentation** up front; it shows you’re prepared to follow policy.  
+
+---
+
+### When to involve other university resources
+
+| Situation | What to do |
+|-----------|------------|
+| **You have a documented disability or chronic condition** | Contact the campus Disability Services office. They can arrange formal accommodations (e.g., extended deadlines) that apply automatically to all your courses. |
+| **Your professor denies the request and you feel it’s unfair** | Review the course syllabus and any university policies on medical extensions. If the denial conflicts with those policies, you can appeal through the department chair or the academic affairs office. |
+| **You need urgent help with the assignment** | Reach out to tutoring centers, writing labs, or peer study groups while you recover. Many campuses offer remote support that can be accessed even when you’re home sick. |
+
+---
+
+### Quick checklist before you hit “send”
+
+- [ ] Subject line clearly states the purpose.  
+- [ ] Email is addressed to the correct professor (check spelling).  
+- [ ] Original due date and requested new date are both mentioned.  
+- [ ] You’ve attached (or offered to attach) any required medical documentation.  
+- [ ] Your signature includes name, student ID, course, and contact info.  
+
+Following these steps will give you the best chance of receiving a timely extension while maintaining a professional relationship with your instructor. Get well soon!
+Tokens: 1475
+Latency: 4.40s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: How do I request a deadline extension if I get sick?
+[*] Rewritten Standalone Query: How do I request a deadline extension if I get sick?
+[*] [Hot Tier] LOW CONFIDENCE (1.1362 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_721567c8-5f99-4840-842d-422c5730ac3a) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+If you become ill, you should get in touch with the Wellbeing Team and ask them for an extension (or a waiver) to the deadline.
+
+[RAG CITATIONS]
+[{'filename': 'Programme_Information_CS_handbook.pdf', 'page': 5, 'clearance': 'public'}]
+
+RAG latency: 6.27s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 32/33
+ID: 32
+Question: Can I use automated software like ChatGPT to refine the logic and argument structure of my essay draft?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+Yes—many universities allow you to use AI‑driven tools such as ChatGPT as **writing assistants**, provided you treat them the same way you would any other form of feedback (e.g., from a tutor, peer, or grammar‑checking program). Here are the key points to keep in mind:
+
+### 1. What you can safely use the tool for
+| Task | How AI can help | What you must still do yourself |
+|------|----------------|--------------------------------|
+| **Identifying logical gaps** | Ask the model to point out places where the argument seems unsupported or where a claim needs more evidence. | Verify the model’s suggestions, locate the missing evidence, and add it yourself. |
+| **Re‑ordering paragraphs** | Request alternative outlines or suggestions for a more coherent flow. | Choose the structure that best fits your thesis and rewrite accordingly. |
+| **Clarifying phrasing** | Get suggestions for clearer wording or smoother transitions. | Ensure the final wording reflects your own voice and style. |
+| **Checking consistency** | Ask the model to spot contradictory statements or shifts in terminology. | Confirm the consistency yourself and make any necessary revisions. |
+
+### 2. What you must avoid
+- **Submitting AI‑generated text as your own work.** The essay should be written by you; the model can only act as a *coach* or *editor*.
+- **Copy‑pasting large passages.** Even if the model produces original‑looking text, many institutions consider that “AI‑assisted authorship” and may require disclosure.
+- **Relying on the model for factual accuracy.** AI can hallucinate facts or citations; always verify any data, references, or quotations it suggests.
+
+### 3. Disclosure and academic honesty
+- **Check your institution’s policy.** Some schools require you to note any AI assistance in a footnote or in an “Acknowledgments” section (e.g., “Portions of the argument‑structure feedback were generated with the assistance of ChatGPT”). Others have no formal requirement but still expect you to be honest.
+- **When in doubt, ask your instructor or teaching assistant.** A quick email asking whether AI‑based editing is permissible can save you trouble later.
+
+### 4. Practical workflow
+1. **Write a first draft** on your own—focus on getting your ideas down.
+2. **Identify specific questions** for the AI (e.g., “Does this paragraph clearly support my thesis?” or “Can you suggest a more logical order for these three sections?”).
+3. **Review the AI’s feedback** critically; keep only the suggestions that improve clarity, logic, or flow.
+4. **Revise the draft** manually, integrating the accepted suggestions and adding any missing evidence or citations.
+5. **Run a final check** (spell‑check, plagiarism detector, citation manager) to ensure the paper meets all formal requirements.
+
+### 5. Ethical considerations
+- **Maintain your voice.** The goal is to sharpen your own reasoning, not to replace it.
+- **Respect intellectual property.** If the AI suggests a quotation or a source you didn’t originally use, verify that you have the right to cite it and that it fits your argument.
+- **Avoid over‑reliance.** Using the tool repeatedly for the same essay can hinder your own development of critical‑thinking and writing skills.
+
+---
+
+**Bottom line:** Using ChatGPT (or similar software) to *refine* the logic and argument structure of an essay is generally acceptable, as long as you treat the output as a suggestion, verify everything yourself, and follow any specific disclosure or usage policies your university may have. When in doubt, ask your instructor for clarification.
+Tokens: 1036
+Latency: 3.73s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: Can I use automated software like ChatGPT to refine the logic and argument structure of my essay draft?
+[*] Rewritten Standalone Query: Can I use automated software like ChatGPT to refine the logic and argument structure of my essay draft?
+[*] [Hot Tier] LOW CONFIDENCE (1.0718 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_9f86c4ae-9a68-4f35-bb52-250bac6ecdaa) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+No, you may not use automated software such as ChatGPT to refine the logic and argument structure of your essay draft, because the University’s policy states that Generative AI must not be used to “alter text to clarify and / or develop the ideas, arguments, and explanations” or to “develop or change the ideas and arguments presented”. Such use would be considered an unacceptable form of editorial assistance and could be deemed plagiarism.
+
+[RAG CITATIONS]
+[{'filename': 'University_Legislation_CS_handbook.pdf', 'page': 15, 'clearance': 'public'}]
+
+RAG latency: 5.90s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+QUESTION 33/33
+ID: 33
+Question: What happens if an invigilator catches a student with handwriting on their skin during an assessment?
+================================================================================
+
+[1/2] Running Plain LLM...
+
+[PLAIN LLM ANSWER]
+When an invigilator spots a student with handwritten notes on the skin (e.g., on an arm, hand, or other part of the body) during a timed assessment, the situation is usually treated as a breach of the exam‑integrity rules that most universities have in place.  What happens next depends on the specific policies of the institution, but the typical sequence of actions is broadly the same across most higher‑education settings:
+
+| Step | What the invigilator does | Why it matters |
+|------|---------------------------|----------------|
+| **1. Intervention** | The invigilator politely asks the student to stop using the notes and, if possible, to remove or conceal the writing (e.g., wipe the arm, cover it with a sleeve). | The goal is to prevent any further use of the unauthorised material while the exam is still in progress. |
+| **2. Documentation** | The invigilator records the incident on the official *exam incident report* (or equivalent form). This usually includes the student’s name, the course/exam, a description of the note‑writing, the time it was observed, and any actions taken (e.g., wiping the skin, confiscating a paper). | A written record is required for any later disciplinary or appeals process and provides a clear audit trail. |
+| **3. Reporting** | The incident is forwarded to the exam officer / faculty exam board or the university’s Academic Integrity Office. In many schools the invigilator also informs the senior invigilator or the exam coordinator on‑site. | The department that holds the authority to decide the final sanction must be notified. |
+| **4. Immediate consequence (exam‑level)** | *Common outcomes* include: <br>• **Disqualification from the current exam** – the student is asked to leave the room and receives a “zero” or “failed” mark for that component. <br>• **Partial penalty** – in some institutions the invigilator may be allowed to let the student finish the paper but the mark is automatically set to zero for the whole assessment. | The exam‑level penalty reflects the fact that the student had unauthorised assistance during the test. |
+| **5. Formal academic‑integrity process** | The university’s disciplinary procedure is triggered. The student will usually receive a written notice of the alleged breach and be invited to a hearing (or submit a written explanation). Possible sanctions range from a warning to a formal misconduct finding, which can lead to: <br>• Grade penalty or failure of the module <br>• Suspension or expulsion (in severe or repeat cases) <br>• Entry of a misconduct record on the student’s transcript | This step ensures due process and gives the student a chance to explain or contest the allegation. |
+| **6. Support & appeal** | If the student believes the finding is unjust (e.g., the writing was a medical note, a therapeutic reminder, or an accidental smudge), they can usually appeal the decision through the university’s appeal mechanisms, often with supporting evidence (e.g., a doctor’s note). | Appeals protect the student’s right to a fair hearing and can overturn or reduce the sanction if the evidence warrants it. |
+
+---
+
+### Why writing on the skin is considered a breach
+
+1. **Unauthorised aid** – Most exam regulations explicitly forbid any “concealed or hidden notes,” and the skin is treated the same as a piece of paper or a hidden device.
+2. **Difficulty of monitoring** – Unlike a notebook, notes on the body are hard for invigilators to see, making them a preferred method for cheating if not caught.
+3. **Equity** – Allowing one student to use such notes would give them an unfair advantage over peers who are abiding by the rules.
+
+---
+
+### What the student should do if caught
+
+| Action | Rationale |
+|--------|-----------|
+| **Stop using the notes immediately** and comply with the invigilator’s request to remove or conceal them. | Demonstrates cooperation; may be taken into account when the university decides on the penalty. |
+| **Ask for clarification** if the invigilator’s instructions are unclear (e.g., “May I wipe my arm?”). | Ensures the student follows the correct procedure and avoids accidental non‑compliance. |
+| **Provide a written explanation** as soon as possible (often required when the incident report is sent). | A clear, honest account can mitigate the severity of the sanction, especially if the writing had a legitimate purpose (e.g., a medical reminder). |
+| **Seek advice** from the student‑support office or a student‑union representative before any formal hearing. | Helps the student understand the process and prepare a defence if needed. |
+
+---
+
+### Typical variations between institutions
+
+| Institution type | Typical handling of skin‑written notes |
+|------------------|----------------------------------------|
+| **Large research universities** | Strict zero‑tolerance: automatic disqualification from the exam and a formal misconduct charge. |
+| **Smaller colleges** | May allow the student to finish the paper but still award a zero for the component; the misconduct process is otherwise the same. |
+| **Professional programmes (e.g., medicine, law)** | Often have additional regulatory bodies (e.g., medical council) that can impose extra penalties beyond the university’s own sanctions. |
+| **Online/remote proctored exams** | The proctoring software may flag “hand‑writing on the face/arm” via facial‑recognition alerts, leading to an automatic flag for review and similar downstream actions. |
+
+---
+
+### Bottom line
+
+- **Writing notes on the skin during an exam is almost universally treated as cheating.**
+- The invigilator will stop the activity, document the incident, and report it to the relevant academic‑integrity office.
+- The student can expect at least a zero on that assessment and a formal misconduct process that could lead to additional penalties, depending on the university’s policy and any mitigating circumstances the student can prove.
+
+If you (or someone you know) are facing this situation, the safest course is to **adhere strictly to the exam rules** and avoid any form of concealed notes—skin included. If a mistake has already been made, cooperating fully with the invigilator and providing a clear, honest explanation as soon as possible will give the best chance of a reduced sanction.
+Tokens: 1793
+Latency: 5.23s
+
+[2/2] Running Hybrid RAG...
+[*] Original Question: What happens if an invigilator catches a student with handwriting on their skin during an assessment?
+[*] Rewritten Standalone Query: What happens if an invigilator catches a student with handwriting on their skin during an assessment?
+[*] [Hot Tier] LOW CONFIDENCE (1.0359 > 0.85). Falling back to Archive.
+[*] [Layer 1] Saved query-response pair to cache (cache_a4357f85-2bd6-4946-b3d1-2fd63a3c9142) [Required Clearance: 'public'].
+
+[HYBRID RAG ANSWER]
+If a student has writing on their hands or arms during an assessment, they are required to inform the invigilator, as having any writing on your person is not permitted and you must not write on yourself during the exam.
+
+[RAG CITATIONS]
+[{'filename': 'University_Legislation_CS_handbook.pdf', 'page': 13, 'clearance': 'public'}]
+
+RAG latency: 6.17s
+
+Results saved to: C:\Birmingham\Dissertation\AcademicHelper\experiment\results\experiment_a_raw_results.json
+
+================================================================================
+EXPERIMENT A COMPLETE
+================================================================================
