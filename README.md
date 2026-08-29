@@ -85,10 +85,11 @@ Documents are processed and converted into vector embeddings using a page-aware 
 ├── app.db                    # SQLAlchemy database storage (app.db)
 ├── uploads/                  # Raw uploaded PDF documents
 ├── chroma_db/                # Persistent vector database store
-├── experiment/               # Test comparing Plain LLM vs Hybrid RAG
+├── experiment/               # Test files for comparing Plain LLM vs Hybrid RAG
 ├── requirements.txt          # Project dependencies
 ├── config.py                 # Project configuration
-└── setup.py                  # Application initial setup
+├── setup.py                  # Application initial setup
+└── run_experiment.py         # Main test for comparing Plain LLM vs Hybrid RAG
 
 ## 🔐 Security & Access Clearances
 The platform enforces strict Role-Based Access Control (RBAC) across document retrieval:
