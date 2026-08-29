@@ -67,7 +67,7 @@ Documents are processed and converted into vector embeddings using a page-aware 
 
 ├── app/
 │   ├── __init__.py           # Application factory & extensions setup
-│   ├── models.py             # Database models & RagEngine (3-Tier RAG Engine)
+│   ├── models.py             # Database models & RagEngine (3-Stage Hybrid RAG Engine)
 │   ├── forms.py              # Login, Registration, and Document Upload forms
 │   ├── templates/            # directory for HTML templates
 │   ├── routes/
@@ -85,6 +85,7 @@ Documents are processed and converted into vector embeddings using a page-aware 
 ├── app.db                    # SQLAlchemy database storage (app.db)
 ├── uploads/                  # Raw uploaded PDF documents
 ├── chroma_db/                # Persistent vector database store
+├── experiment/               # Test comparing Plain LLM vs Hybrid RAG
 ├── requirements.txt          # Project dependencies
 ├── config.py                 # Project configuration
 └── setup.py                  # Application initial setup
