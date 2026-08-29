@@ -31,7 +31,6 @@ def load_user(user_id):
 
 
 # 4. Architectural Blueprint Ingestion
-# 🚀 This line pulls cleanly from the routes package interface we define below!
 from app.routes import auth_bp, admin_bp, chat_bp
 
 app.register_blueprint(auth_bp)
@@ -39,33 +38,33 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(chat_bp)
 
 
-# 5. Global Jinja2 Template Filters
-@app.template_filter('render_citations')
-def render_citations(text):
-    """
-    Server-side template parser. Inspects database message strings for citations
-    and normalizes them into safe, clickable anchor links for the UI layout history.
-    """
-    if not text:
-        return ""
-
-    # Matches patterns matching the format: "| Source: Filename.pdf (Page X)"
-    pattern = r"\|\s*Source:\s*(.*?)\s*\(Page\s*(\d+)\)"
-    match = re.search(pattern, text)
-
-    if match:
-        filename = match.group(1).strip()
-        page = match.group(2)
-        encoded_filename = quote(filename)
-
-        # Build standard production HTML target links pointing to our blueprint view endpoint
-        link_html = (
-            f'| Source: <a href="/view-source/{encoded_filename}#page={page}" '
-            f'target="_blank" style="color: #007bff; text-decoration: underline; '
-            f'font-weight: 500;">{filename} (Page {page}) ↗️</a>'
-        )
-
-        # Swaps raw matching text patterns out for our live HTML link elements
-        return re.sub(pattern, link_html, text)
-
-    return text
+# # 5. Global Jinja2 Template Filters
+# @app.template_filter('render_citations')
+# def render_citations(text):
+#     """
+#     Server-side template parser. Inspects database message strings for citations
+#     and normalizes them into safe, clickable anchor links for the UI layout history.
+#     """
+#     if not text:
+#         return ""
+#
+#     # Matches patterns matching the format: "| Source: Filename.pdf (Page X)"
+#     pattern = r"\|\s*Source:\s*(.*?)\s*\(Page\s*(\d+)\)"
+#     match = re.search(pattern, text)
+#
+#     if match:
+#         filename = match.group(1).strip()
+#         page = match.group(2)
+#         encoded_filename = quote(filename)
+#
+#         # Build standard production HTML target links pointing to our blueprint view endpoint
+#         link_html = (
+#             f'| Source: <a href="/view-source/{encoded_filename}#page={page}" '
+#             f'target="_blank" style="color: #007bff; text-decoration: underline; '
+#             f'font-weight: 500;">{filename} (Page {page}) ↗️</a>'
+#         )
+#
+#         # Swaps raw matching text patterns out for our live HTML link elements
+#         return re.sub(pattern, link_html, text)
+#
+#     return text
