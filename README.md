@@ -149,12 +149,19 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-3. Run the Application
+3. Initialise the Application.
+python setup.py
+
+4.Run the Application
+
+Admin Test account:
+    username: system_root
+    password: master123
 
 flask run
 Access the web application at http://127.0.0.1:5000.
 
-4. Running the Test Suite
+5.Running the Test Suite
 Make sure the Flask application is running before executing HTTP integration tests.
 
  1. Run LLM-as-a-Judge Evaluation (generates rag_evaluation_results.csv)

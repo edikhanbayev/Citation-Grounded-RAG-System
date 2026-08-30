@@ -16,8 +16,6 @@ SQLAlchemy==2.0.48
 typing_extensions==4.15.0
 Werkzeug==3.1.6
 WTForms==3.2.1
-Flask-Mail
-pypdf
 requests
 chromadb
 python-dotenv
@@ -25,7 +23,6 @@ flask_migrate
 pymupdf
 rank-bm25
 groq
-pandas
 ragas
 datasets
 langchain-groq
