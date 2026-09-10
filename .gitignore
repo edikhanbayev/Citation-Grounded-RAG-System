@@ -2,7 +2,11 @@
 __pycache__/
 *.pyc
 .env
-chroma_db/
 app.db
 .idea/
 .migrations/
+ProjectFiles/
+uploads/
+chroma_db/
+migrations/
+Academic_papers/
