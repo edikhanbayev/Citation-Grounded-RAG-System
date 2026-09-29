@@ -1,100 +1,100 @@
-# Система поиска по университетским регламентам со ссылками на источники
+# Citation-Grounded University Regulations Assistant
 
-Проект MSc Computer Science, исследующий, как **гибридный поиск, привязка ответов к источникам, преобразование контекстных запросов и контроль доступа на этапе поиска** могут улучшить ответы на вопросы по университетским регламентам.
+An MSc Computer Science project investigating how **hybrid retrieval, citation-grounded answers, contextual query rewriting, and retrieval-time access control** can improve question answering over university regulations.
 
-Система разработана с использованием справочника School of Computer Science Университета Бирмингема как основного корпуса документов.
+The system was developed using the University of Birmingham School of Computer Science handbook as the primary document corpus.
 
-## Обзор
+## Overview
 
-Универсальные LLM способны формировать связные ответы, однако вопросы по внутренним правилам конкретной организации предъявляют дополнительные требования: ответы должны основываться на официальных документах; точные термины и сокращения должны надежно находиться; пользователь должен иметь возможность проверить ответ по странице источника; закрытые материалы должны отфильтровываться до передачи в LLM; последующие вопросы должны сохранять контекст; а кэшированные ответы не должны использоваться после изменения исходного документа.
+General-purpose LLMs can produce fluent answers, but questions about organisation-specific regulations introduce additional requirements: answers should be grounded in official documents; exact terminology and abbreviations should be retrieved reliably; users should be able to verify answers against source pages; restricted content should be filtered before it reaches the LLM; follow-up questions should preserve conversational context; and cached answers should not be reused after the underlying source document changes.
 
-Проект решает эти задачи с помощью **трехэтапной Hybrid RAG-архитектуры**, которая объединяет семантический кэш, векторный поиск, лексический поиск BM25, Reciprocal Rank Fusion (RRF), ролевое управление доступом (RBAC) и генерацию ответов со ссылками на источники.
+This project addresses these challenges through a **three-stage Hybrid RAG architecture** combining semantic caching, vector retrieval, BM25 lexical retrieval, Reciprocal Rank Fusion (RRF), role-based access control (RBAC), and citation-grounded answer generation.
 
-## Основные возможности
+## Key Features
 
-- **Гибридный поиск** — объединяет векторный поиск и лексический поиск BM25.
-- **Reciprocal Rank Fusion** — объединяет результаты двух типов поиска с использованием `K = 60`.
-- **Ответы со ссылками на источники** — сохраняют имя исходного файла и номер страницы на этапах поиска и генерации.
-- **RBAC на этапе поиска** — фильтрует фрагменты документов до того, как они попадут в контекст LLM.
-- **Преобразование контекстных запросов** — преобразует зависимые от истории диалога вопросы в самостоятельные поисковые запросы.
-- **Семантический кэш ответов** — повторно использует достаточно похожие предыдущие ответы с учетом прав доступа.
-- **Инвалидация кэша** — удаляет кэшированные ответы при изменении или удалении связанных исходных документов.
-- **ТОП документы** — часто цитируемые документы переносятся в уменьшенную векторную коллекцию для приоритетного поиска.
-- **Фоновая обработка PDF** — используется `ThreadPoolExecutor`, чтобы длительная обработка документов не блокировала HTTP-запрос загрузки.
-- **Административное управление базой знаний** — поддерживаются загрузка PDF, назначение уровня доступа, отслеживание статуса обработки и удаление документов.
+- **Hybrid retrieval** — combines vector retrieval with BM25 lexical retrieval.
+- **Reciprocal Rank Fusion** — merges rankings from both retrieval methods using `K = 60`.
+- **Citation-grounded answers** — preserve the source filename and page number through retrieval and generation.
+- **Retrieval-time RBAC** — filters document chunks before they are included in the LLM context.
+- **Contextual query rewriting** — converts dialogue-dependent follow-up questions into standalone retrieval queries.
+- **Semantic answer cache** — reuses sufficiently similar previous answers while respecting access permissions.
+- **Cache invalidation** — removes cached answers when related source documents are modified or deleted.
+- **Hot documents** — frequently cited documents are promoted to a smaller vector collection for priority retrieval.
+- **Background PDF processing** — uses `ThreadPoolExecutor` so long-running document processing does not block the HTTP upload request.
+- **Administrative knowledge-base management** — supports PDF upload, access-level assignment, processing-status tracking, and document deletion.
 
-## Архитектура
+## Architecture
 
 ```mermaid
 flowchart TD
-    A[Вопрос пользователя] --> B{Есть история диалога?}
-    B -- Да --> C[Преобразование запроса]
-    B -- Нет --> D[Самостоятельный запрос]
+    A[User question] --> B{Conversation history available?}
+    B -- Yes --> C[Query rewriting]
+    B -- No --> D[Standalone query]
     C --> D
-    D --> E[Семантический кэш ответов]
-    E -- Подходящий результат + есть доступ --> Z[Возврат кэшированного ответа + ссылки]
-    E -- Промах --> F1[Векторный поиск]
-    E -- Промах --> F2[Поиск BM25]
-    F1 --> G1[Горячий уровень]
-    G1 -->|низкая уверенность| G2[Основная векторная коллекция]
-    F2 --> H[BM25-индекс в памяти]
-    G1 --> I[Фильтрация кандидатов]
+    D --> E[Semantic answer cache]
+    E -- Suitable hit + access allowed --> Z[Return cached answer + citations]
+    E -- Miss --> F1[Vector retrieval]
+    E -- Miss --> F2[BM25 retrieval]
+    F1 --> G1[Hot tier]
+    G1 -->|low confidence| G2[Primary vector collection]
+    F2 --> H[In-memory BM25 index]
+    G1 --> I[Candidate filtering]
     G2 --> I
     H --> I
     I --> J[Reciprocal Rank Fusion - K=60]
-    J --> K[Лучшие 4 фрагмента]
-    K --> L[Генерация LLM]
-    L --> M[Ответ + ссылки на страницы]
-    M --> N[Опциональная запись в кэш]
+    J --> K[Top 4 chunks]
+    K --> L[LLM generation]
+    L --> M[Answer + page citations]
+    M --> N[Optional cache write]
 ```
 
-### Настройки поиска
+### Retrieval Settings
 
-| Параметр | Значение |
+| Parameter | Value |
 |---|---:|
-| Размер фрагмента | 150 слов |
-| Перекрытие фрагментов | 30 слов |
-| Максимум кандидатов векторного поиска | 15 |
-| Максимум кандидатов BM25 | 15 |
-| Порог L2 для векторного поиска | `1.40` |
-| Порог семантического кэша | `0.18` |
-| Порог расстояния для горячего уровня | `0.85` |
-| Порог переноса в горячий уровень | 5 ответов с цитированием |
-| Константа RRF | `K = 60` |
-| Финальный размер контекста | `top_k = 4` |
+| Chunk size | 150 words |
+| Chunk overlap | 30 words |
+| Maximum vector candidates | 15 |
+| Maximum BM25 candidates | 15 |
+| Vector retrieval L2 threshold | `1.40` |
+| Semantic cache threshold | `0.18` |
+| Hot-tier distance threshold | `0.85` |
+| Hot-tier promotion threshold | 5 answers with citations |
+| RRF constant | `K = 60` |
+| Final context size | `top_k = 4` |
 
-Эти значения являются настройками конкретного проекта и оставались неизменными во время экспериментов. Их не следует считать универсально оптимальными параметрами.
+These values are specific project settings and remained fixed during the experiments. They should not be interpreted as universally optimal parameters.
 
-## Ролевое управление доступом
+## Role-Based Access Control
 
-Каждый индексируемый фрагмент содержит уровень доступа. Поиск ограничивается в соответствии с ролью аутентифицированного пользователя **до** объединения кандидатов и генерации ответа.
+Each indexed chunk contains an access level. Retrieval is restricted according to the authenticated user's role **before** candidate fusion and answer generation.
 
-| Роль | Разрешенные уровни доступа |
+| Role | Allowed access levels |
 |---|---|
-| Студент | Public |
-| Преподаватель | Public, Internal |
-| Администратор | Public, Internal, Restricted |
+| Student | Public |
+| Staff | Public, Internal |
+| Administrator | Public, Internal, Restricted |
 
-Тот же принцип применяется к кэшированным ответам: кэшированный ответ возвращается только в том случае, если пользователь имеет доступ к самому высокому уровню конфиденциальности среди процитированных источников.
+The same principle is applied to cached answers: a cached response is returned only when the user has access to the highest confidentiality level among the cited sources.
 
-## Стек технологий
+## Technology Stack
 
-| Компонент | Технология |
+| Component | Technology |
 |---|---|
-| Язык | Python 3.11 |
-| Веб-фреймворк | Flask 3.0 |
-| Аутентификация | Flask-Login, Flask-WTF |
-| ORM / данные приложения | SQLAlchemy, SQLite |
-| Векторный поиск | ChromaDB |
-| Лексический поиск | `rank_bm25` / BM25Okapi |
-| Извлечение текста из PDF | PyMuPDF |
-| Векторные представления | `all-MiniLM-L6-v2` |
-| Размерность вектора | 384 |
-| Работа с LLM | Groq API |
-| Генерация / преобразование запросов | `openai/gpt-oss-120b` |
-| Оценка RAG | RAGAS |
+| Language | Python 3.11 |
+| Web framework | Flask 3.0 |
+| Authentication | Flask-Login, Flask-WTF |
+| ORM / application data | SQLAlchemy, SQLite |
+| Vector retrieval | ChromaDB |
+| Lexical retrieval | `rank_bm25` / BM25Okapi |
+| PDF text extraction | PyMuPDF |
+| Embeddings | `all-MiniLM-L6-v2` |
+| Embedding dimension | 384 |
+| LLM integration | Groq API |
+| Generation / query rewriting | `openai/gpt-oss-120b` |
+| RAG evaluation | RAGAS |
 
-## Структура проекта
+## Project Structure
 
 ```text
 .
@@ -121,127 +121,127 @@ flowchart TD
 └── README.md
 ```
 
-Репозиторий также содержит входные и выходные данные экспериментов, а также вспомогательную документацию по проектированию системы.
+The repository also contains experiment inputs and outputs, as well as supporting documentation describing the system design.
 
-## Установка
+## Installation
 
-### 1. Клонировать репозиторий
+### 1. Clone the repository
 
 ```bash
 git clone <repository-url>
 cd <repository-folder>
 ```
 
-### 2. Создать виртуальное окружение
+### 2. Create a virtual environment
 
 ```bash
 python -m venv venv
 ```
 
-Активировать в Windows:
+Activate it on Windows:
 
 ```powershell
 venv\Scripts\activate
 ```
 
-В macOS/Linux:
+On macOS/Linux:
 
 ```bash
 source venv/bin/activate
 ```
 
-### 3. Установить зависимости
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Настроить переменные окружения
+### 4. Configure environment variables
 
-Создайте файл `.env` в корневой папке репозитория:
+Create a `.env` file in the repository root:
 
 ```env
 SECRET_KEY=replace-with-a-strong-random-secret
 GROQ_API_KEY=your-groq-api-key
 ```
 
-`SECRET_KEY` используется Flask для защиты сессий и приложения. `GROQ_API_KEY` должен содержать действующий ключ Groq API.
+`SECRET_KEY` is used by Flask to protect sessions and application security. `GROQ_API_KEY` must contain a valid Groq API key.
 
-**Не добавляйте `.env`, API-ключи, пароли и рабочие секреты в систему контроля версий.**
+**Do not commit `.env`, API keys, passwords, or production secrets to version control.**
 
-### 5. Инициализировать приложение
+### 5. Initialise the application
 
 ```bash
 python setup.py
 ```
 
-### 6. Запустить приложение
+### 6. Run the application
 
 ```bash
 flask run
 ```
 
-Откройте:
+Open:
 
 ```text
 http://127.0.0.1:5000
 ```
 
-## Типичный процесс обработки запроса
+## Typical Request Processing Flow
 
-1. Пользователь задает вопрос на естественном языке.
-2. Если существует история диалога, система преобразует последующий вопрос в самостоятельный поисковый запрос.
-3. Проверяется семантический кэш с учетом прав доступа.
-4. При отсутствии подходящего кэшированного ответа выполняются векторный поиск и BM25 по разрешенному пользователю содержимому.
-5. Результаты векторного поиска фильтруются по расстоянию, а каждый поисковый механизм предоставляет до 15 кандидатов.
-6. RRF объединяет лексический и семантический рейтинги.
-7. Лучшие четыре фрагмента передаются в LLM вместе с именем источника и номером страницы.
-8. Пользователю возвращается ответ со ссылками на источники.
-9. Успешный ответ может быть сохранен в кэше вместе с требуемым уровнем доступа.
+1. The user asks a question in natural language.
+2. If conversation history exists, the system rewrites the follow-up question into a standalone retrieval query.
+3. The semantic cache is checked with access control applied.
+4. If no suitable cached answer exists, vector retrieval and BM25 retrieval are performed over content the user is authorised to access.
+5. Vector results are filtered by distance, and each retrieval method contributes up to 15 candidates.
+6. RRF combines the lexical and semantic rankings.
+7. The top four chunks are passed to the LLM together with the source filename and page number.
+8. The user receives an answer with source citations.
+9. A successful answer may be stored in the cache together with its required access level.
 
-## Оценка системы
+## System Evaluation
 
-### Сравнение методов поиска
+### Retrieval Method Comparison
 
-На тестовом наборе из 35 вопросов сравнивались векторный поиск, BM25 и Hybrid RRF. Результат считался успешным только в том случае, если **и ожидаемый документ, и ожидаемая страница** присутствовали среди первых четырех результатов.
+A test set of 35 questions was used to compare vector retrieval, BM25, and Hybrid RRF. A result was counted as successful only when **both the expected document and the expected page** appeared within the top four retrieved results.
 
-| Метод поиска | Hit Rate@4 | MRR@4 |
+| Retrieval method | Hit Rate@4 | MRR@4 |
 |---|---:|---:|
-| Только векторный поиск | 94.3% (33/35) | 0.8524 |
-| Только BM25 | 97.1% (34/35) | 0.8976 |
+| Vector only | 94.3% (33/35) | 0.8524 |
+| BM25 only | 97.1% (34/35) | 0.8976 |
 | **Hybrid RRF** | **100.0% (35/35)** | **0.9214** |
 
-На использованном тестовом наборе Hybrid RRF показал лучший результат, хотя улучшение по сравнению с BM25 было умеренным, а как минимум один запрос продемонстрировал ухудшение позиции после объединения результатов.
+On the evaluated dataset, Hybrid RRF achieved the strongest result, although the improvement over BM25 was moderate, and at least one query showed a lower ranking after result fusion.
 
-### Оценка RAGAS
+### RAGAS Evaluation
 
-Отдельная сквозная оценка на 16 запросах показала следующие результаты:
+A separate end-to-end evaluation on 16 queries produced the following results:
 
-| Метрика | Значение |
+| Metric | Value |
 |---|---:|
 | Context Recall | **0.9792** |
 | Context Precision | **0.9427** |
 | Faithfulness | **0.8861** |
 | Answer Relevancy | **0.8745** |
 
-Результаты показывают высокое покрытие поиска и в целом хорошую привязку ответов к найденному контексту на выбранном тестовом наборе. Они не являются доказательством аналогичной эффективности на других университетах или других наборах документов.
+These results indicate high retrieval coverage and generally strong grounding of answers in the retrieved context on the selected test set. They do not demonstrate equivalent performance across other universities or document collections.
 
-### Обычная LLM и Hybrid RAG
+### Plain LLM vs Hybrid RAG
 
-В сравнительном эксперименте на 33 вопросах использовалась одна и та же базовая модель — с институциональным поиском и без него. Hybrid RAG лучше предоставлял информацию, специфичную для университета, и позволял отслеживать источник ответа. Обычная LLM в некоторых случаях отказывалась отвечать или использовала общие знания о высшем образовании.
+A comparative experiment on 33 questions used the same base model with and without institutional retrieval. Hybrid RAG was better able to provide university-specific information and allowed the source of each answer to be traced. The plain LLM sometimes refused to answer or relied on general knowledge about higher education.
 
-Измеренная задержка составила:
+Measured latency was:
 
-| Конфигурация | Средняя задержка |
+| Configuration | Average latency |
 |---|---:|
-| Обычная LLM | ~3.40 с |
-| Hybrid RAG | ~7.23 с |
+| Plain LLM | ~3.40 s |
+| Hybrid RAG | ~7.23 s |
 
-В этом эксперименте Hybrid RAG работал примерно **в 2.12 раза медленнее** из-за дополнительных этапов поиска, фильтрации, объединения результатов и генерации ответа на основе найденного контекста.
+In this experiment, Hybrid RAG was approximately **2.12× slower** because of the additional retrieval, filtering, result-fusion, and context-grounded generation stages.
 
-## Запуск экспериментов
+## Running the Experiments
 
-Репозиторий содержит скрипты для оценки поиска, RAGAS, многошаговых диалогов и горячего уровня документов.
+The repository contains scripts for retrieval evaluation, RAGAS evaluation, multi-turn dialogue testing, and hot-tier testing.
 
 ```bash
 python tests/test_ablation.py
@@ -250,33 +250,33 @@ python tests/test_multiturn.py
 python tests/test_hot_tier.py
 ```
 
-Сравнение обычной LLM и Hybrid RAG реализовано в экспериментальном процессе внутри репозитория. Точные команды могут зависеть от окончательной структуры проекта и настроек окружения.
+The plain-LLM-versus-Hybrid-RAG comparison is implemented in the repository's experimental workflow. Exact commands may depend on the final project structure and environment configuration.
 
-## Согласованность кэша
+## Cache Consistency
 
-Семантический кэш связан с исходными документами. Если индексируемый документ изменяется или удаляется, связанные с ним кэшированные ответы удаляются. Это снижает риск возврата ответов, основанных на устаревших правилах.
+The semantic cache is linked to source documents. If an indexed document is modified or deleted, cached answers associated with that document are removed. This reduces the risk of returning answers grounded in outdated regulations.
 
-Повторное использование кэша также ограничено RBAC: одной семантической близости недостаточно, если у пользователя нет необходимого уровня доступа к источникам кэшированного ответа.
+Cache reuse is also restricted by RBAC: semantic similarity alone is insufficient when the user does not have the required level of access to the sources referenced by the cached answer.
 
-## Ограничения
+## Limitations
 
-- Относительно небольшие наборы данных для оценки.
-- Фиксированные значения RRF, порогов и количества кандидатов.
-- Не проводился систематический подбор гиперпараметров.
-- При извлечении сложных таблиц или многостолбцовых PDF возможна потеря информации.
-- BM25-индекс хранится в памяти локального приложения.
-- Семантический кэш и горячий уровень требуют согласованности состояния.
-- Качество системы зависит от актуальности и корректности исходных документов.
-- Использование внешнего LLM API увеличивает задержку.
-- Галлюцинации и фактическая корректность не оценивались как полностью независимый набор утверждений на уровне отдельных фактов.
-- Горячий уровень и преобразование контекстных запросов не оценивались отдельно с точки зрения влияния на производительность.
+- Relatively small evaluation datasets.
+- Fixed RRF, threshold, and candidate-count settings.
+- No systematic hyperparameter optimisation was performed.
+- Complex tables or multi-column PDFs may lose information during extraction.
+- The BM25 index is stored in local application memory.
+- The semantic cache and hot tier require state consistency.
+- System quality depends on the correctness and freshness of the source documents.
+- Use of an external LLM API increases latency.
+- Hallucination and factual correctness were not evaluated as a fully independent set of claim-level factual checks.
+- The hot tier and contextual query rewriting were not evaluated independently for their effect on system performance.
 
-## Дальнейшее развитие
+## Future Work
 
-Возможные направления развития включают адаптивное или обучаемое объединение результатов поиска, reranking с использованием cross-encoder, обработку PDF с учетом структуры документа или мультимодальных данных, более крупные независимо размеченные тестовые наборы, количественную оценку фактической корректности на уровне отдельных утверждений, распределенный лексический поиск, более надежное версионирование документов, автоматическую переиндексацию и обеспечение согласованности кэша и индексов на уровне промышленной эксплуатации.
+Possible extensions include adaptive or learnable retrieval fusion, cross-encoder reranking, document-structure-aware or multimodal PDF processing, larger independently labelled evaluation datasets, quantitative claim-level factual correctness evaluation, distributed lexical retrieval, more robust document versioning, automatic re-indexing, and production-grade consistency management across the cache and indexes.
 
-## Научное позиционирование
+## Research Positioning
 
-Проект **не предлагает новый алгоритм поиска**. Его вклад заключается в интеграции и оценке известных методов поиска и программной инженерии для ответов на вопросы по нормативным документам конкретной организации: гибридный векторный и лексический поиск, объединение результатов через RRF, контроль доступа на этапе поиска, ссылки на источник и страницу, семантический кэш с инвалидацией, преобразование контекстных запросов и фоновая обработка документов.
+This project **does not propose a new retrieval algorithm**. Its contribution lies in integrating and evaluating established retrieval and software-engineering techniques for question answering over organisation-specific regulatory documents: hybrid vector and lexical retrieval, RRF-based result fusion, retrieval-time access control, source-and-page citations, semantic caching with invalidation, contextual query rewriting, and background document processing.
 
-Представленные результаты следует интерпретировать как данные, полученные для корпуса нормативных документов School of Computer Science Университета Бирмингема и использованной конфигурации тестирования.
+The reported results should be interpreted as evidence from the University of Birmingham School of Computer Science regulations corpus and the specific experimental configuration used in this project.
